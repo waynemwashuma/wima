@@ -1,35 +1,65 @@
 # Wima
-This is an ECS driven game engine written in javascript.
+Wima is a modular, browser-focused game engine. If you already know ECS, render pipelines, and scheduling, think of it as a set of composable subsystems you can assemble into your runtime.
 
-## Features of this game engine.
+## Features
 
- - An entity-component-system architecture where entities are made up of components and components are updated by their respective systems.Data-driven systems only.
- - A semi-realistic physics engine that features the following:
-    - Collision Masking:Used to allow or disallow physical bodies from colliding with each other.
+### Core + ECS
+- `app`: Application lifecycle, system registration, and resource orchestration.
+- `schedule`: System ordering and execution cadence.
+- `ecs`: Entities, components, queries, and data-oriented storage.
+- `command`: Deferred world mutations via command queues.
+- `event`: Event signaling and consumption primitives.
+- `reflect`: Runtime type metadata and identifiers.
+- `logger`: Logging and assertion utilities.
+- `profiler`: Timing and profiling utilities for system instrumentation.
+- `diagnostic`: Runtime diagnostics and counters.
+- `name`: Entity naming for debugging and inspection.
+- `misc`: Bundled defaults to bootstrap common subsystems.
 
-    - Narrowphase:Provides collision manifold from a given pair of bodies if the bodies are colliding.
-    
-    - Broadphase:Used to improve performance of the physics world by calculating pairs of bodies that could possibly be colliding.
-    
-    - Static and Dynamic bodies types:Static bodies do not respond to collision with other bodies(due to infinite mass) while dynamic bodies respond to collision forces.
-    
-    - Friction:Bodies colliding experience friction between their two surfaces.
-    
-    - Sleeping:Bodies at rest do not need to be tested every frame hence are put to "sleep" to improve performance of the physics engine.
-        
-    - Querying:The world can be queried to know if bodies are within a certain range(either a bounding-box or bounding-circle).
-    
-    - Iterative solving for velocity to improve non-rotational stacking.
-    
-    - Shapes:Various convex shapes are supported in the physics engine.
- - A set of loaders to load game assets.
- - A storage API to store data in cookies, sessions or local storage.
- - An input abstraction that normalizes input from the keyboard,mouse and touch on mobile devices.
- - A math library with support for 2D and 3D vectors, matrices and quaternion.
+### Rendering + Visuals
+- `render-core`: Shared render abstractions, components, and resource management.
+- `render-canvas2d`: 2D rendering backend utilities and integration.
+- `render-webgl`: 3D rendering backend utilities and integration.
+- `color`: Color types and helpers.
+- `geometry`: Bounding volumes and overlap tests.
+
+### Physics + Motion
+- `physics`: Rigid body simulation primitives and integration hooks.
+- `broadphase`: Candidate pair generation for collision detection.
+- `narrowphase`: Contact generation and resolution support.
+- `integrator`: Motion integration utilities.
+- `gravity`: Gravity-related resources and systems.
+- `damping`: Damping-related resources and systems.
+- `movable`: Kinematic motion helpers.
+- `transform`: 2D/3D transform components and systems.
+- `tween`: Tweening components and easing utilities.
+- `animation`: Animation playback primitives and resources.
+
+### Input + Windowing
+- `input`: Input aggregation for keyboard/mouse/touch.
+- `keyboard`: Keyboard input helpers and events.
+- `mouse`: Mouse input helpers and events.
+- `touch`: Touch input helpers and events.
+- `window`: Window lifecycle, events, and commands.
+- `window-dom`: DOM-backed window integration.
+- `device`: Device and platform detection utilities.
+
+### Assets + Audio + Storage
+- `asset`: Asset loading, parsing, and lifecycle management.
+- `audio`: Audio playback primitives and resources.
+- `storage`: Local persistence helpers.
+
+### Math + Data + Utils
+- `math`: Vector, matrix, quaternion, and affine math utilities.
+- `datastructures`: Common data structures and allocators.
+- `algorithms`: Generic algorithm utilities.
+- `noise`: Noise generation utilities.
+- `utils`: General-purpose helpers and type definitions.
+- `gizmo`: Debug and tooling visualization helpers.
+- `demo`: Demo scaffolding utilities.
 
 ## Getting Started
 TODO
 
 ## Contributing
 Will be available when a contribution guide is written.
-
