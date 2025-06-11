@@ -45,6 +45,7 @@ app
   .registerPlugin(new InputPlugin())
   .registerPlugin(new TransformPlugin())
   .registerPlugin(new RenderCorePlugin())
+  .registerPlugin(new ParticleEmitter2D())
   .registerPlugin(new StoragePlugin())
   .registerSystem(AppSchedule.Startup, setupViewport)
   .registerSystem(AppSchedule.Startup, setupCamera)
@@ -77,9 +78,9 @@ function setupCamera(world) {
 function setupViewport(world) {
   const windowcommands = world.getResource(WindowCommands)
   const window = new Query(world, [Entity, MainWindow]).single()
-
+  
   if (!window) return warn('No main window defined.')
-
+  
   windowcommands
     .window(window[0])
     .resize(innerWidth, innerHeight)
