@@ -372,3 +372,6 @@ export class Matrix3 {
     yield this.i
   }
 }
+
+
+// This is column major

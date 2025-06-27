@@ -57,3 +57,5 @@ export class Matrix2 {
     yield this.d
   }
 }
+
+// Make column major

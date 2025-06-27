@@ -355,3 +355,5 @@ export class Matrix2x3 {
     yield this.f
   }
 }
+
+// Make column major

@@ -346,3 +346,5 @@ export class Matrix3x4 {
     yield this.l
   }
 }
+
+// Column major

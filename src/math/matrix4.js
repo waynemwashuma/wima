@@ -580,3 +580,5 @@ export class Matrix4 {
     yield this.p
   }
 }
+
+// this is column major
