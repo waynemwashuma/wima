@@ -13,26 +13,33 @@ import {
   warn,
   Window,
   Entity,
-  ParticleEmitter,
+  CPUEmitter,
   EmitterTimer,
   typeidGeneric,
-  createParticleEmitter2D
+  createCPUEmitter2D,
+  Touches,
+  Device,
+  PlatformOS,
+  MouseButtons,
+  MouseButton,
+  Position2D,
+  TimerMode
 } from 'wima'
-
-export default new Demo('basic cpu particle system', [init], [update])
 
 const itemWidth = 50
 const itemHeight = 50
 const paddingWidth = 10
 const paddingHeight = 10
 
+export default new Demo('cpu emitter duration', [init])
+
 /**
  * @param {World} world
  */
 function init(world) {
   const commands = world.getResource(EntityCommands)
-  const meshes = world.getResourceByTypeId(typeidGeneric(Assets,[Mesh]))
-  const materials = world.getResourceByTypeId(typeidGeneric(Assets,[Material]))
+  const meshes = world.getResourceByTypeId(typeidGeneric(Assets, [Mesh]))
+  const materials = world.getResourceByTypeId(typeidGeneric(Assets, [Material]))
   
   const mesh = meshes.add('material', Mesh.quad2D(
     itemHeight - paddingWidth,
@@ -51,18 +58,19 @@ function init(world) {
     ]
   }
   
-  commands
-    .spawn()
-    .insertPrefab([
-      ...createParticleEmitter2D(particle),
-      new Cleanup()
-    ])
-    .build()
-}
-
-/**
- * @param {World} world
- */
-function update(world) {
-  const commands = world.getResource(EntityCommands)
+  const number = 10
+  const width = 50
+  const offset = -(50 * number) / 2
+  for (var i = 0; i < number; i++) {
+    commands
+      .spawn()
+      .insertPrefab([
+        ...createCPUEmitter2D(particle),
+        new Cleanup()
+      ])
+      .insert(new EmitterTimer(0.2 * i, TimerMode.Repeat))
+      .insert(new Position2D(0,offset + i * width))
+      
+      .build()
+  }
 }

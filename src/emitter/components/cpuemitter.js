@@ -1,4 +1,4 @@
-export class ParticleEmitter {
+export class CPUEmitter {
   // replace with handle to a scene in the future
   /**
    * @type {()=>unknown[] | undefined}
@@ -13,7 +13,7 @@ export class ParticleEmitter {
    */
   enabled = true
   /**
-   * @param {()=>unknown[]} prefab
+   * @param {()=>unknown[] | undefined} prefab
    */
   constructor(prefab) {
     this.prefab = prefab

@@ -1,1 +1,1 @@
-export { default as basicCPUEmitter } from './basic.js'
+export * from './2d/index.js';

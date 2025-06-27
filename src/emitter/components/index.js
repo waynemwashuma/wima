@@ -1,3 +1,3 @@
-export * from './cpuparticleemitter.js'
+export * from './cpuemitter.js'
 export * from './timer.js'
 export * from './particle.js'

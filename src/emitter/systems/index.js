@@ -3,7 +3,7 @@ import { VirtualClock } from '../../time/index.js';
 import { EntityCommands } from '../../command/index.js';
 import { createMovable2D, Velocity2D, Rotation2D } from '../../movable/index.js'
 import { Position2D, Orientation2D } from '../../transform/index.js';
-import { Particle, EmitterTimer, ParticleEmitter } from '../components/index.js';
+import { Particle, EmitterTimer, CPUEmitter } from '../components/index.js';
 
 
 // TODO: Remove in favor of `Timer` updating in the time package instead.
@@ -18,7 +18,7 @@ export function updateEmitterTimers(world) {
 }
 
 export function emitParticles(world) {
-  const emitters = new Query(world, [Position2D, Orientation2D, ParticleEmitter, EmitterTimer])
+  const emitters = new Query(world, [Position2D, Orientation2D, CPUEmitter, EmitterTimer])
   const commands = world.getResource(EntityCommands)
   
   emitters.each(([position, orientation, emitter, timer]) => {

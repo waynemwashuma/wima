@@ -26,7 +26,8 @@ import {
   EulerIntegrator2DPlugin
 } from 'wima'
 import {
-  basicCPUEmitter
+  basicCPUEmitter,
+  CPUEmitterDuration
 } from './demos/index.js'
 
 const app = new App()
@@ -51,7 +52,8 @@ app
   .registerDebugger(new FPSDebugger())
   .registerPlugin(new DemoPlugin({
     demos: [
-      basicCPUEmitter
+      basicCPUEmitter,
+      CPUEmitterDuration
     ]
   }))
   .run()
