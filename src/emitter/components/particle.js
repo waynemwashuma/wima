@@ -1,5 +1,4 @@
 import { Timer } from '../../time/index.js'
 
-export class Particle {
-  timer = new Timer()
-}
+//Temporary component till timer component for despawning entities is made.
+export class Particle extends Timer{}

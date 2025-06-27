@@ -23,16 +23,13 @@ import {
   MouseButtons,
   MouseButton,
   Position2D,
-  TimerMode
+  TimerMode,
+  Range
 } from 'wima'
-
-const itemWidth = 50
-const itemHeight = 50
-const paddingWidth = 10
-const paddingHeight = 10
 
 export default new Demo('cpu emitter duration', [init])
 
+const ASSET_PATH = "particle"
 /**
  * @param {World} world
  */
@@ -41,11 +38,8 @@ function init(world) {
   const meshes = world.getResourceByTypeId(typeidGeneric(Assets, [Mesh]))
   const materials = world.getResourceByTypeId(typeidGeneric(Assets, [Material]))
   
-  const mesh = meshes.add('material', Mesh.quad2D(
-    itemHeight - paddingWidth,
-    itemWidth - paddingHeight
-  ))
-  const material = materials.add('basic', new CanvasMeshedMaterial({
+  const mesh = meshes.get(ASSET_PATH) || meshes.add(ASSET_PATH, Mesh.quad2D(50, 50))
+  const material = materials.get(ASSET_PATH) || materials.add(ASSET_PATH, new CanvasMeshedMaterial({
     fill: new Color(1, 1, 1)
   }))
   
@@ -61,16 +55,21 @@ function init(world) {
   const number = 10
   const width = 50
   const offset = -(50 * number) / 2
+  
   for (var i = 0; i < number; i++) {
     commands
       .spawn()
       .insertPrefab([
-        ...createCPUEmitter2D(particle),
+        ...createCPUEmitter2D(),
         new Cleanup()
       ])
+      .insert(new CPUEmitter({
+        prefab: particle,
+        lifetime: new Range(2, 4)
+      }))
+      // Sets the duration after which the emitter emits particles and how often.
       .insert(new EmitterTimer(0.2 * i, TimerMode.Repeat))
-      .insert(new Position2D(0,offset + i * width))
-      
+      .insert(new Position2D(0, offset + i * width))
       .build()
   }
 }

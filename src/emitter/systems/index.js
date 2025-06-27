@@ -24,21 +24,24 @@ export function emitParticles(world) {
   emitters.each(([position, orientation, emitter, timer]) => {
     if (!emitter.enabled || !timer.tick()) return
     
-    for (let i = 0; i < emitter.burstCount; i++) {
+    const burstCount = Math.round(emitter.burstCount.lerp(Math.random()))
+    for (let i = 0; i < burstCount; i++) {
       const orient = new Orientation2D()
       orient.value = orientation.value
+      const lifetime = emitter.lifetime.lerp(Math.random())
+      const particle = emitter.prefab ? emitter.prefab() : []
       
       commands
         .spawn()
         .insertPrefab([
           ...createMovable2D(),
-          ...emitter.prefab(),
-          new Particle()
+          ...particle,
+          new Particle(lifetime)
         ])
         .insert(new Position2D().copy(position))
         .insert(orient)
         .insert(new Velocity2D(100))
-        .insert(new Rotation2D())
+        .insert(new Rotation2D(5))
         .build()
     }
   })
@@ -51,8 +54,8 @@ export function updateParticles(world) {
   const delta = clock.getDelta()
   
   particles.each(([entity, particle]) => {
-    particle.timer.update(delta)
-    if (particle.timer.completed()) {
+    particle.update(delta)
+    if (particle.completed()) {
       commands.despawn(entity)
     }
   })

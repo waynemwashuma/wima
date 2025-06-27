@@ -23,7 +23,8 @@ import {
   WindowCommands,
   DevicePlugin,
   ParticleEmitter2DPlugin,
-  EulerIntegrator2DPlugin
+  EulerIntegrator2DPlugin,
+  EntityCountDiagnosticPlugin
 } from 'wima'
 import {
   basicCPUEmitter,
@@ -56,6 +57,7 @@ app
       CPUEmitterDuration
     ]
   }))
+  .registerDebugger(new EntityCountDiagnosticPlugin())
   .run()
 
 /**
