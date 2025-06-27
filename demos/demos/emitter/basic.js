@@ -1,5 +1,7 @@
 import {
+  Assets,
   Mesh,
+  Material,
   CanvasMeshedMaterial,
   createTransform2D,
   World,
@@ -11,11 +13,13 @@ import {
   warn,
   Window,
   Entity,
-  CPUParticleEmitter,
-  EmitterTimer
+  ParticleEmitter,
+  EmitterTimer,
+  typeidGeneric,
+  createParticleEmitter2D
 } from 'wima'
 
-export default new Demo('despawn', [init], [update])
+export default new Demo('basic cpu particle system', [init], [update])
 
 const itemWidth = 50
 const itemHeight = 50
@@ -27,16 +31,9 @@ const paddingHeight = 10
  */
 function init(world) {
   const commands = world.getResource(EntityCommands)
-  const meshes = world.getResourceByName('assets<mesh>')
-  const materials = world.getResourceByName('assets<material>')
-  const window = new Query(world, [Window]).single()
+  const meshes = world.getResourceByTypeId(typeidGeneric(Assets,[Mesh]))
+  const materials = world.getResourceByTypeId(typeidGeneric(Assets,[Material]))
   
-  if (!window) return warn('No window set up')
-  
-  const width = window[0].getWidth()
-  const height = window[0].getHeight()
-  const nx = Math.floor(width / itemWidth)
-  const ny = Math.floor(height / itemHeight)
   const mesh = meshes.add('material', Mesh.quad2D(
     itemHeight - paddingWidth,
     itemWidth - paddingHeight
@@ -45,17 +42,21 @@ function init(world) {
     fill: new Color(1, 1, 1)
   }))
   
-  function particle(){
+  function particle() {
     return [
-      createTransform2D(x, y),
+      ...createTransform2D(),
       mesh,
-      material
+      material,
+      new Cleanup()
     ]
   }
+  
   commands
     .spawn()
-    .insertPrefab(createParticleEmitter2D(particle))
-    .insert(new Cleanup())
+    .insertPrefab([
+      ...createParticleEmitter2D(particle),
+      new Cleanup()
+    ])
     .build()
 }
 

@@ -21,16 +21,12 @@ import {
   createCamera2D,
   Entity,
   WindowCommands,
-  DevicePlugin
+  DevicePlugin,
+  ParticleEmitter2DPlugin,
+  EulerIntegrator2DPlugin
 } from 'wima'
 import {
-  spawn,
-  despawn,
-  keyboard,
-  mouse,
-  touch,
-  easing,
-  materials
+  basicCPUEmitter
 } from './demos/index.js'
 
 const app = new App()
@@ -43,9 +39,10 @@ app
   .registerPlugin(new WindowPlugin())
   .registerPlugin(new DOMWindowPlugin())
   .registerPlugin(new InputPlugin())
+  .registerPlugin(new EulerIntegrator2DPlugin())
   .registerPlugin(new TransformPlugin())
   .registerPlugin(new RenderCorePlugin())
-  .registerPlugin(new ParticleEmitter2D())
+  .registerPlugin(new ParticleEmitter2DPlugin())
   .registerPlugin(new StoragePlugin())
   .registerSystem(AppSchedule.Startup, setupViewport)
   .registerSystem(AppSchedule.Startup, setupCamera)
@@ -54,13 +51,7 @@ app
   .registerDebugger(new FPSDebugger())
   .registerPlugin(new DemoPlugin({
     demos: [
-      spawn,
-      despawn,
-      materials,
-      easing,
-      keyboard,
-      mouse,
-      touch
+      basicCPUEmitter
     ]
   }))
   .run()

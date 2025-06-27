@@ -1,0 +1,1 @@
+export { default as basicCPUEmitter } from './basic.js'
