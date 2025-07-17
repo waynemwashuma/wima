@@ -1,0 +1,5 @@
+export * from './circle.js'
+export * from './triangle.js'
+export * from './polygon.js'
+export * from './shape2.js'
+export * from './rectangle.js'

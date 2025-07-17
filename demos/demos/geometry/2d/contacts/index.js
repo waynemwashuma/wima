@@ -1,0 +1,6 @@
+export { default as capsuleContacts } from './capsule.js'
+
+export { default as circleContacts } from './circle.js'
+export { default as rectangleContacts } from './rectangle.js'
+export { default as triangleContacts } from './triangle.js'
+export { default as polygonContacts } from './polygon.js'

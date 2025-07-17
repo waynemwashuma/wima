@@ -15,7 +15,7 @@ export const shapes = new Demo('gizmo2d/shapes', [init], [update])
  */
 function init(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
-
+  
   gizmo.settings.lineWidth = 2
   gizmo.settings.lineStyle = GizmoLineStyle.Solid
 }
@@ -25,7 +25,7 @@ function init(world) {
  */
 function update(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
-
+  
   gizmo
     .translate(100, 150)
     .aabb(50, 50, new Color(1, 1, 1, 1))
@@ -42,6 +42,13 @@ function update(world) {
     .axes(20)
     .translate(150, 0)
     .line(new Vector2(-50, 0), new Vector2(50, 0))
+    .axes(20)
+    .translate(150, 0)
+    .triangle(50, 50, 0)
+    .axes(20)
+    .reset()
+    .translate(100, 450)
+    .capsule(25,50)
     .axes(20)
     .reset()
 }

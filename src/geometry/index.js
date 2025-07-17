@@ -1,2 +1,5 @@
+export * from './core/index.js'
+export * from './query/index.js'
+export * from './shapes/index.js'
 export * from './AABB/index.js'
 export * from './noise/index.js'

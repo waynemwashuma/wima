@@ -22,7 +22,12 @@ import {
   mouse,
   touch,
   easing,
-  materials
+  materials,
+  capsuleContacts,
+  circleContacts,
+  rectangleContacts,
+  polygonContacts,
+  triangleContacts
 } from './demos/index.js'
 import { Demo1, Demo2, ResourceAliasPlugin } from './demos/utils.js'
 import {
@@ -60,6 +65,11 @@ app
       keyboard,
       mouse,
       touch,
+      circleContacts,
+      capsuleContacts,
+      triangleContacts,
+      rectangleContacts,
+      polygonContacts,
       lineStyle,
       arcs2d,
       shapes,

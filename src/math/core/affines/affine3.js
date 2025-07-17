@@ -14,62 +14,62 @@ import { invert } from '../functions/index.js'
  *  | c | f | i | l |
  */
 export class Affine3 {
-
+  
   /**
    * @type {number}
    */
   a
-
+  
   /**
    * @type {number}
    */
   b
-
+  
   /**
    * @type {number}
    */
   c
-
+  
   /**
    * @type {number}
    */
   d
-
+  
   /**
    * @type {number}
    */
   e
-
+  
   /**
    * @type {number}
    */
   f
-
+  
   /**
    * @type {number}
    */
   g
-
+  
   /**
    * @type {number}
    */
   h
-
+  
   /**
    * @type {number}
    */
   i
-
+  
   /**
    * @type {number}
    */
   x
-
+  
   /**
    * @type {number}
    */
   y
-
+  
   /**
    * @type {number}
    */
@@ -90,7 +90,7 @@ export class Affine3 {
   ) {
     Affine3.set(e11, e12, e13, e14, e21, e22, e23, e24, e31, e32, e33, e34, this)
   }
-
+  
   /**
    * @param {number} e11
    * @param {number} e12
@@ -107,10 +107,10 @@ export class Affine3 {
    */
   set(e11, e12, e13, e14, e21, e22, e23, e24, e31, e32, e33, e34) {
     Affine3.set(e11, e12, e13, e14, e21, e22, e23, e24, e31, e32, e33, e34, this)
-
+    
     return this
   }
-
+  
   /**
    * Copies a affine into this affine.
    *
@@ -119,10 +119,10 @@ export class Affine3 {
    */
   copy(affine) {
     Affine3.copy(affine, this)
-
+    
     return this
   }
-
+  
   /**
    * Creates a new affine,fills its values with this ones and returns the former.
    *
@@ -131,7 +131,7 @@ export class Affine3 {
   clone() {
     return new Affine3().copy(this)
   }
-
+  
   /**
    * @param {Vector3} translation
    * @param {Quaternion} orientation
@@ -141,17 +141,17 @@ export class Affine3 {
    */
   compose(translation, orientation, scale) {
     Affine3.compose(translation, orientation, scale, this)
-
+    
     return this
   }
-
+  
   /**
    * @returns {[Vector3,Quaternion,Vector3]}
    */
   decompose() {
     return Affine3.decompose(this)
   }
-
+  
   /**
    * Translates a affine by a given amount.
    *
@@ -160,10 +160,10 @@ export class Affine3 {
    */
   translate(translation) {
     Affine3.translate(this, translation, this)
-
+    
     return this
   }
-
+  
   /**
    * Rotates the affine by the given angle.
    *
@@ -172,10 +172,10 @@ export class Affine3 {
    */
   rotate(angle) {
     Affine3.rotate(this, angle, this)
-
+    
     return this
   }
-
+  
   /**
    * Scales a affine by a given amount.
    *
@@ -184,10 +184,10 @@ export class Affine3 {
    */
   scale(scale) {
     Affine3.scale(this, scale, this)
-
+    
     return this
   }
-
+  
   /**
    * @param {Vector3} target
    * @param {Vector3} up
@@ -195,12 +195,12 @@ export class Affine3 {
    */
   lookAt(target, up) {
     const eye = new Vector3(this.x, this.y, this.z)
-
+    
     Affine3.lookAt(eye, target, up, this)
-
+    
     return this
   }
-
+  
   /**
    * Transforms the given vector.
    *
@@ -209,7 +209,7 @@ export class Affine3 {
   transform(vector) {
     return Affine3.transform(this, vector, vector)
   }
-
+  
   /**
    * Inverts the affine.
    *
@@ -217,10 +217,10 @@ export class Affine3 {
    */
   invert() {
     Affine3.invert(this, this)
-
+    
     return this
   }
-
+  
   /**
    * Multiplies with another affine,
    *  A * B = C, where A is this affine.
@@ -230,10 +230,10 @@ export class Affine3 {
    */
   multiply(affine) {
     Affine3.multiply(this, affine, this)
-
+    
     return this
   }
-
+  
   /**
    * Multiplies with another affine,
    *  A * B = C, where A is this affine.
@@ -243,10 +243,10 @@ export class Affine3 {
    */
   divide(affine) {
     Affine3.divide(this, affine, this)
-
+    
     return this
   }
-
+  
   /**
    * Deeply checks if a affine is equal to another.
    *
@@ -256,7 +256,7 @@ export class Affine3 {
   equals(affine) {
     return Affine3.equal(this, affine)
   }
-
+  
   /**
    * @param {number} e11
    * @param {number} e12
@@ -285,10 +285,10 @@ export class Affine3 {
     out.x = e14
     out.y = e24
     out.z = e34
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine
    * @param {Affine3} [out]
@@ -306,10 +306,10 @@ export class Affine3 {
     out.x = affine.x
     out.y = affine.y
     out.z = affine.z
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} out
    * @returns {Affine3}
@@ -327,10 +327,10 @@ export class Affine3 {
     out.x = 0
     out.y = 0
     out.z = 0
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} out
    * @returns {Affine3}
@@ -348,10 +348,10 @@ export class Affine3 {
     out.x = 0
     out.y = 0
     out.z = 0
-
+    
     return out
   }
-
+  
   /**
    * @param {Vector3} position
    * @param {Quaternion} orientation
@@ -372,30 +372,30 @@ export class Affine3 {
     const wx = w * x2,
       wy = w * y2,
       wz = w * z2
-
+    
     const sx = scale.x,
       sy = scale.y,
       sz = scale.z
-
+    
     out.a = (1 - (yy + zz)) * sx
     out.b = (xy + wz) * sx
     out.c = (xz - wy) * sx
-
+    
     out.d = (xy - wz) * sy
     out.e = (1 - (xx + zz)) * sy
     out.f = (yz + wx) * sy
-
+    
     out.g = (xz + wy) * sz
     out.h = (yz - wx) * sz
     out.i = (1 - (xx + yy)) * sz
-
+    
     out.x = position.x
     out.y = position.y
     out.z = position.z
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine 
    * @returns {[Vector3,Quaternion,Vector3]}
@@ -415,7 +415,7 @@ export class Affine3 {
       affine.f,
       affine.i
     )
-
+    
     const det = Matrix3.determinant(rotMatrix)
     const sx = new Vector3().set(affine.a, affine.b, affine.c)
       .magnitude() * (det < 0 ? -1 : 1)
@@ -426,7 +426,7 @@ export class Affine3 {
     const invSX = 1 / sx
     const invSY = 1 / sy
     const invSZ = 1 / sz
-
+    
     rotMatrix.a *= invSX
     rotMatrix.b *= invSX
     rotMatrix.c *= invSX
@@ -436,20 +436,20 @@ export class Affine3 {
     rotMatrix.g *= invSZ
     rotMatrix.h *= invSZ
     rotMatrix.i *= invSZ
-
+    
     position.x = affine.x
     position.y = affine.y
     position.z = affine.z
-
+    
     scale.x = sx
     scale.y = sy
     scale.z = sz
-
+    
     Quaternion.fromRotationMatrix(rotMatrix, orientation)
-
+    
     return [position, orientation, scale]
   }
-
+  
   /**
    * @param {Affine3} affine1
    * @param {Affine3} affine2
@@ -469,7 +469,7 @@ export class Affine3 {
       a14 = affine1.x,
       a24 = affine1.y,
       a34 = affine1.z
-
+    
     const
       b11 = affine2.a,
       b21 = affine2.b,
@@ -483,26 +483,26 @@ export class Affine3 {
       b14 = affine2.x,
       b24 = affine2.y,
       b34 = affine2.z
-
+    
     out.a = a11 * b11 + a12 * b21 + a13 * b31
     out.b = a21 * b11 + a22 * b21 + a23 * b31
     out.c = a31 * b11 + a32 * b21 + a33 * b31
-
+    
     out.d = a11 * b12 + a12 * b22 + a13 * b32
     out.e = a21 * b12 + a22 * b22 + a23 * b32
     out.f = a31 * b12 + a32 * b22 + a33 * b32
-
+    
     out.g = a11 * b13 + a12 * b23 + a13 * b33
     out.h = a21 * b13 + a22 * b23 + a23 * b33
     out.i = a31 * b13 + a32 * b23 + a33 * b33
-
+    
     out.x = a11 * b14 + a12 * b24 + a13 * b34 + a14
     out.y = a21 * b14 + a22 * b24 + a23 * b34 + a24
     out.z = a31 * b14 + a32 * b24 + a33 * b34 + a34
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine1
    * @param {Affine3} affine2
@@ -510,12 +510,12 @@ export class Affine3 {
    */
   static divide(affine1, affine2, out = new Affine3()) {
     const multiplier = this.invert(affine2)
-
+    
     this.multiply(affine1, multiplier, out)
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine
    * @param {Affine3} [out]
@@ -525,13 +525,13 @@ export class Affine3 {
     const t11 = i * e - h * f,
       t12 = h * c - i * b,
       t13 = f * b - e * c,
-
+      
       det = a * t11 + d * t12 + g * t13
-
+    
     if (det === 0) return this.zero(out)
-
+    
     const detInv = invert(det)
-
+    
     out.a = t11 * detInv
     out.b = t12 * detInv
     out.c = t13 * detInv
@@ -541,14 +541,14 @@ export class Affine3 {
     out.g = (h * d - g * e) * detInv
     out.h = (g * b - h * a) * detInv
     out.i = (e * a - d * b) * detInv
-
+    
     out.x = -(out.a * x + out.d * y + out.g * z)
     out.y = -(out.b * x + out.e * y + out.h * z)
     out.z = -(out.c * x + out.f * y + out.i * z)
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine
    * @param {Vector3} translation
@@ -567,10 +567,10 @@ export class Affine3 {
     out.x = affine.x + translation.x
     out.y = affine.y + translation.y
     out.z = affine.z + translation.z
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine
    * @param {Quaternion} rotation
@@ -593,32 +593,32 @@ export class Affine3 {
     const ty = 2 * (qz * x - qx * z)
     const tz = 2 * (qx * y - qy * x)
     const matrixA = new Matrix3(
-      affine.a, 
-      affine.d, 
+      affine.a,
+      affine.d,
       affine.f,
-      affine.b, 
-      affine.e, 
+      affine.b,
+      affine.e,
       affine.h,
-      affine.c, 
-      affine.f, 
+      affine.c,
+      affine.f,
       affine.i
     )
-
-     
+    
+    
     const matrixB = new Matrix3(
-      2 * (q00 + q11) - 1, 
-      2 * (q12 - q03), 
+      2 * (q00 + q11) - 1,
+      2 * (q12 - q03),
       2 * (q13 + q02),
-      2 * (q12 + q03), 
-      2 * (q00 + q22) - 1, 
+      2 * (q12 + q03),
+      2 * (q00 + q22) - 1,
       2 * (q23 + q01),
-      2 * (q13 + q02), 
-      2 * (q12 + q03), 
+      2 * (q13 + q02),
+      2 * (q12 + q03),
       2 * (q00 + q33) - 1
     )
-
+    
     Matrix3.multiply(matrixA, matrixB, matrixA)
-
+    
     out.a = matrixA.a
     out.b = matrixA.b
     out.c = matrixA.c
@@ -631,10 +631,10 @@ export class Affine3 {
     out.x = x + qw * tx + qy * tz - qz * ty
     out.y = y + qw * ty + qz * tx - qx * tz
     out.z = z + qw * tz + qx * ty - qy * tx
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine
    * @param {Vector3} scale
@@ -650,10 +650,10 @@ export class Affine3 {
     out.g = affine.g * scale.z
     out.h = affine.h * scale.z
     out.i = affine.i * scale.z
-
+    
     return out
   }
-
+  
   /**
    * @param {Vector3} eye
    * @param {Vector3} target
@@ -667,13 +667,13 @@ export class Affine3 {
       upx = up.x,
       upy = up.y,
       upz = up.z
-
+    
     let zx = eyex - target.x,
       zy = eyey - target.y,
       zz = eyez - target.z
-
+    
     let len = zx * zx + zy * zy + zz * zz
-
+    
     if (len > 0) {
       len = invert(Math.sqrt(len))
       zx *= len
@@ -682,13 +682,13 @@ export class Affine3 {
     } else {
       zz = 1
     }
-
+    
     let xx = upy * zz - upz * zy,
       xy = upz * zx - upx * zz,
       xz = upx * zy - upy * zx
-
+    
     len = xx * xx + xy * xy + xz * xz
-
+    
     if (len > 0) {
       len = invert(Math.sqrt(len))
       xx *= len
@@ -700,7 +700,7 @@ export class Affine3 {
       } else {
         zz += 0.0001
       }
-
+      
       len = zx * zx + zy * zy + zz * zz
       len = invert(Math.sqrt(len))
       zx *= len
@@ -710,7 +710,7 @@ export class Affine3 {
       xy = upz * zx - upx * zz
       xz = upx * zy - upy * zx
     }
-
+    
     out.a = xx
     out.b = xy
     out.c = xz
@@ -723,10 +723,10 @@ export class Affine3 {
     out.x = eyex
     out.y = eyey
     out.z = eyez
-
+    
     return out
   }
-
+  
   /**
    * @param {Affine3} affine
    * @param {Vector3} vector
@@ -735,14 +735,30 @@ export class Affine3 {
   static transform(affine, vector, out = new Vector3()) {
     const { a, b, c, d, e, f, g, h, i, x, y, z } = affine
     const { x: vx, y: vy, z: vz } = vector
-
+    
     out.x = a * vx + d * vy + g * vz + x
     out.y = b * vx + e * vy + h * vz + y
     out.z = c * vx + f * vy + i * vz + z
-
+    
     return out
   }
-
+  
+  /**
+   * @param {Affine3} affine
+   * @param {Vector3} vector
+   * @param {Vector3} out
+   */
+  static transformWithoutTranslation(affine, vector, out = new Vector3()) {
+    const { a, b, c, d, e, f, g, h, i } = affine
+    const { x: vx, y: vy, z: vz } = vector
+    
+    out.x = a * vx + d * vy + g * vz
+    out.y = b * vx + e * vy + h * vz
+    out.z = c * vx + f * vy + i * vz
+    
+    return out
+  }
+  
   /**
    * @param {Affine3} affine
    * @param {Matrix4} out
@@ -769,7 +785,7 @@ export class Affine3 {
       out
     )
   }
-
+  
   /**
    * @param {Affine3} affine1
    * @param {Affine3} Affine3
@@ -791,7 +807,7 @@ export class Affine3 {
       (affine1.z === Affine3.z)
     )
   }
-
+  
   /**
    * Allows iteration of components.
    *
@@ -811,13 +827,13 @@ export class Affine3 {
     yield this.y
     yield this.z
   }
-
+  
   /**
    * @readonly
    * @type {Affine3}
    */
   static Identity = Affine3.identity()
-
+  
   /**
    * @readonly
    * @type {Affine3}
