@@ -18,7 +18,7 @@ import { Demo1Gizmo2D } from '../../../utils.js'
 
 export default new Demo('geometry2d/capsule contacts', [init], [
   capsule1,
-  //capsule2,
+  capsule2,
   capsuleCircle1,
   capsuleCircle2
 ])
@@ -40,7 +40,7 @@ function capsule1(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
   const clock = world.getResource(VirtualClock)
   const radius = 20
-  const halfHeight = 25
+  const halfHeight = 20
   const circleA = new Capsule(radius, halfHeight)
   const circleB = new Capsule(radius, halfHeight)
   const center = new Vector2(100, 100)
@@ -48,11 +48,9 @@ function capsule1(world) {
     .translate(center)
   
   const transformB = new Affine2()
-    .rotate(Rotary.fromAngle(-Math.PI / 4))
-    //.rotate(Rotary.fromAngle(-clock.getElapsed() * 0.4))
+    .rotate(Rotary.fromAngle(-clock.getElapsed() * 0.4))
     .translate(new Vector2(50, 0))
-    .rotate(Rotary.fromAngle(-Math.PI / 1.5))
-    //.rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
     .translate(center)
   
   const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
@@ -90,7 +88,7 @@ function capsule2(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
   const clock = world.getResource(VirtualClock)
   const radius = 20
-  const halfHeight = 25
+  const halfHeight = 20
   const circleA = new Capsule(radius, halfHeight)
   const circleB = new Capsule(radius, halfHeight)
   const center = new Vector2(300, 100)
@@ -137,7 +135,7 @@ function capsuleCircle1(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
   const clock = world.getResource(VirtualClock)
   const radius = 20
-  const halfHeight = 25
+  const halfHeight = 20
   const center = new Vector2(100, 300)
   const circleA = new Capsule(radius, halfHeight)
   const circleB = new Circle(radius)
@@ -185,7 +183,7 @@ function capsuleCircle2(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
   const clock = world.getResource(VirtualClock)
   const radius = 20
-  const halfHeight = 25
+  const halfHeight = 20
   const center = new Vector2(300, 300)
   const circleA = new Capsule(radius, halfHeight)
   const circleB = new Circle(radius)

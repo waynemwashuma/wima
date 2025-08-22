@@ -12,9 +12,9 @@ export function closestPointOn2DSegment(a, b, p) {
   const ab = Vector2.subtract(b, a)
   const ap = Vector2.subtract(p, a)
   const length = Vector2.magnitude(ab)
-  const t = clamp(Vector2.dot(ap, ab) / length, 0, 1)
-  const delta = Vector2.multiplyScalar(ab, t)
-
+  const direction = ab.divideScalar(length)
+  const t = clamp(Vector2.dot(ap, direction) / length, 0, 1)
+  const delta = Vector2.multiplyScalar(ab, t * length)
   return Vector2.add(a, delta)
 }
 
