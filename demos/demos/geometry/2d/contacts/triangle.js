@@ -63,7 +63,8 @@ function triangleContactDraw(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -108,7 +109,8 @@ function triangleContactDraw2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -154,7 +156,8 @@ function triangleContactDraw3(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -200,7 +203,8 @@ function triangleContactDraw4(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -246,7 +250,8 @@ function rectangleTriangleContactDraw(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     

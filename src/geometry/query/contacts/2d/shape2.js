@@ -32,55 +32,46 @@ import {
  * @param {Affine2} transformB
  */
 export function getShape2Contacts(shapeA, shapeB, transformA, transformB) {
-  const transformAB = Affine2.invert(transformA).multiply(transformB)
+  const transform = Affine2.invert(transformA).multiply(transformB)
+  const transformInv = Affine2.invert(transform)
   
   let contacts = undefined
 
   if (shapeA instanceof Circle && shapeB instanceof Circle) {
-    const contact = circleContact(shapeA, shapeB, transformAB)
+    const contact = circleContact(shapeA, shapeB, transform,transformInv)
 
     if (contact) contacts = [contact]
   } else if (shapeA instanceof Capsule && shapeB instanceof Capsule) {
-    contacts = capsuleContacts(shapeA, shapeB, transformAB)
+    contacts = capsuleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Rectangle && shapeB instanceof Rectangle) {
-    contacts = rectangleContacts(shapeA, shapeB, transformAB)
+    contacts = rectangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof ConvexPolygon) {
-    contacts = polygonContacts(shapeA, shapeB, transformAB)
+    contacts = polygonContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Triangle && shapeB instanceof Triangle) {
-    contacts = triangleContacts(shapeA, shapeB, transformAB)
+    contacts = triangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Line2 && shapeB instanceof Circle) {
-    const contact = lineCircleContact(shapeA, shapeB, transformAB)
+    const contact = lineCircleContact(shapeA, shapeB, transform,transformInv)
 
     if (contact) contacts = [contact]
   } else if (shapeA instanceof Triangle && shapeB instanceof Rectangle) {
-    contacts = triangleRectangleContacts(shapeA, shapeB, transformAB)
+    contacts = triangleRectangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Triangle) {
-    contacts = polygonTriangleContacts(shapeA, shapeB, transformAB)
+    contacts = polygonTriangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Rectangle) {
-    contacts = polygonRectangleContacts(shapeA, shapeB, transformAB)
+    contacts = polygonRectangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Circle && shapeB instanceof Triangle) {
-    contacts = circleTriangleContacts(shapeA, shapeB, transformAB)
+    contacts = circleTriangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Circle && shapeB instanceof Rectangle) {
-    contacts = circleRectangleContacts(shapeA, shapeB, transformAB)
+    contacts = circleRectangleContacts(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Circle && shapeB instanceof ConvexPolygon) {
-    contacts = circlePolygonContact(shapeA, shapeB, transformAB)
+    contacts = circlePolygonContact(shapeA, shapeB, transform,transformInv)
   } else if (shapeA instanceof Capsule && shapeB instanceof Circle) {
-    const contact = capsuleCircleContact(shapeA, shapeB, transformAB)
+    const contact = capsuleCircleContact(shapeA, shapeB, transform,transformInv)
 
     if (contact) contacts = [contact]
   }
   
   if (!contacts) return undefined
   
-  for (let i = 0; i < contacts.length; i++) {
-    const { pointA, pointB, normalA, normalB } = contacts[i]
-
-    transformA.transform(pointA)
-    transformA.transform(pointB)
-    Affine2.transformWithoutTranslation(transformA, normalA, normalA)
-    Affine2.transformWithoutTranslation(transformA, normalB, normalB)
-    
-  }
-
   return contacts
 }

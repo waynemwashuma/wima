@@ -5,40 +5,28 @@ import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
 /**
  * @param {Circle} a
  * @param {Circle} b
- * @param {Affine2} transformAB
+ * @param {Affine2} transform
  */
-export function circleContact(a, b, transformAB) {
-  const dx = transformAB.x
-  const dy = transformAB.y
+export function circleContact(a, b, transform, invTransform) {
+  const dx = transform.x
+  const dy = transform.y
   const distSquared = dx * dx + dy * dy
   const radiiSum = a.radius + b.radius
   const distance = Math.sqrt(distSquared)
-
+  
   if (distance >= radiiSum) {
     return undefined
   }
   
-  let normalX = dx / distance
-  let normalY = dy / distance
-
-  if (distance === 0) {
-    normalX = 0
-    normalY = 1
-  }
-  
   const penetration = radiiSum - distance
-
+  const normalA = distance !== 0 ? new Vector2(dx / distance, dy / distance) : Vector2.Y.clone()
+  const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
+  
   return new Contact2D(
-    new Vector2(
-      normalX * a.radius,
-      normalY * a.radius
-    ),
-    new Vector2(
-      normalX * (a.radius - penetration),
-      normalY * (a.radius - penetration)
-    ),
-    new Vector2(normalX, normalY),
-    new Vector2(-normalX, -normalY),
+    Vector2.multiplyScalar(normalA, a.radius),
+    Vector2.multiplyScalar(normalB, b.radius),
+    normalA,
+    normalB,
     penetration
   )
 }
@@ -46,13 +34,13 @@ export function circleContact(a, b, transformAB) {
 /**
  * @param {Line2} line
  * @param {Circle} circle
- * @param {Affine2} transformAB
+ * @param {Affine2} transform
  */
-export function lineCircleContact(line, circle, transformAB) {
+export function lineCircleContact(line, circle, transform,invTransform) {
   const lineStart = Vector2.set(line.halfLength, 0)
   const lineEnd = Vector2.set(-line.halfLength, 0)
-  const cx = transformAB.x
-  const cy = transformAB.y
+  const cx = transform.x
+  const cy = transform.y
   const r = circle.radius
   
   const dx = lineEnd.x - lineStart.x
@@ -60,7 +48,7 @@ export function lineCircleContact(line, circle, transformAB) {
   const lenSq = dx * dx + dy * dy
   
   let t = ((cx - lineStart.x) * dx + (cy - lineStart.y) * dy) / lenSq
-
+  
   t = clamp(t, 0, 1)
   
   const closestX = lineStart.x + t * dx
@@ -76,23 +64,14 @@ export function lineCircleContact(line, circle, transformAB) {
   
   const distance = Math.sqrt(distSq)
   const penetration = r - distance
-  
-  let nx = distX / distance
-  let ny = distY / distance
-  
-  if (distance === 0) {
-    nx = 0
-    ny = 1
-  }
+  const normalA = distance !== 0 ? new Vector2(distX / distance, distY / distance) : Vector2.Y.clone()
+  const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
   
   return new Contact2D(
-    new Vector2(closestX, closestY),
-    new Vector2(
-      cx - nx * r,
-      cy - ny * r
-    ),
-    new Vector2(nx, ny),
-    new Vector2(-nx, -ny),
+    new Vector2(closestX,closestY),
+    Vector2.multiplyScalar(normalB, circle.radius),
+    normalA,
+    normalB,
     penetration
   )
 }

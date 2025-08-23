@@ -65,7 +65,8 @@ function capsule1(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -112,7 +113,8 @@ function capsule2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -160,7 +162,8 @@ function capsuleCircle1(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -207,6 +210,7 @@ function capsuleCircle2(world) {
     .reset()
   
   if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
   
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact

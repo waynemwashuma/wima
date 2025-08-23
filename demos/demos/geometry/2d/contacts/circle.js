@@ -67,7 +67,7 @@ function circle1(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -114,7 +114,8 @@ function circle2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -160,7 +161,8 @@ function circle3(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -206,7 +208,8 @@ function circle4(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -253,7 +256,8 @@ function linecircle(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -302,7 +306,8 @@ function circleRectangle1(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -349,7 +354,8 @@ function circleRectangle2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -398,7 +404,8 @@ function circleTriangle1(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -445,7 +452,8 @@ function circleTriangle2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     

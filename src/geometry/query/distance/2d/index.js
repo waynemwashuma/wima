@@ -1,5 +1,5 @@
 import { ClosestPoint2D } from '../../../core/index.js'
-import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
+import { Vector2, clamp, Affine2, sqrt } from '../../../../math/index.js'
 
 export * from "./circle.js"
 export * from "./shape2.js"
@@ -34,23 +34,23 @@ export function getClosestPoints(verticesA, verticesB) {
   let closestA = null
   let closestB = null
   
-  if(lengthA < 2 || lengthB < 2){
+  if (lengthA < 2 || lengthB < 2) {
     return []
   }
-
+  
   for (let i = 0, j = lengthA - 1; i < lengthA; j = i, i++) {
     const a1 = verticesA[j]
     const a2 = verticesA[i]
-
+    
     for (let k = 0, l = lengthB - 1; k < lengthB; l = k, k++) {
       const b1 = verticesB[l]
       const b2 = verticesB[k]
-
+      
       // todo: Unroll this
       for (const bv of [b1, b2]) {
         const pa = closestPointOnSegment2D(a1, a2, bv)
         const distSq = Vector2.distanceToSquared(pa, bv)
-
+        
         if (distSq < minDistSq) {
           minDistSq = distSq
           closestA = pa
@@ -62,7 +62,7 @@ export function getClosestPoints(verticesA, verticesB) {
       for (const av of [a1, a2]) {
         const pb = closestPointOnSegment2D(b1, b2, av)
         const distSq = Vector2.distanceToSquared(pb, av)
-
+        
         if (distSq < minDistSq) {
           minDistSq = distSq
           closestA = av
@@ -72,5 +72,5 @@ export function getClosestPoints(verticesA, verticesB) {
     }
   }
   
-  return [new ClosestPoint2D(closestA, closestB, minDistSq)]
+  return [new ClosestPoint2D(closestA, closestB, sqrt(minDistSq))]
 }

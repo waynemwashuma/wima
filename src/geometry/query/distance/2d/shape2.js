@@ -3,10 +3,10 @@ import { Circle, Capsule, Line2, Rectangle, ConvexPolygon, Triangle, Shape2 } fr
 import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
 import {getCircleClosestPoint} from './circle.js';
 export function getShape2ClosestPoints(shapeA, shapeB, transformA, transformB) {
-  const transformAB = Affine2.invert(transformA).multiply(transformB)
+  const transform = Affine2.invert(transformA).multiply(transformB)
   
   if(shapeA instanceof Circle && shapeB instanceof Circle) {
-    return [getCircleClosestPoint(shapeA,shapeB,transformAB)]
+    return [getCircleClosestPoint(shapeA,shapeB,transform)]
   }
   return undefined
 }

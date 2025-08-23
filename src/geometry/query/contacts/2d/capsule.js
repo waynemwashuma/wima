@@ -9,26 +9,35 @@ import { getClosestPoints } from '../../distance/index.js'
  * @param {Capsule} capsuleB
  * @param {Affine2} transform
  */
-export function capsuleContacts(capsuleA, capsuleB, transform) {
+export function capsuleContacts(capsuleA, capsuleB, transform, invTransform) {
   const pointsA = [
     new Vector2(0, capsuleA.halfHeight),
     new Vector2(0, -capsuleA.halfHeight)
   ]
   const pointsB = [
-    Affine2.transform(transform, new Vector2(0, capsuleB.halfHeight)),
-    Affine2.transform(transform, new Vector2(0, -capsuleB.halfHeight))
+    transform.transform(new Vector2(0, capsuleB.halfHeight)),
+    transform.transform(new Vector2(0, -capsuleB.halfHeight))
   ]
   const radiusSum = capsuleA.radius + capsuleB.radius
   const closest = getClosestPoints(pointsA, pointsB)
   const contacts = closest.map((point) => {
     const axis = Vector2.subtract(point.pointB, point.pointA).normalize()
     const axisReverse = axis.clone().reverse()
-    const distance = radiusSum - sqrt(point.distanceSquared)
-
+    const distance = radiusSum - point.distance
+    
     if (distance < 0) {
       return undefined
     }
-
+    const normalA = axis.clone()
+    const normalB = Affine2.transformWithoutTranslation(invTransform, axis).reverse()
+    const pointB = invTransform.transform(point.pointB)
+    return new Contact2D(
+      Vector2.multiplyScalar(normalA, capsuleA.radius).add(point.pointA),
+      Vector2.multiplyScalar(normalB, capsuleB.radius).add(pointB),
+      normalA,
+      normalB,
+      distance
+    )
     return new Contact2D(
       Vector2.multiplyScalar(axis, capsuleA.radius).add(point.pointA),
       Vector2.multiplyScalar(axis, -capsuleB.radius).add(point.pointB),
@@ -37,11 +46,11 @@ export function capsuleContacts(capsuleA, capsuleB, transform) {
       distance
     )
   }).filter((e) => e !== undefined)
-
+  
   if (!contacts.length) {
     return undefined
   }
-
+  
   return contacts
 }
 
@@ -50,7 +59,7 @@ export function capsuleContacts(capsuleA, capsuleB, transform) {
  * @param {Circle} circle
  * @param {Affine2} transform
  */
-export function capsuleCircleContact(capsule, circle, transform) {
+export function capsuleCircleContact(capsule, circle, transform,invTransform) {
   const position = new Vector2(
     transform.x,
     transform.y
@@ -74,17 +83,14 @@ export function capsuleCircleContact(capsule, circle, transform) {
   const distance = Math.sqrt(distSq)
   const penetration = radiusSum - distance
   
-  const normal = Vector2.divideScalar(dist, distance)
-  
-  if (distance === 0) {
-    normal.copy(Vector2.Y)
-  }
-  
+  const normalA = distance !== 0 ? Vector2.divideScalar(dist, distance) : Vector2.Y.clone()
+  const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
+  console.log(position)
   return new Contact2D(
-    Vector2.multiplyScalar(normal, capsule.radius).add(closest),
-    Vector2.multiplyScalar(normal, -circle.radius).add(position),
-    normal,
-    normal.clone().reverse(),
+    Vector2.multiplyScalar(normalA, capsule.radius).add(closest),
+    Vector2.multiplyScalar(normalB, circle.radius),
+    normalA,
+    normalB,
     penetration
   )
 }

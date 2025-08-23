@@ -63,7 +63,8 @@ function rectangleContactDraw(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -109,6 +110,8 @@ function rectangleContactDraw2(world) {
     .reset()
   
   if (!contacts) return
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -156,7 +159,8 @@ function rectangleContactDraw3(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -206,7 +210,8 @@ function rectangleContactDraw4(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     

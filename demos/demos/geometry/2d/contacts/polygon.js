@@ -66,7 +66,8 @@ function polygons(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -112,7 +113,8 @@ function rectanglePolygon(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -158,7 +160,8 @@ function rectanglePolygon2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -203,7 +206,8 @@ function trianglePolygon(world) {
     .axes(30)
     .reset()
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -249,7 +253,8 @@ function trianglePolygon2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -295,7 +300,8 @@ function circlePolygon(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     
@@ -341,7 +347,8 @@ function circlePolygon2(world) {
     .reset()
   
   if (!contacts) return
-  
+  contacts.map(contact=>contact.transform(transformA,transformB))
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
     

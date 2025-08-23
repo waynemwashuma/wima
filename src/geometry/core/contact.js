@@ -1,4 +1,4 @@
-import { Vector2 } from '../../math/index.js'
+import { Vector2,Affine2 } from '../../math/index.js'
 
 export class Contact2D {
  
@@ -66,8 +66,8 @@ export class Contact2D {
  transform(transformA, transformB) {
   this.pointA = transformA.transform(this.pointA)
   this.pointB = transformB.transform(this.pointB)
-  this.normalA = transformA.transformWithoutTranslation(this.normalA)
-  this.normalB = transformB.transformWithoutTranslation(this.normalB)
+  this.normalA = Affine2.transformWithoutTranslation(transformA,this.normalA)
+  this.normalB = Affine2.transformWithoutTranslation(transformB,this.normalB)
   
   // TODO: Transform tangents
   return this
