@@ -1,6 +1,6 @@
 import { Vector2 } from '../../math/index.js'
 
-export class Intersection {
+export class Intersection2D {
 
   /**
    * @readonly
@@ -30,4 +30,6 @@ export class Intersection {
     this.normal = normal
     this.distance = distance
   }
+  
+  
 }

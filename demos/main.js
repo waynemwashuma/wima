@@ -27,7 +27,8 @@ import {
   circleContacts,
   rectangleContacts,
   polygonContacts,
-  triangleContacts
+  triangleContacts,
+  circleClosePoints
 } from './demos/index.js'
 import { Demo1, Demo2, ResourceAliasPlugin } from './demos/utils.js'
 import {
@@ -70,6 +71,7 @@ app
       triangleContacts,
       rectangleContacts,
       polygonContacts,
+      circleClosePoints,
       lineStyle,
       arcs2d,
       shapes,

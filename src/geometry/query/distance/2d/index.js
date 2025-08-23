@@ -1,6 +1,9 @@
 import { ClosestPoint2D } from '../../../core/index.js'
 import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
 
+export * from "./circle.js"
+export * from "./shape2.js"
+
 /**
  * Get closest point on a segment AB to point P.
  * @param {Vector2} a 
@@ -8,7 +11,7 @@ import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
  * @param {Vector2} p 
  * @returns {Vector2}
  */
-export function closestPointOn2DSegment(a, b, p) {
+export function closestPointOnSegment2D(a, b, p) {
   const ab = Vector2.subtract(b, a)
   const ap = Vector2.subtract(p, a)
   const length = Vector2.magnitude(ab)
@@ -19,7 +22,7 @@ export function closestPointOn2DSegment(a, b, p) {
 }
 
 /**
- * Get closest points between two convex polygons.
+ * Get closest points between two convex vertex polygons.
  * @param {Vector2[]} verticesA 
  * @param {Vector2[]} verticesB 
  * @returns {ClosestPoint2D[]}
@@ -45,7 +48,7 @@ export function getClosestPoints(verticesA, verticesB) {
 
       // todo: Unroll this
       for (const bv of [b1, b2]) {
-        const pa = closestPointOn2DSegment(a1, a2, bv)
+        const pa = closestPointOnSegment2D(a1, a2, bv)
         const distSq = Vector2.distanceToSquared(pa, bv)
 
         if (distSq < minDistSq) {
@@ -57,7 +60,7 @@ export function getClosestPoints(verticesA, verticesB) {
       
       // todo: Unroll this
       for (const av of [a1, a2]) {
-        const pb = closestPointOn2DSegment(b1, b2, av)
+        const pb = closestPointOnSegment2D(b1, b2, av)
         const distSq = Vector2.distanceToSquared(pb, av)
 
         if (distSq < minDistSq) {

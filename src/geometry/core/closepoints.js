@@ -1,11 +1,10 @@
 import { Vector2 } from '../../math/index.js'
 
 export class ClosestPoint2D {
-
   /**
    * @type {number}
    */
-  distanceSquared
+  distance
 
   /**
    * @type {Vector2}
@@ -20,11 +19,21 @@ export class ClosestPoint2D {
   /**
    * @param {Vector2} pointA
    * @param {Vector2} pointB
-   * @param {number} distanceSquared
+   * @param {number} distance
    */
-  constructor(pointA, pointB, distanceSquared) {
+  constructor(pointA, pointB, distance) {
     this.pointA = pointA
     this.pointB = pointB
-    this.distanceSquared = distanceSquared
+    this.distance = distance
+  }
+  
+  clone(){
+    return new ClosestPoint2D(this.pointA,this.pointB,this.distance)
+  }
+  
+  transform(transformA,transformB){
+    this.pointA = transformA.transform(this.pointA)
+    this.pointB = transformB.transform(this.pointB)
+    return this
   }
 }
