@@ -169,7 +169,7 @@ export class Gizmo2D {
   /**
    * @param {Vector2[]} strips
    * @param {Color} color
-   * @param closed
+   * @param {boolean} closed
    * @returns {this}
    */
   lineStrip(strips, color = Color.WHITE, closed = false) {
@@ -191,7 +191,7 @@ export class Gizmo2D {
   
   /**
    * @param {[Vector2,Color][]} strips
-   * @param closed
+   * @param {boolean} closed
    * @returns {this}
    */
   lineStripGradient(strips, closed = false) {
@@ -351,7 +351,7 @@ export class Gizmo2D {
    * @param {number} halfBase
    * @param {number} halfHeight
    * @param {number} baseRatio
-   * @param color
+   * @param {Color} color
    */
   triangle(halfBase, halfHeight, baseRatio, color = Color.WHITE) {
     this.lineStrip(
@@ -370,7 +370,7 @@ export class Gizmo2D {
   /**
    * @param {number} radius
    * @param {number} halfHeight
-   * @param color
+   * @param {Color} [color]
    */
   capsule(radius, halfHeight, color = Color.WHITE) {
     const transform = this.transformation.clone()

@@ -1,4 +1,4 @@
-import { invert, lerp } from '../../functions/index.js'
+import { fuzzyEqual, invert, lerp } from '../../functions/index.js'
 
 export class Vector3 {
   constructor(x = 0, y = 0, z = 0) {
@@ -249,6 +249,16 @@ export class Vector3 {
    */
   equals(v) {
     return Vector3.equal(this, v)
+  }
+
+  /**
+   * Checks to see if this vector is equal to another vector.
+   *
+   * @param {Vector3} v
+   * @returns {boolean}
+   */
+  fuzzyEquals(v) {
+    return Vector3.fuzzyEqual(this, v)
   }
 
   /**
@@ -557,6 +567,18 @@ export class Vector3 {
    */
   static equal(v1, v2) {
     return v1.x === v2.x && v1.y === v2.y && v1.z === v2.z
+  }
+
+  /**
+   * @param {Vector3} a
+   * @param {Vector3} b
+   */
+  static fuzzyEqual(a, b) {
+    return (
+      fuzzyEqual(a.x, b.x) &&
+      fuzzyEqual(a.y, b.y) &&
+      fuzzyEqual(a.z, b.z)
+    )
   }
 
   /**

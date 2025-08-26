@@ -1,12 +1,16 @@
 import { ClosestPoint2D } from '../../../core/index.js'
-import { Circle, Line2 } from '../../../shapes/index.js'
-import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
+import { Vector2, Affine2 } from '../../../../math/index.js'
 
-export function getCircleClosestPoint(a, b, transform) {
+/**
+ * @param {{ radius: number; }} circleA
+ * @param {{ radius: number; }} circleB
+ * @param {Affine2} transform
+ */
+export function getCircleClosestPoint(circleA, circleB, transform) {
   const dx = transform.x
   const dy = transform.y
   const distSquared = dx * dx + dy * dy
-  const radiiSum = a.radius + b.radius
+  const radiiSum = circleA.radius + circleB.radius
   const distance = Math.sqrt(distSquared)
   const normal1 = distance !== 0 ? new Vector2(dx / distance, dy / distance) : Vector2.Y.clone()
   const normal2 = Affine2.transformWithoutTranslation(transform.clone().invert(), normal1).reverse()
@@ -14,8 +18,8 @@ export function getCircleClosestPoint(a, b, transform) {
   const penetration = distance - radiiSum
   
   return new ClosestPoint2D(
-    Vector2.multiplyScalar(normal1, a.radius),
-    Vector2.multiplyScalar(normal2, b.radius),
+    Vector2.multiplyScalar(normal1, circleA.radius),
+    Vector2.multiplyScalar(normal2, circleB.radius),
     penetration
   )
 }

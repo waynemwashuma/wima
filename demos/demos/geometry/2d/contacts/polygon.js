@@ -5,7 +5,6 @@ import {
   Demo,
   GizmoLineStyle,
   Circle,
-  Line2,
   Affine2,
   Vector2,
   Rotary,

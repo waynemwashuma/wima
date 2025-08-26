@@ -1,6 +1,4 @@
-import { Contact2D, SAT2d, sat2dCircle } from '../../../core/index.js'
-import { Circle, Line2, Rectangle, ConvexPolygon, Triangle } from '../../../shapes/index.js'
-import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
+import { Vector2 } from '../../../../math/index.js'
 
 /**
  * @param {Vector2} position

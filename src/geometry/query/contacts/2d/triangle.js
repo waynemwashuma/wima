@@ -1,19 +1,20 @@
-import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
-import { Contact2D, SAT2d, sat2dCircle } from '../../../core/index.js'
-import { Circle, Line2, Rectangle, ConvexPolygon, Triangle } from '../../../shapes/index.js'
+import { Vector2, Affine2 } from '../../../../math/index.js'
+import { SAT2d, sat2dCircle } from '../../../core/index.js'
+import { Circle, Rectangle, Triangle } from '../../../shapes/index.js'
 import { getNearVertex } from './utils.js'
 
 /**
  * @param {Triangle} boxA
  * @param {Triangle} boxB
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function triangleContacts(boxA, boxB, transform,invTransform) {
+export function triangleContacts(boxA, boxB, transform, invTransform) {
   const pointsA = boxA.getPoints()
   const pointsB = boxB.getPoints().map((e) => transform.transform(e))
   
   if (pointsA.length < 3 || pointsB.length < 3) {
-    throw '`Triangle` is not properly implemented.'
+    return undefined
   }
 
   const axes = [
@@ -25,15 +26,16 @@ export function triangleContacts(boxA, boxB, transform,invTransform) {
     Vector2.subtract(pointsB[2], pointsB[0]).normalize()
   ].map((axis) => Vector2.normal(axis, axis))
 
-  return SAT2d(pointsA, pointsB, axes, transform,invTransform)
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
  * @param {Triangle} boxA
  * @param {Rectangle} boxB
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function triangleRectangleContacts(boxA, boxB, transform,invTransform) {
+export function triangleRectangleContacts(boxA, boxB, transform, invTransform) {
   const pointsA = boxA.getPoints()
   const pointsB = boxB.getPoints().map((e) => transform.transform(e))
   
@@ -49,15 +51,16 @@ export function triangleRectangleContacts(boxA, boxB, transform,invTransform) {
     Vector2.subtract(pointsB[1], pointsB[2]).normalize()
   ].map((axis) => Vector2.normal(axis, axis))
 
-  return SAT2d(pointsA, pointsB, axes, transform,invTransform)
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
  * @param {Circle} circle
  * @param {Triangle} triangle
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function circleTriangleContacts(circle, triangle, transform,invTransform) {
+export function circleTriangleContacts(circle, triangle, transform, invTransform) {
   const points = triangle.getPoints().map((e) => transform.transform(e.clone()))
   
   const nearestIndex = getNearVertex(Vector2.Zero, points)
@@ -78,5 +81,5 @@ export function circleTriangleContacts(circle, triangle, transform,invTransform)
     Vector2.normal(Vector2.subtract(points[2], points[0])).normalize()
   ]
 
-  return sat2dCircle(circle, points, axes, transform,invTransform)
+  return sat2dCircle(circle, points, axes, transform, invTransform)
 }

@@ -21,7 +21,7 @@ export class Triangle extends Shape2 {
   /**
    * @param {number} halfBase
    * @param {number} halfHeight
-   * @param baseRatio
+   * @param {number} baseRatio
    */
   constructor(halfBase, halfHeight, baseRatio = 0) {
     super()

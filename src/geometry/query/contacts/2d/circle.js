@@ -6,6 +6,7 @@ import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
  * @param {Circle} a
  * @param {Circle} b
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
 export function circleContact(a, b, transform, invTransform) {
   const dx = transform.x
@@ -35,8 +36,9 @@ export function circleContact(a, b, transform, invTransform) {
  * @param {Line2} line
  * @param {Circle} circle
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function lineCircleContact(line, circle, transform,invTransform) {
+export function lineCircleContact(line, circle, transform, invTransform) {
   const lineStart = Vector2.set(line.halfLength, 0)
   const lineEnd = Vector2.set(-line.halfLength, 0)
   const cx = transform.x
@@ -68,7 +70,7 @@ export function lineCircleContact(line, circle, transform,invTransform) {
   const normalB = Affine2.transformWithoutTranslation(invTransform, normalA).reverse()
   
   return new Contact2D(
-    new Vector2(closestX,closestY),
+    new Vector2(closestX, closestY),
     Vector2.multiplyScalar(normalB, circle.radius),
     normalA,
     normalB,

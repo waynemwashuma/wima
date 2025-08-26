@@ -1,14 +1,15 @@
-import { Contact2D, SAT2d, sat2dCircle } from '../../../core/index.js'
-import { Circle, Line2, Rectangle, ConvexPolygon, Triangle } from '../../../shapes/index.js'
-import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
+import { SAT2d, sat2dCircle } from '../../../core/index.js'
+import { Circle, Rectangle, ConvexPolygon, Triangle } from '../../../shapes/index.js'
+import { Vector2, Affine2 } from '../../../../math/index.js'
 import { getNearVertex } from './utils.js'
 
 /**
  * @param {ConvexPolygon} boxA
  * @param {ConvexPolygon} boxB
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function polygonContacts(boxA, boxB, transform,invTransform) {
+export function polygonContacts(boxA, boxB, transform, invTransform) {
   const pointsA = boxA.points.map((e) => e.clone())
   const pointsB = boxB.points.map((e) => transform.transform(e.clone()))
   
@@ -17,15 +18,16 @@ export function polygonContacts(boxA, boxB, transform,invTransform) {
     ...boxB.normals.map((e) => Affine2.transformWithoutTranslation(transform, e))
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform,invTransform)
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
  * @param {Circle} circle
  * @param {ConvexPolygon} polygon
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function circlePolygonContact(circle, polygon, transform,invTransform) {
+export function circlePolygonContact(circle, polygon, transform, invTransform) {
   const points = polygon.points.map((e) => transform.transform(e.clone()))
   
   const nearestIndex = getNearVertex(Vector2.Zero, points)
@@ -44,15 +46,16 @@ export function circlePolygonContact(circle, polygon, transform,invTransform) {
     ...polygon.normals.map((e) => Affine2.transformWithoutTranslation(transform, e))
   ]
 
-  return sat2dCircle(circle, points, axes, transform,invTransform)
+  return sat2dCircle(circle, points, axes, transform, invTransform)
 }
 
 /**
  * @param {ConvexPolygon} boxA
  * @param {Rectangle} boxB
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function polygonRectangleContacts(boxA, boxB, transform,invTransform) {
+export function polygonRectangleContacts(boxA, boxB, transform, invTransform) {
   const pointsA = boxA.points.map((e) => e.clone())
   const pointsB = boxB.getPoints().map((e) => transform.transform(e))
   
@@ -66,15 +69,16 @@ export function polygonRectangleContacts(boxA, boxB, transform,invTransform) {
     Vector2.normal(Vector2.subtract(pointsB[1], pointsB[2])).normalize()
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform,invTransform)
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }
 
 /**
  * @param {ConvexPolygon} boxA
  * @param {Triangle} boxB
  * @param {Affine2} transform
+ * @param {Affine2} invTransform
  */
-export function polygonTriangleContacts(boxA, boxB, transform,invTransform) {
+export function polygonTriangleContacts(boxA, boxB, transform, invTransform) {
   const pointsA = boxA.points.map((e) => e.clone())
   const pointsB = boxB.getPoints().map((e) => transform.transform(e))
 
@@ -89,5 +93,5 @@ export function polygonTriangleContacts(boxA, boxB, transform,invTransform) {
     Vector2.normal(Vector2.subtract(pointsB[2], pointsB[0])).normalize()
   ]
 
-  return SAT2d(pointsA, pointsB, axes, transform,invTransform)
+  return SAT2d(pointsA, pointsB, axes, transform, invTransform)
 }

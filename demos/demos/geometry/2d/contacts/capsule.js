@@ -6,12 +6,9 @@ import {
   GizmoLineStyle,
   Capsule,
   Circle,
-  Line2,
   Affine2,
   Vector2,
   Rotary,
-  Rectangle,
-  Triangle,
   getShape2Contacts
 } from 'wima'
 import { Demo1Gizmo2D } from '../../../utils.js'
@@ -19,6 +16,10 @@ import { Demo1Gizmo2D } from '../../../utils.js'
 export default new Demo('geometry2d/capsule contacts', [init], [
   capsule1,
   capsule2,
+  capsule3,
+  capsule4,
+  capsule5,
+  capsule6,
   capsuleCircle1,
   capsuleCircle2
 ])
@@ -28,7 +29,7 @@ export default new Demo('geometry2d/capsule contacts', [init], [
  */
 function init(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
-  
+
   gizmo.settings.lineWidth = 1
   gizmo.settings.lineStyle = GizmoLineStyle.Solid
 }
@@ -46,15 +47,15 @@ function capsule1(world) {
   const center = new Vector2(100, 100)
   const transformA = new Affine2()
     .translate(center)
-  
+
   const transformB = new Affine2()
     .rotate(Rotary.fromAngle(-clock.getElapsed() * 0.4))
     .translate(new Vector2(50, 0))
     .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
     .translate(center)
-  
+
   const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
-  
+
   gizmo
     .setTransform(transformA)
     .capsule(radius, halfHeight)
@@ -63,13 +64,13 @@ function capsule1(world) {
     .capsule(radius, halfHeight)
     .axes(30)
     .reset()
-  
+
   if (!contacts) return
-  contacts.map(contact=>contact.transform(transformA,transformB))
+  contacts.map(contact => contact.transform(transformA, transformB))
 
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
-    
+
     gizmo
       .translate(pointA.x, pointA.y)
       .arrow(normalA, 20, Color.PURPLE)
@@ -95,14 +96,14 @@ function capsule2(world) {
   const center = new Vector2(300, 100)
   const transformA = new Affine2()
     .translate(center)
-  
+
   const transformB = new Affine2()
     .translate(new Vector2(50, 0))
     .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
     .translate(center)
-  
+
   const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
-  
+
   gizmo
     .setTransform(transformA)
     .capsule(radius, halfHeight)
@@ -111,13 +112,13 @@ function capsule2(world) {
     .capsule(radius, halfHeight)
     .axes(30)
     .reset()
-  
+
   if (!contacts) return
-  contacts.map(contact=>contact.transform(transformA,transformB))
+  contacts.map(contact => contact.transform(transformA, transformB))
 
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
-    
+
     gizmo
       .translate(pointA.x, pointA.y)
       .arrow(normalA, 20, Color.PURPLE)
@@ -133,6 +134,206 @@ function capsule2(world) {
 /**
  * @param {World} world
  */
+function capsule3(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 20
+  const halfHeight = 20
+  const circleA = new Capsule(radius, halfHeight)
+  const circleB = new Capsule(radius, halfHeight)
+  const center = new Vector2(500, 100)
+  const transformA = new Affine2()
+    .rotate(Rotary.fromAngle(clock.getElapsed() * -0.4))
+    .translate(center)
+
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(radius, halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(radius, halfHeight)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function capsule4(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 20
+  const halfHeight = 20
+  const radius2 = 10
+  const halfHeight2 = 10
+  const circleA = new Capsule(radius, halfHeight)
+  const circleB = new Capsule(radius2, halfHeight2)
+  const center = new Vector2(700, 100)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(clock.getElapsed() * -0.4))
+    .translate(new Vector2(20, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(radius, halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(radius2, halfHeight2)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function capsule5(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 20
+  const halfHeight = 20
+  const radius2 = 10
+  const halfHeight2 = 10
+  const circleA = new Capsule(radius, halfHeight)
+  const circleB = new Capsule(radius2, halfHeight2)
+  const center = new Vector2(900, 100)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+    .translate(new Vector2(20, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(radius, halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(radius2, halfHeight2)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function capsule6(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 20
+  const halfHeight = 20
+  const radius2 = 20
+  const halfHeight2 = 20
+  const circleA = new Capsule(radius, halfHeight)
+  const circleB = new Capsule(radius2, halfHeight2)
+  const center = new Vector2(1100, 100)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+  .rotate(Rotary.fromAngle(clock.getElapsed()))
+    .translate(new Vector2(20, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .capsule(radius, halfHeight)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(radius2, halfHeight2)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+/**
+ * @param {World} world
+ */
 function capsuleCircle1(world) {
   const gizmo = world.getResource(Demo1Gizmo2D)
   const clock = world.getResource(VirtualClock)
@@ -143,15 +344,15 @@ function capsuleCircle1(world) {
   const circleB = new Circle(radius)
   const transformA = new Affine2()
     .translate(center)
-  
+
   const transformB = new Affine2()
     .rotate(Rotary.fromAngle(-clock.getElapsed() * 0.4))
     .translate(new Vector2(50, 0))
     .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
     .translate(center)
-  
+
   const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
-  
+
   gizmo
     .setTransform(transformA)
     .capsule(radius, halfHeight)
@@ -160,13 +361,13 @@ function capsuleCircle1(world) {
     .circle(radius)
     .axes(30)
     .reset()
-  
+
   if (!contacts) return
-  contacts.map(contact=>contact.transform(transformA,transformB))
+  contacts.map(contact => contact.transform(transformA, transformB))
 
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
-    
+
     gizmo
       .translate(pointA.x, pointA.y)
       .arrow(normalA, 20, Color.PURPLE)
@@ -192,14 +393,14 @@ function capsuleCircle2(world) {
   const circleB = new Circle(radius)
   const transformA = new Affine2()
     .translate(center)
-  
+
   const transformB = new Affine2()
     .translate(new Vector2(50, 0))
     .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
     .translate(center)
-  
+
   const contacts = getShape2Contacts(circleA, circleB, transformA, transformB)
-  
+
   gizmo
     .setTransform(transformA)
     .capsule(radius, halfHeight)
@@ -208,13 +409,13 @@ function capsuleCircle2(world) {
     .circle(radius)
     .axes(30)
     .reset()
-  
+
   if (!contacts) return
   contacts.map(contact => contact.transform(transformA, transformB))
-  
+
   for (let contact of contacts) {
     const { pointA, pointB, normalA, normalB } = contact
-    
+
     gizmo
       .translate(pointA.x, pointA.y)
       .arrow(normalA, 20, Color.PURPLE)

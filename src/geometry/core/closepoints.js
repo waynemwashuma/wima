@@ -1,6 +1,7 @@
-import { Vector2 } from '../../math/index.js'
+import { Affine2, Vector2 } from '../../math/index.js'
 
 export class ClosestPoint2D {
+
   /**
    * @type {number}
    */
@@ -28,12 +29,26 @@ export class ClosestPoint2D {
   }
   
   clone(){
-    return new ClosestPoint2D(this.pointA,this.pointB,this.distance)
+    return new ClosestPoint2D(this.pointA, this.pointB, this.distance)
   }
   
-  transform(transformA,transformB){
+  /**
+   * @param {Affine2} transformA
+   * @param {Affine2} transformB
+   */
+  transform(transformA, transformB){
     this.pointA = transformA.transform(this.pointA)
     this.pointB = transformB.transform(this.pointB)
+
+    return this
+  }
+
+  flip() {
+    const { pointA } = this
+
+    this.pointA = this.pointB
+    this.pointB = pointA
+
     return this
   }
 }

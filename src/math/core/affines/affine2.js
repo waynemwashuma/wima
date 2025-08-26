@@ -465,7 +465,7 @@ export class Affine2 {
    * @param {Vector2} [out]
    */
   static transformWithoutTranslation(affine, v, out = new Vector2()) {
-    const { a, b, c, d, x, y } = affine
+    const { a, b, c, d } = affine
     const { x: vx, y: vy } = v
     
     out.x = a * vx + c * vy
