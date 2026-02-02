@@ -3,7 +3,6 @@ import { Capsule, Circle } from '../../../shapes/index.js'
 import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
 import { getClosestPoints } from '../../distance/index.js'
 
-
 /**
  * @param {Capsule} capsuleA
  * @param {Capsule} capsuleB
@@ -86,6 +85,275 @@ export function capsuleCircleContact(capsule, circle, transform, invTransform) {
     Vector2.multiplyScalar(normalB, circle.radius),
     normalA,
     normalB,
+    penetration
+  )
+}
+
+/**
+ * @param {Capsule} a   // body A
+ * @param {Rectangle} b // body B (OBB)
+ * @param {Affine2} transform     // B -> A
+ * @param {Affine2} invTransform  // A -> B
+ */
+export function capsuleOBBContact(a, b, transform, invTransform) {
+  // --- Step 1: capsule segment endpoints in B local space ---
+  const a0B = Affine2.transform(invTransform, a.a)
+  const a1B = Affine2.transform(invTransform, a.b)
+
+  // --- Step 2: closest point between segment and OBB (in B space) ---
+  const segDir = Vector2.subtract(a1B, a0B)
+  const segLenSq = segDir.lengthSquared()
+
+  let t = 0
+  if (segLenSq > 0) {
+    t = Vector2.dot(Vector2.negate(a0B), segDir) / segLenSq
+    t = Math.max(0, Math.min(1, t))
+  }
+
+  const closestSegPoint = Vector2.add(a0B, Vector2.multiplyScalar(segDir, t))
+
+  const clamped = new Vector2(
+    Math.max(-b.halfExtents.x, Math.min(b.halfExtents.x, closestSegPoint.x)),
+    Math.max(-b.halfExtents.y, Math.min(b.halfExtents.y, closestSegPoint.y))
+  )
+
+  const delta = Vector2.subtract(closestSegPoint, clamped)
+  const distSq = delta.lengthSquared()
+
+  if (distSq > a.radius * a.radius) {
+    return undefined
+  }
+
+  const distance = Math.sqrt(distSq)
+  const penetration = a.radius - distance
+
+  // --- Step 3: normal in B local space ---
+  let normalB
+  if (distance !== 0) {
+    normalB = Vector2.multiplyScalar(delta, 1 / distance)
+  } else {
+    // fallback: push out along dominant axis
+    if (Math.abs(delta.x) > Math.abs(delta.y)) {
+      normalB = new Vector2(Math.sign(delta.x), 0)
+    } else {
+      normalB = new Vector2(0, Math.sign(delta.y) || 1)
+    }
+  }
+
+  // --- Step 4: contact points ---
+  const contactB = clamped
+  const contactA_B = Vector2.add(contactB, Vector2.multiplyScalar(normalB, a.radius))
+
+  // convert A contact back to A local space
+  const contactA = Affine2.transform(transform, contactA_B)
+
+  // --- Step 5: normals in respective local spaces ---
+  const normalA = Affine2.transformWithoutTranslation(transform, normalB)
+  normalA.normalize()
+
+  return new Contact2D(
+    contactA,                            // A local
+    contactB,                            // B local
+    normalA,                             // A local (A -> B)
+    normalB.clone().reverse(),           // B local (B -> A)
+    penetration
+  )
+}
+
+/**
+ * @param {Capsule} a    // body A
+ * @param {Triangle} b  // body B
+ * @param {Affine2} transform     // B -> A
+ * @param {Affine2} invTransform  // A -> B
+ */
+export function capsuleTriangleContact(a, b, transform, invTransform) {
+  // --- Step 1: capsule segment endpoints in triangle (B) local space ---
+  const a0B = Affine2.transform(invTransform, a.a)
+  const a1B = Affine2.transform(invTransform, a.b)
+
+  // --- Step 2: closest points between capsule segment and triangle ---
+  let bestDistSq = Infinity
+  let bestSegPoint = null
+  let bestTriPoint = null
+
+  // Check segment vs triangle interior
+  {
+    const mid = Vector2.multiplyScalar(Vector2.add(a0B, a1B), 0.5)
+    const triClosest = closestPointOnTriangle(mid, b.v0, b.v1, b.v2)
+    const segClosest = closestPointOnSegment(triClosest, a0B, a1B)
+
+    const d = Vector2.subtract(segClosest, triClosest)
+    const dsq = d.lengthSquared()
+    if (dsq < bestDistSq) {
+      bestDistSq = dsq
+      bestSegPoint = segClosest
+      bestTriPoint = triClosest
+    }
+  }
+
+  // Check against triangle edges
+  const edges = [
+    [b.v0, b.v1],
+    [b.v1, b.v2],
+    [b.v2, b.v0]
+  ]
+
+  for (let i = 0; i < 3; i++) {
+    const [e0, e1] = edges[i]
+
+    const p0 = closestPointOnSegment(e0, a0B, a1B)
+    const p1 = closestPointOnSegment(e1, a0B, a1B)
+
+    const d0 = Vector2.subtract(p0, e0)
+    const d1 = Vector2.subtract(p1, e1)
+
+    const dsq0 = d0.lengthSquared()
+    const dsq1 = d1.lengthSquared()
+
+    if (dsq0 < bestDistSq) {
+      bestDistSq = dsq0
+      bestSegPoint = p0
+      bestTriPoint = e0
+    }
+
+    if (dsq1 < bestDistSq) {
+      bestDistSq = dsq1
+      bestSegPoint = p1
+      bestTriPoint = e1
+    }
+  }
+
+  if (bestDistSq > a.radius * a.radius) {
+    return undefined
+  }
+
+  const distance = Math.sqrt(bestDistSq)
+  const penetration = a.radius - distance
+
+  // --- Step 3: normal in triangle (B) local space ---
+  let normalB
+  if (distance !== 0) {
+    normalB = Vector2.multiplyScalar(
+      Vector2.subtract(bestSegPoint, bestTriPoint),
+      1 / distance
+    )
+  } else {
+    // fallback: triangle face normal (2D perpendicular)
+    const edge = Vector2.subtract(b.v1, b.v0)
+    normalB = new Vector2(-edge.y, edge.x).normalize()
+  }
+
+  // --- Step 4: contact points ---
+  const contactB = bestTriPoint
+  const contactA_B = Vector2.add(
+    contactB,
+    Vector2.multiplyScalar(normalB, a.radius)
+  )
+
+  const contactA = Affine2.transform(transform, contactA_B)
+
+  // --- Step 5: normals in respective local spaces ---
+  const normalA = Affine2.transformWithoutTranslation(transform, normalB)
+  normalA.normalize()
+
+  return new Contact2D(
+    contactA,                      // A local
+    contactB,                      // B local
+    normalA,                       // A local (A -> B)
+    normalB.clone().reverse(),     // B local (B -> A)
+    penetration
+  )
+}
+
+/**
+ * @param {Capsule} a          // body A
+ * @param {ConvexPolygon} b   // body B
+ * @param {Affine2} transform     // B -> A
+ * @param {Affine2} invTransform  // A -> B
+ */
+export function capsuleConvexPolygonContact(a, b, transform, invTransform) {
+  // --- Step 1: capsule segment endpoints in polygon (B) local space ---
+  const a0B = Affine2.transform(invTransform, a.a)
+  const a1B = Affine2.transform(invTransform, a.b)
+
+  let bestDistSq = Infinity
+  let bestSegPoint = null
+  let bestPolyPoint = null
+
+  const verts = b.vertices
+  const count = verts.length
+
+  // --- Step 2: check against polygon edges ---
+  for (let i = 0; i < count; i++) {
+    const v0 = verts[i]
+    const v1 = verts[(i + 1) % count]
+
+    const { pA, pB } = closestPointsSegmentSegment(a0B, a1B, v0, v1)
+    const d = Vector2.subtract(pA, pB)
+    const dsq = d.lengthSquared()
+
+    if (dsq < bestDistSq) {
+      bestDistSq = dsq
+      bestSegPoint = pA
+      bestPolyPoint = pB
+    }
+  }
+
+  // --- Step 3: also test polygon vertices vs capsule segment ---
+  for (let i = 0; i < count; i++) {
+    const v = verts[i]
+    const p = closestPointOnSegment(v, a0B, a1B)
+    const d = Vector2.subtract(p, v)
+    const dsq = d.lengthSquared()
+
+    if (dsq < bestDistSq) {
+      bestDistSq = dsq
+      bestSegPoint = p
+      bestPolyPoint = v
+    }
+  }
+
+  if (bestDistSq > a.radius * a.radius) {
+    return undefined
+  }
+
+  const distance = Math.sqrt(bestDistSq)
+  const penetration = a.radius - distance
+
+  // --- Step 4: normal in polygon (B) local space ---
+  let normalB
+  if (distance !== 0) {
+    normalB = Vector2.multiplyScalar(
+      Vector2.subtract(bestSegPoint, bestPolyPoint),
+      1 / distance
+    )
+  } else {
+    // fallback: outward normal of closest edge
+    const edge = Vector2.subtract(
+      verts[1],
+      verts[0]
+    )
+    normalB = new Vector2(-edge.y, edge.x).normalize()
+  }
+
+  // --- Step 5: contact points ---
+  const contactB = bestPolyPoint
+  const contactA_B = Vector2.add(
+    contactB,
+    Vector2.multiplyScalar(normalB, a.radius)
+  )
+
+  const contactA = Affine2.transform(transform, contactA_B)
+
+  // --- Step 6: normals in respective local spaces ---
+  const normalA = Affine2.transformWithoutTranslation(transform, normalB)
+  normalA.normalize()
+
+  return new Contact2D(
+    contactA,                  // capsule local
+    contactB,                  // polygon local
+    normalA,                   // A -> B
+    normalB.clone().reverse(), // B -> A
     penetration
   )
 }

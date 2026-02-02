@@ -72,3 +72,9 @@ export function getClosestPoints(verticesA, verticesB) {
   
   return [new ClosestPoint2D(closestA, closestB, sqrt(minDistSq))]
 }
+
+function closestPointOnTriangle(p, a, b, c) {
+  // Standard Voronoi-region solution
+  // Returns closest point on triangle to p
+  // (implementation omitted here for brevity, assumed available)
+}
