@@ -2,8 +2,8 @@ import { ClosestPoint2D } from '../../../core/index.js'
 import { Vector2, Affine2 } from '../../../../math/index.js'
 
 /**
- * @param {{ radius: number; }} circleA
- * @param {{ radius: number; }} circleB
+ * @param {Circle} circleA
+ * @param {Circle} circleB
  * @param {Affine2} transform
  */
 export function getCircleClosestPoint(circleA, circleB, transform) {
@@ -23,3 +23,4 @@ export function getCircleClosestPoint(circleA, circleB, transform) {
     penetration
   )
 }
+

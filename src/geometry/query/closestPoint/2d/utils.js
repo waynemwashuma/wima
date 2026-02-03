@@ -56,7 +56,7 @@ export function getClosestPoints(verticesA, verticesB) {
         }
       }
       
-      // todo: Unroll this
+      // PERF: Unroll this
       for (const av of [a1, a2]) {
         const pb = closestPointOnSegment2D(b1, b2, av)
         const distSq = Vector2.distanceToSquared(pb, av)
@@ -77,4 +77,21 @@ function closestPointOnTriangle(p, a, b, c) {
   // Standard Voronoi-region solution
   // Returns closest point on triangle to p
   // (implementation omitted here for brevity, assumed available)
+}
+
+/**
+ * Closest point on an OBB to a point
+ * OBB is centered at origin, axis-aligned in its local space
+ *
+ * @param {Vector2} p
+ * @param {Vector2} halfExtents
+ * @returns {Vector2}
+ */
+export function closestPointPointOBB(p, halfExtents) {
+  const q = p.clone()
+
+  const clampedX = Math.max(-halfExtents.x, Math.min(halfExtents.x, q.x))
+  const clampedY = Math.max(-halfExtents.y, Math.min(halfExtents.y, q.y))
+
+  return new Vector2(clampedX, clampedY)
 }

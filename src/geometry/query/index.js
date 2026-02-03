@@ -1,2 +1,2 @@
 export * from './contacts/index.js'
-export * from './distance/index.js'
+export * from './closestPoint/index.js'

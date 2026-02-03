@@ -6,7 +6,7 @@
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
-export function lineLineContact(a, b, transform, invTransform) {
+export function linesContact(a, b, transform, invTransform) {
   // Transform A line into B local space
   const a0 = Affine2.transformPoint(invTransform, a.p0)
   const a1 = Affine2.transformPoint(invTransform, a.p1)
@@ -166,7 +166,6 @@ export function lineOBBContact(a, b, transform, invTransform) {
     penetration
   )
 }
-
 
 /**
  * @param {LineSegment} a
