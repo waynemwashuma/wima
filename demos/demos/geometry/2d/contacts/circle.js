@@ -6,11 +6,13 @@ import {
   GizmoLineStyle,
   Circle,
   Line2,
+  Capsule,
   Affine2,
   Vector2,
   Rotary,
   Rectangle,
   Triangle,
+  ConvexPolygon,
   getShape2Contacts
 } from 'wima'
 import { Demo1Gizmo2D } from '../../../utils.js'
@@ -35,7 +37,17 @@ export default new Demo('geometry2d/circle contacts', [init], [
   circleTriangle2,
   circleTriangle3,
   circleTriangle4,
-  circleTriangle5
+  circleTriangle5,
+  circleCapsule1,
+  circleCapsule2,
+  circleCapsule3,
+  circleCapsule4,
+  circleCapsule5,
+  circlePolygon1,
+  circlePolygon2,
+  circlePolygon3,
+  circlePolygon4,
+  circlePolygon5
 ])
 
 /**
@@ -992,6 +1004,490 @@ function circleTriangle5(world) {
     .axes(30)
     .setTransform(transformB)
     .lineStrip(shapeB.getPoints(), Color.WHITE, true)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circleCapsule1(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 40
+  const capRadius = 20
+  const capHalfHeight = 30
+  const center = new Vector2(100, 900)
+  const shapeA = new Circle(radius)
+  const shapeB = new Capsule(capRadius, capHalfHeight)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-clock.getElapsed() * 0.4))
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(capRadius, capHalfHeight)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circleCapsule2(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 40
+  const capRadius = 20
+  const capHalfHeight = 30
+  const center = new Vector2(300, 900)
+  const shapeA = new Circle(radius)
+  const shapeB = new Capsule(capRadius, capHalfHeight)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(capRadius, capHalfHeight)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circleCapsule3(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 40
+  const capRadius = 20
+  const capHalfHeight = 30
+  const center = new Vector2(500, 900)
+  const shapeA = new Circle(radius)
+  const shapeB = new Capsule(capRadius, capHalfHeight)
+  const transformA = new Affine2()
+    .rotate(Rotary.fromAngle(clock.getElapsed() * -0.4))
+    .translate(center)
+
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(capRadius, capHalfHeight)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circleCapsule4(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius1 = 60
+  const capRadius = 15
+  const capHalfHeight = 25
+  const center = new Vector2(700, 900)
+  const shapeA = new Circle(radius1)
+  const shapeB = new Capsule(capRadius, capHalfHeight)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius1)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(capRadius, capHalfHeight)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circleCapsule5(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius1 = 60
+  const capRadius = 15
+  const capHalfHeight = 25
+  const center = new Vector2(900, 900)
+  const shapeA = new Circle(radius1)
+  const shapeB = new Capsule(capRadius, capHalfHeight)
+  const transformA = new Affine2()
+    .translate(center)
+
+  const transformB = new Affine2()
+    .translate(new Vector2(30, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius1)
+    .axes(30)
+    .setTransform(transformB)
+    .capsule(capRadius, capHalfHeight)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circlePolygon1(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 40
+  const polygonB = ConvexPolygon.fromPoints(new Circle(50).getPoints(12))
+  const center = new Vector2(100, 1100)
+  const shapeA = new Circle(radius)
+  const shapeB = polygonB
+  const transformA = new Affine2()
+    .translate(center)
+  const transformB = new Affine2()
+    .rotate(Rotary.fromAngle(-clock.getElapsed() * 0.4))
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius)
+    .axes(30)
+    .setTransform(transformB)
+    .lineStrip(polygonB.getPoints(), Color.WHITE, true)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circlePolygon2(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 40
+  const polygonB = ConvexPolygon.fromPoints(new Circle(50).getPoints(12))
+  const center = new Vector2(300, 1100)
+  const shapeA = new Circle(radius)
+  const shapeB = polygonB
+  const transformA = new Affine2()
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius)
+    .axes(30)
+    .setTransform(transformB)
+    .lineStrip(polygonB.getPoints(), Color.WHITE, true)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circlePolygon3(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius = 40
+  const polygonB = ConvexPolygon.fromPoints(new Circle(50).getPoints(12))
+  const center = new Vector2(500, 1100)
+  const shapeA = new Circle(radius)
+  const shapeB = polygonB
+  const transformA = new Affine2()
+    .rotate(Rotary.fromAngle(clock.getElapsed() * -0.4))
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius)
+    .axes(30)
+    .setTransform(transformB)
+    .lineStrip(polygonB.getPoints(), Color.WHITE, true)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circlePolygon4(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius1 = 60
+  const polygonB = ConvexPolygon.fromPoints(new Circle(40).getPoints(8))
+  const center = new Vector2(700, 1100)
+  const shapeA = new Circle(radius1)
+  const shapeB = polygonB
+  const transformA = new Affine2()
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(50, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius1)
+    .axes(30)
+    .setTransform(transformB)
+    .lineStrip(polygonB.getPoints(), Color.WHITE, true)
+    .axes(30)
+    .reset()
+
+  if (!contacts) return
+  contacts.map(contact => contact.transform(transformA, transformB))
+
+  for (let contact of contacts) {
+    const { pointA, pointB, normalA, normalB } = contact
+
+    gizmo
+      .translate(pointA.x, pointA.y)
+      .arrow(normalA, 20, Color.PURPLE)
+      .circle(2, Color.RED)
+      .reset()
+      .translate(pointB.x, pointB.y)
+      .arrow(normalB, 20, Color.CYAN)
+      .circle(2, Color.BLUE)
+      .reset()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function circlePolygon5(world) {
+  const gizmo = world.getResource(Demo1Gizmo2D)
+  const clock = world.getResource(VirtualClock)
+  const radius1 = 60
+  const polygonB = ConvexPolygon.fromPoints(new Circle(40).getPoints(8))
+  const center = new Vector2(900, 1100)
+  const shapeA = new Circle(radius1)
+  const shapeB = polygonB
+  const transformA = new Affine2()
+    .translate(center)
+  const transformB = new Affine2()
+    .translate(new Vector2(30, 0))
+    .rotate(Rotary.fromAngle(clock.getElapsed() * 0.4))
+    .translate(center)
+
+  const contacts = getShape2Contacts(shapeA, shapeB, transformA, transformB)
+
+  gizmo
+    .setTransform(transformA)
+    .circle(radius1)
+    .axes(30)
+    .setTransform(transformB)
+    .lineStrip(polygonB.getPoints(), Color.WHITE, true)
     .axes(30)
     .reset()
 

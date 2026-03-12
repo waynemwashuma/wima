@@ -100,7 +100,7 @@ export function capsuleCircleContact(capsule, circle, transform, invTransform) {
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
-export function capsuleOBBContact(a, b, transform, invTransform) {
+export function capsuleRectangleContact(a, b, transform, invTransform) {
   // --- Step 1: capsule segment endpoints in B local space ---
   const a0 = new Vector2(0, a.halfHeight)
   const a1 = new Vector2(0, -a.halfHeight)

@@ -5,6 +5,13 @@ import {
   lineCircleContact
 } from './circle.js'
 import {
+  linesContact,
+  lineRectangleContact,
+  lineTriangleContact,
+  lineCapsuleContact,
+  lineConvexPolygonContact
+} from './line.js'
+import {
   rectangleContacts,
   circleRectangleContacts
 } from './rectangle.js'
@@ -21,7 +28,10 @@ import {
 } from './polygon.js'
 import {
   capsuleContacts,
-  capsuleCircleContact
+  capsuleCircleContact,
+  capsuleRectangleContact,
+  capsuleTriangleContact,
+  capsuleConvexPolygonContact
 } from './capsule.js'
 
 /**
@@ -53,6 +63,78 @@ export function getShape2Contacts(shapeA, shapeB, transformA, transformB) {
 
     if (contact) {
       return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Line2 && shapeB instanceof Line2) {
+    const contact = linesContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Line2 && shapeB instanceof Rectangle) {
+    const contact = lineRectangleContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Rectangle && shapeB instanceof Line2) {
+    const contact = lineRectangleContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Line2 && shapeB instanceof Triangle) {
+    const contact = lineTriangleContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Triangle && shapeB instanceof Line2) {
+    const contact = lineTriangleContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Line2 && shapeB instanceof Capsule) {
+    const contact = lineCapsuleContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Capsule && shapeB instanceof Line2) {
+    const contact = lineCapsuleContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Line2 && shapeB instanceof ConvexPolygon) {
+    const contact = lineConvexPolygonContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Line2) {
+    const contact = lineConvexPolygonContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
     }
 
     return undefined
@@ -129,6 +211,54 @@ export function getShape2Contacts(shapeA, shapeB, transformA, transformB) {
 
     if (contact){ 
       return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Capsule && shapeB instanceof Rectangle) {
+    const contact = capsuleRectangleContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Rectangle && shapeB instanceof Capsule) {
+    const contact = capsuleRectangleContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Capsule && shapeB instanceof Triangle) {
+    const contact = capsuleTriangleContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Triangle && shapeB instanceof Capsule) {
+    const contact = capsuleTriangleContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
+    }
+
+    return undefined
+  } else if (shapeA instanceof Capsule && shapeB instanceof ConvexPolygon) {
+    const contact = capsuleConvexPolygonContact(shapeA, shapeB, transform, transformInv)
+
+    if (contact) {
+      return [contact]
+    }
+
+    return undefined
+  } else if (shapeA instanceof ConvexPolygon && shapeB instanceof Capsule) {
+    const contact = capsuleConvexPolygonContact(shapeB, shapeA, transformInv, transform)
+
+    if (contact) {
+      return [contact.flip()]
     }
 
     return undefined
