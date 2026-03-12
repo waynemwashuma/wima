@@ -199,7 +199,7 @@ export function closestPointOnTriangle(p, a, b, c) {
  * @param {Vector2} halfExtents
  * @returns {Vector2}
  */
-export function closestPointPointOBB(p, halfExtents) {
+export function closestPointPointAABB(p, halfExtents) {
   const q = p.clone()
 
   const clampedX = Math.max(-halfExtents.x, Math.min(halfExtents.x, q.x))
