@@ -1,7 +1,12 @@
 import { Contact2D } from '../../../core/index.js'
-import { Capsule, Circle } from '../../../shapes/index.js'
+import { Capsule, Circle, ConvexPolygon, Rectangle, Triangle } from '../../../shapes/index.js'
 import { Vector2, clamp, Affine2 } from '../../../../math/index.js'
-import { getClosestPoints } from '../../distance/index.js'
+import {
+  getClosestPoints,
+  closestPointOnTriangle,
+  closestPointsSegmentSegment,
+  closestPointOnSegment2D
+} from '../../closestPoint/index.js'
 
 /**
  * @param {Capsule} capsuleA
@@ -97,28 +102,30 @@ export function capsuleCircleContact(capsule, circle, transform, invTransform) {
  */
 export function capsuleOBBContact(a, b, transform, invTransform) {
   // --- Step 1: capsule segment endpoints in B local space ---
-  const a0B = Affine2.transform(invTransform, a.a)
-  const a1B = Affine2.transform(invTransform, a.b)
+  const a0 = new Vector2(0, a.halfHeight)
+  const a1 = new Vector2(0, -a.halfHeight)
+  const a0B = Affine2.transform(invTransform, a0)
+  const a1B = Affine2.transform(invTransform, a1)
 
   // --- Step 2: closest point between segment and OBB (in B space) ---
   const segDir = Vector2.subtract(a1B, a0B)
-  const segLenSq = segDir.lengthSquared()
+  const segLenSq = segDir.magnitudeSquared()
 
   let t = 0
   if (segLenSq > 0) {
-    t = Vector2.dot(Vector2.negate(a0B), segDir) / segLenSq
+    t = Vector2.dot(Vector2.multiplyScalar(a0B, -1), segDir) / segLenSq
     t = Math.max(0, Math.min(1, t))
   }
 
   const closestSegPoint = Vector2.add(a0B, Vector2.multiplyScalar(segDir, t))
 
   const clamped = new Vector2(
-    Math.max(-b.halfExtents.x, Math.min(b.halfExtents.x, closestSegPoint.x)),
-    Math.max(-b.halfExtents.y, Math.min(b.halfExtents.y, closestSegPoint.y))
+    Math.max(-b.halfWidth, Math.min(b.halfWidth, closestSegPoint.x)),
+    Math.max(-b.halfHeight, Math.min(b.halfHeight, closestSegPoint.y))
   )
 
   const delta = Vector2.subtract(closestSegPoint, clamped)
-  const distSq = delta.lengthSquared()
+  const distSq = delta.magnitudeSquared()
 
   if (distSq > a.radius * a.radius) {
     return undefined
@@ -168,22 +175,25 @@ export function capsuleOBBContact(a, b, transform, invTransform) {
  */
 export function capsuleTriangleContact(a, b, transform, invTransform) {
   // --- Step 1: capsule segment endpoints in triangle (B) local space ---
-  const a0B = Affine2.transform(invTransform, a.a)
-  const a1B = Affine2.transform(invTransform, a.b)
+  const a0 = new Vector2(0, a.halfHeight)
+  const a1 = new Vector2(0, -a.halfHeight)
+  const a0B = Affine2.transform(invTransform, a0)
+  const a1B = Affine2.transform(invTransform, a1)
 
   // --- Step 2: closest points between capsule segment and triangle ---
   let bestDistSq = Infinity
   let bestSegPoint = null
   let bestTriPoint = null
+  const [v0, v1, v2] = b.getPoints()
 
   // Check segment vs triangle interior
   {
     const mid = Vector2.multiplyScalar(Vector2.add(a0B, a1B), 0.5)
-    const triClosest = closestPointOnTriangle(mid, b.v0, b.v1, b.v2)
-    const segClosest = closestPointOnSegment(triClosest, a0B, a1B)
+    const triClosest = closestPointOnTriangle(mid, v0, v1, v2)
+    const segClosest = closestPointOnSegment2D(triClosest, a0B, a1B)
 
     const d = Vector2.subtract(segClosest, triClosest)
-    const dsq = d.lengthSquared()
+    const dsq = d.magnitudeSquared()
     if (dsq < bestDistSq) {
       bestDistSq = dsq
       bestSegPoint = segClosest
@@ -193,22 +203,22 @@ export function capsuleTriangleContact(a, b, transform, invTransform) {
 
   // Check against triangle edges
   const edges = [
-    [b.v0, b.v1],
-    [b.v1, b.v2],
-    [b.v2, b.v0]
+    [v0, v1],
+    [v1, v2],
+    [v2, v0]
   ]
 
   for (let i = 0; i < 3; i++) {
     const [e0, e1] = edges[i]
 
-    const p0 = closestPointOnSegment(e0, a0B, a1B)
-    const p1 = closestPointOnSegment(e1, a0B, a1B)
+    const p0 = closestPointOnSegment2D(e0, a0B, a1B)
+    const p1 = closestPointOnSegment2D(e1, a0B, a1B)
 
     const d0 = Vector2.subtract(p0, e0)
     const d1 = Vector2.subtract(p1, e1)
 
-    const dsq0 = d0.lengthSquared()
-    const dsq1 = d1.lengthSquared()
+    const dsq0 = d0.magnitudeSquared()
+    const dsq1 = d1.magnitudeSquared()
 
     if (dsq0 < bestDistSq) {
       bestDistSq = dsq0
@@ -239,7 +249,7 @@ export function capsuleTriangleContact(a, b, transform, invTransform) {
     )
   } else {
     // fallback: triangle face normal (2D perpendicular)
-    const edge = Vector2.subtract(b.v1, b.v0)
+    const edge = Vector2.subtract(v1, v0)
     normalB = new Vector2(-edge.y, edge.x).normalize()
   }
 
@@ -273,14 +283,16 @@ export function capsuleTriangleContact(a, b, transform, invTransform) {
  */
 export function capsuleConvexPolygonContact(a, b, transform, invTransform) {
   // --- Step 1: capsule segment endpoints in polygon (B) local space ---
-  const a0B = Affine2.transform(invTransform, a.a)
-  const a1B = Affine2.transform(invTransform, a.b)
+  const a0 = new Vector2(0, a.halfHeight)
+  const a1 = new Vector2(0, -a.halfHeight)
+  const a0B = Affine2.transform(invTransform, a0)
+  const a1B = Affine2.transform(invTransform, a1)
 
   let bestDistSq = Infinity
   let bestSegPoint = null
   let bestPolyPoint = null
 
-  const verts = b.vertices
+  const verts = b.getPoints()
   const count = verts.length
 
   // --- Step 2: check against polygon edges ---
@@ -290,7 +302,7 @@ export function capsuleConvexPolygonContact(a, b, transform, invTransform) {
 
     const { pA, pB } = closestPointsSegmentSegment(a0B, a1B, v0, v1)
     const d = Vector2.subtract(pA, pB)
-    const dsq = d.lengthSquared()
+    const dsq = d.magnitudeSquared()
 
     if (dsq < bestDistSq) {
       bestDistSq = dsq
@@ -302,9 +314,9 @@ export function capsuleConvexPolygonContact(a, b, transform, invTransform) {
   // --- Step 3: also test polygon vertices vs capsule segment ---
   for (let i = 0; i < count; i++) {
     const v = verts[i]
-    const p = closestPointOnSegment(v, a0B, a1B)
+    const p = closestPointOnSegment2D(v, a0B, a1B)
     const d = Vector2.subtract(p, v)
-    const dsq = d.lengthSquared()
+    const dsq = d.magnitudeSquared()
 
     if (dsq < bestDistSq) {
       bestDistSq = dsq

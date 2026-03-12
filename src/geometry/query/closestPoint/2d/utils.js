@@ -20,6 +20,67 @@ export function closestPointOnSegment2D(a, b, p) {
 }
 
 /**
+ * Closest points between two segments in 2D.
+ * @param {Vector2} a0
+ * @param {Vector2} a1
+ * @param {Vector2} b0
+ * @param {Vector2} b1
+ * @returns {{pA: Vector2, pB: Vector2}}
+ */
+export function closestPointsSegmentSegment(a0, a1, b0, b1) {
+  const d1 = Vector2.subtract(a1, a0)
+  const d2 = Vector2.subtract(b1, b0)
+  const r = Vector2.subtract(a0, b0)
+
+  const a = Vector2.dot(d1, d1)
+  const e = Vector2.dot(d2, d2)
+  const f = Vector2.dot(d2, r)
+
+  const EPS = 1e-8
+  let s = 0
+  let t = 0
+
+  if (a <= EPS && e <= EPS) {
+    s = 0
+    t = 0
+  } else if (a <= EPS) {
+    s = 0
+    t = clamp(f / e, 0, 1)
+  } else {
+    const c = Vector2.dot(d1, r)
+    if (e <= EPS) {
+      t = 0
+      s = clamp(-c / a, 0, 1)
+    } else {
+      const b = Vector2.dot(d1, d2)
+      const denom = a * e - b * b
+
+      if (Math.abs(denom) > EPS) {
+        s = clamp((b * f - c * e) / denom, 0, 1)
+      } else {
+        s = 0
+      }
+
+      const tNom = b * s + f
+      if (tNom < 0) {
+        t = 0
+        s = clamp(-c / a, 0, 1)
+      } else if (tNom > e) {
+        t = 1
+        s = clamp((b - c) / a, 0, 1)
+      } else {
+        t = tNom / e
+      }
+    }
+  }
+
+  const pA = Vector2.add(a0, Vector2.multiplyScalar(d1, s))
+  const pB = Vector2.add(b0, Vector2.multiplyScalar(d2, t))
+
+  return { pA, pB }
+}
+
+/**
  * Get closest points between two convex vertex polygons.
  * @param {Vector2[]} verticesA 
  * @param {Vector2[]} verticesB 
@@ -73,10 +134,61 @@ export function getClosestPoints(verticesA, verticesB) {
   return [new ClosestPoint2D(closestA, closestB, sqrt(minDistSq))]
 }
 
-function closestPointOnTriangle(p, a, b, c) {
+/**
+ * @param {Vector2} p
+ * @param {Vector2} a
+ * @param {Vector2} b
+ * @param {Vector2} c
+ */
+export function closestPointOnTriangle(p, a, b, c) {
   // Standard Voronoi-region solution
-  // Returns closest point on triangle to p
-  // (implementation omitted here for brevity, assumed available)
+  const ab = Vector2.subtract(b, a)
+  const ac = Vector2.subtract(c, a)
+  const ap = Vector2.subtract(p, a)
+
+  const d1 = Vector2.dot(ab, ap)
+  const d2 = Vector2.dot(ac, ap)
+  if (d1 <= 0 && d2 <= 0) return a.clone()
+
+  const bp = Vector2.subtract(p, b)
+  const d3 = Vector2.dot(ab, bp)
+  const d4 = Vector2.dot(ac, bp)
+  if (d3 >= 0 && d4 <= d3) return b.clone()
+
+  const vc = d1 * d4 - d3 * d2
+  if (vc <= 0 && d1 >= 0 && d3 <= 0) {
+    const v = d1 / (d1 - d3)
+    return Vector2.add(a, Vector2.multiplyScalar(ab, v))
+  }
+
+  const cp = Vector2.subtract(p, c)
+  const d5 = Vector2.dot(ab, cp)
+  const d6 = Vector2.dot(ac, cp)
+  if (d6 >= 0 && d5 <= d6) return c.clone()
+
+  const vb = d5 * d2 - d1 * d6
+  if (vb <= 0 && d2 >= 0 && d6 <= 0) {
+    const w = d2 / (d2 - d6)
+    return Vector2.add(a, Vector2.multiplyScalar(ac, w))
+  }
+
+  const va = d3 * d6 - d5 * d4
+  if (va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0) {
+    const w = (d4 - d3) / ((d4 - d3) + (d5 - d6))
+    const bc = Vector2.subtract(c, b)
+    return Vector2.add(b, Vector2.multiplyScalar(bc, w))
+  }
+
+  const denom = 1 / (va + vb + vc)
+  const v = vb * denom
+  const w = vc * denom
+  return Vector2.add(
+    a,
+    Vector2.add(
+      Vector2.multiplyScalar(ab, v),
+      Vector2.multiplyScalar(ac, w)
+    )
+  )
 }
 
 /**

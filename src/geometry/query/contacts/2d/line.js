@@ -1,18 +1,23 @@
+import { Affine2, Vector2 } from "../../../../math/index.js"
+import { Contact2D } from "../../../core/contact.js"
+import { Capsule, ConvexPolygon, Line2, Rectangle, Triangle } from "../../../shapes/index.js"
 
 
 /**
- * @param {LineSegment} a
- * @param {LineSegment} b
+ * @param {Line2} a
+ * @param {Line2} b
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
 export function linesContact(a, b, transform, invTransform) {
   // Transform A line into B local space
-  const a0 = Affine2.transformPoint(invTransform, a.p0)
-  const a1 = Affine2.transformPoint(invTransform, a.p1)
+  const a0Local = new Vector2(a.halfLength, 0)
+  const a1Local = new Vector2(-a.halfLength, 0)
+  const a0 = Affine2.transform(invTransform, a0Local)
+  const a1 = Affine2.transform(invTransform, a1Local)
 
-  const b0 = b.p0
-  const b1 = b.p1
+  const b0 = new Vector2(b.halfLength, 0)
+  const b1 = new Vector2(-b.halfLength, 0)
 
   const da = Vector2.subtract(a1, a0)
   const db = Vector2.subtract(b1, b0)
@@ -59,7 +64,7 @@ export function linesContact(a, b, transform, invTransform) {
 
   // Choose a stable normal (perpendicular to B)
   let normalB = new Vector2(db.y, -db.x)
-  if (normalB.lengthSquared() < EPS) {
+  if (normalB.magnitudeSquared() < EPS) {
     normalB = new Vector2(da.y, -da.x)
   }
   normalB.normalize()
@@ -72,8 +77,8 @@ export function linesContact(a, b, transform, invTransform) {
   // Contact points
   const contactB = closestB
   const contactA = Vector2.add(
-    a.p0,
-    Vector2.multiplyScalar(Vector2.subtract(a.p1, a.p0), s)
+    a0Local,
+    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), s)
   )
 
   return new Contact2D(
@@ -86,15 +91,17 @@ export function linesContact(a, b, transform, invTransform) {
 }
 
 /**
- * @param {LineSegment} a   // body A
- * @param {OBB} b           // body B
+ * @param {Line2} a   // body A
+ * @param {Rectangle} b           // body B
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
 export function lineOBBContact(a, b, transform, invTransform) {
   // Transform line endpoints into B local space
-  const p0 = Affine2.transformPoint(invTransform, a.p0)
-  const p1 = Affine2.transformPoint(invTransform, a.p1)
+  const a0Local = new Vector2(a.halfLength, 0)
+  const a1Local = new Vector2(-a.halfLength, 0)
+  const p0 = Affine2.transform(invTransform, a0Local)
+  const p1 = Affine2.transform(invTransform, a1Local)
 
   const d = Vector2.subtract(p1, p0)
 
@@ -106,8 +113,8 @@ export function lineOBBContact(a, b, transform, invTransform) {
   for (let axis = 0; axis < 2; axis++) {
     const origin = axis === 0 ? p0.x : p0.y
     const direction = axis === 0 ? d.x : d.y
-    const min = axis === 0 ? -b.hx : -b.hy
-    const max = axis === 0 ?  b.hx :  b.hy
+    const min = axis === 0 ? -b.halfWidth : -b.halfHeight
+    const max = axis === 0 ?  b.halfWidth :  b.halfHeight
 
     if (Math.abs(direction) < 1e-8) {
       // Parallel to slab
@@ -151,12 +158,12 @@ export function lineOBBContact(a, b, transform, invTransform) {
 
   // Contact point on line in A space
   const contactA = Vector2.add(
-    a.p0,
-    Vector2.multiplyScalar(Vector2.subtract(a.p1, a.p0), tMin)
+    a0Local,
+    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), tMin)
   )
 
   // Penetration: distance from contact to exit point
-  const penetration = Math.max(0, tMax - tMin) * d.length()
+  const penetration = Math.max(0, tMax - tMin) * d.magnitude()
 
   return new Contact2D(
     contactA,
@@ -168,22 +175,24 @@ export function lineOBBContact(a, b, transform, invTransform) {
 }
 
 /**
- * @param {LineSegment} a
+ * @param {Line2} a
  * @param {Triangle} b
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
 export function lineTriangleContact(a, b, transform, invTransform) {
   // Transform line into triangle local space
-  const p0 = Affine2.transformPoint(invTransform, a.p0)
-  const p1 = Affine2.transformPoint(invTransform, a.p1)
+  const a0Local = new Vector2(a.halfLength, 0)
+  const a1Local = new Vector2(-a.halfLength, 0)
+  const p0 = Affine2.transform(invTransform, a0Local)
+  const p1 = Affine2.transform(invTransform, a1Local)
   const d = Vector2.subtract(p1, p0)
 
   let bestT = Infinity
   let bestNormalB = null
 
   // Triangle edges
-  const verts = [b.v0, b.v1, b.v2]
+  const verts = b.getPoints()
 
   for (let i = 0; i < 3; i++) {
     const v0 = verts[i]
@@ -224,8 +233,8 @@ export function lineTriangleContact(a, b, transform, invTransform) {
 
   // Contact point on line in A space
   const contactA = Vector2.add(
-    a.p0,
-    Vector2.multiplyScalar(Vector2.subtract(a.p1, a.p0), bestT)
+    a0Local,
+    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), bestT)
   )
 
   // Penetration is zero for pure segment intersection
@@ -241,18 +250,20 @@ export function lineTriangleContact(a, b, transform, invTransform) {
 }
 
 /**
- * @param {LineSegment} a
+ * @param {Line2} a
  * @param {Capsule} b
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
 export function lineCapsuleContact(a, b, transform, invTransform) {
   // Transform line into capsule (B) local space
-  const a0 = Affine2.transformPoint(invTransform, a.p0)
-  const a1 = Affine2.transformPoint(invTransform, a.p1)
+  const a0Local = new Vector2(a.halfLength, 0)
+  const a1Local = new Vector2(-a.halfLength, 0)
+  const a0 = Affine2.transform(invTransform, a0Local)
+  const a1 = Affine2.transform(invTransform, a1Local)
 
-  const b0 = b.p0
-  const b1 = b.p1
+  const b0 = new Vector2(0, b.halfHeight)
+  const b1 = new Vector2(0, -b.halfHeight)
   const r = b.radius
 
   // Segment directions
@@ -264,17 +275,17 @@ export function lineCapsuleContact(a, b, transform, invTransform) {
   const dbLenSq = Vector2.dot(db, db)
   const dab = Vector2.dot(da, db)
 
-  const a = daLenSq
+  const daLen = daLenSq
   const e = dbLenSq
   const f = Vector2.dot(db, r0)
 
   let s, t
 
   const EPS = 1e-8
-  if (a <= EPS && e <= EPS) {
+  if (daLen <= EPS && e <= EPS) {
     // Both segments degenerate
     s = t = 0
-  } else if (a <= EPS) {
+  } else if (daLen <= EPS) {
     // Line A is a point
     s = 0
     t = Math.max(0, Math.min(1, f / e))
@@ -284,9 +295,9 @@ export function lineCapsuleContact(a, b, transform, invTransform) {
     if (e <= EPS) {
       // Capsule spine is a point
       t = 0
-      s = Math.max(0, Math.min(1, -c / a))
+      s = Math.max(0, Math.min(1, -c / daLen))
     } else {
-      const denom = a * e - dab * dab
+      const denom = daLen * e - dab * dab
 
       if (denom !== 0) {
         s = Math.max(0, Math.min(1, (dab * f - c * e) / denom))
@@ -298,10 +309,10 @@ export function lineCapsuleContact(a, b, transform, invTransform) {
 
       if (t < 0) {
         t = 0
-        s = Math.max(0, Math.min(1, -c / a))
+        s = Math.max(0, Math.min(1, -c / daLen))
       } else if (t > 1) {
         t = 1
-        s = Math.max(0, Math.min(1, (dab - c) / a))
+        s = Math.max(0, Math.min(1, (dab - c) / daLen))
       }
     }
   }
@@ -336,8 +347,8 @@ export function lineCapsuleContact(a, b, transform, invTransform) {
 
   // Contact point on line (A space)
   const contactA = Vector2.add(
-    a.p0,
-    Vector2.multiplyScalar(Vector2.subtract(a.p1, a.p0), s)
+    a0Local,
+    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), s)
   )
 
   return new Contact2D(
@@ -350,22 +361,24 @@ export function lineCapsuleContact(a, b, transform, invTransform) {
 }
 
 /**
- * @param {LineSegment} a
+ * @param {Line2} a
  * @param {ConvexPolygon} b
  * @param {Affine2} transform     // B -> A
  * @param {Affine2} invTransform  // A -> B
  */
 export function lineConvexPolygonContact(a, b, transform, invTransform) {
   // Transform line into polygon (B) local space
-  const p0 = Affine2.transformPoint(invTransform, a.p0)
-  const p1 = Affine2.transformPoint(invTransform, a.p1)
+  const a0Local = new Vector2(a.halfLength, 0)
+  const a1Local = new Vector2(-a.halfLength, 0)
+  const p0 = Affine2.transform(invTransform, a0Local)
+  const p1 = Affine2.transform(invTransform, a1Local)
   const d = Vector2.subtract(p1, p0)
 
   let tEnter = 0
   let tExit = 1
   let enterNormalB = null
 
-  const verts = b.vertices
+  const verts = b.getPoints()
   const count = verts.length
   const EPS = 1e-8
 
@@ -414,8 +427,8 @@ export function lineConvexPolygonContact(a, b, transform, invTransform) {
 
   // Contact point on line in A space
   const contactA = Vector2.add(
-    a.p0,
-    Vector2.multiplyScalar(Vector2.subtract(a.p1, a.p0), tEnter)
+    a0Local,
+    Vector2.multiplyScalar(Vector2.subtract(a1Local, a0Local), tEnter)
   )
 
   // Penetration for a zero-thickness line is zero
@@ -429,5 +442,4 @@ export function lineConvexPolygonContact(a, b, transform, invTransform) {
     penetration
   )
 }
-
 

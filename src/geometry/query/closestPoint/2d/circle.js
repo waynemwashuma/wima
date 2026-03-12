@@ -1,5 +1,6 @@
 import { ClosestPoint2D } from '../../../core/index.js'
 import { Vector2, Affine2 } from '../../../../math/index.js'
+import { Circle } from '../../../shapes/index.js'
 
 /**
  * @param {Circle} circleA
