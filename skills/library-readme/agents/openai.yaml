@@ -1,0 +1,4 @@
+interface:
+  display_name: "Library Readme"
+  short_description: "Feature-focused README drafting for libraries"
+  default_prompt: "Use $library-readme to draft a feature-focused README for a package."
