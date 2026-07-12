@@ -3,7 +3,7 @@ title: App
 ---
 
 `App` is the runtime container for Wima.
-It gathers setup, schedules, plugins, and the runner into one place.
+It gathers setup, schedules, plugins, worlds, and the runner into one place.
 The point is to build the runtime first and start it once.
 
 This chapter stays at the coordination level.
@@ -26,7 +26,7 @@ The world is where the runtime state actually lives, and [World](../13-world/ind
 
 `App` keeps a small set of runtime responsibilities together.
 
-- A `World` for ECS state.
+- A `Worlds` registry for ECS state.
 - A `Scheduler` for schedule execution.
 - A plugin registry for staged setup.
 - A runner for the runtime loop.
@@ -49,13 +49,13 @@ After that, the app stops being a setup container and becomes a running system.
 
 1. Create an `App`.
 2. Register baseline plugins.
-3. Register resources, resource aliases, types, and component hooks.
+3. Create any extra worlds, shared resources, resource aliases, and component hooks you need.
 4. Add schedules, system groups, and systems.
 5. Set the runner.
 6. Call `run()`.
 7. Plugins are replayed in registration order.
 8. The staged schedules are pushed into the scheduler.
-9. The runner receives the scheduler and the world.
+9. The runner receives the scheduler and the world registry.
 10. Startup work runs once.
 11. Update work repeats.
 
@@ -217,37 +217,31 @@ Setup runs once.
 Update runs every frame.
 The app just stages the pieces and starts the runtime.
 
-## World Setup
+## Worlds, Resources, And Hooks
 
-`App` owns a `World` instance and exposes it when you need lower-level ECS access.
-Use `getWorld()` only when the app-level helpers are not enough.
+`App` owns a `Worlds` registry and exposes it through `getWorld()`.
+Call `getWorld()` with no argument for the default world.
+Pass a label to read a specific world by constructor.
 
-Most of the time, you should use the app helpers instead of reaching into the world directly.
-That keeps setup code readable.
-It also keeps the runtime composition in one place.
+`setWorld(label)` creates an extra world before startup.
+`defaultWorld(label)` changes which world `getWorld()` returns when you do not pass a label.
+`CorePlugin` creates `MainWorld` and uses it as the default world label for the standard runtime.
 
-`registerType()` adds type metadata for reflection and world-level bookkeeping.
-`setComponentHooks()` installs lifecycle hooks for a component class.
-`setResource()` stores shared state on the world.
-`setResource()` and resource alias setup happen before `run()`, because startup is when the world shape gets finalized.
-
-That is the right surface for bootstrap state.
-Use it for config, clocks, caches, and shared engine data.
-Use components for per-entity state.
-
-`setResource()` is guarded after initialization.
-That means world-owned shared state belongs in the startup phase, not after the app is already running.
+Most app-level setup is staged against the app rather than a single world.
+Use `setResource()` when you want a resource instance to land in the default world.
+Pass a world label to `setResource()` or `setResourceByTypeId()` when the resource belongs somewhere else.
+Use `setResourceAlias()` when you want a resource alias to be applied to every world during startup.
+Use `setComponentHooks()` when you want component lifecycle callbacks to be applied during startup.
 
 ```js
 import { App } from '@wimaengine/app'
 import { ComponentHooks } from '@wimaengine/ecs'
 import { typeid } from '@wimaengine/type'
 
-class Position {}
-class Velocity {}
-class GameConfig {}
+class GameplayWorld {}
 class AssetStore {}
 class SceneAssets extends AssetStore {}
+class Player {}
 
 const onAdd = () => {}
 const onRemove = () => {}
@@ -256,20 +250,16 @@ const onInsert = () => {}
 const app = new App()
 
 app
-  .registerType(Position)
-  .registerType(Velocity)
-  .setComponentHooks(Position, new ComponentHooks(onAdd, onRemove, onInsert))
-  .setResource(new GameConfig())
-
-const world = app.getWorld()
-
-world.setResource(new AssetStore())
-world.setResourceAlias(typeid(AssetStore), SceneAssets)
+  .setWorld(GameplayWorld)
+  .setResourceByTypeId(typeid(AssetStore), new AssetStore(), GameplayWorld)
+  .setResourceAlias(typeid(AssetStore), SceneAssets)
+  .setComponentHooks(Player, new ComponentHooks(onAdd, onRemove, onInsert))
 ```
 
-That keeps the alias close to the resource that owns the data.
-It also keeps the app layer focused on composition instead of on every lookup detail.
+That keeps world-specific setup in one place.
+It also keeps the app layer focused on startup composition instead of on live ECS mutation.
 
+If you need direct access to one world, use `getWorld(label)` and then work with the world API directly.
 The storage model is covered in [World](../13-world/index.md). [Resources](../05-resources/index.md), [Components](../04-components/index.md), and [Component hooks](../09-component-hooks/index.md) sit on top of it.
 
 ## Runners
@@ -279,7 +269,7 @@ The storage model is covered in [World](../13-world/index.md). [Resources](../05
 That is the boundary between setup and execution.
 
 The runner contract is simple.
-It receives the scheduler and the world.
+It receives the scheduler and the world registry.
 It decides how to advance the scheduler.
 It owns the timing policy.
 
@@ -293,7 +283,7 @@ import { App } from '@wimaengine/app'
 const app = new App()
 
 app
-  .setRunner((scheduler, world) => {
+  .setRunner((scheduler, worlds) => {
     // Drive the scheduler with your own loop policy.
     // The app only needs the Runner shape.
   })
@@ -309,7 +299,7 @@ The driver model lives in [Runners](../11-runners/index.md). The schedule execut
 ## Core Integration
 
 `@wimaengine/core` is the normal baseline above `App`.
-It wires the standard schedules, the default runner, and the core phase graph.
+It wires the standard schedules, the default runner, the core phase graph, and the default `MainWorld` label.
 It also seeds type metadata and flushes deferred commands.
 
 If you want the standard engine path, register `CorePlugin`.
@@ -324,7 +314,7 @@ The core package is where the common frame flow lives.
 
 ```js
 import { App } from '@wimaengine/app'
-import { CoreSystems } from '@wimaengine/core'
+import { CoreSystems, MainWorld } from '@wimaengine/core'
 
 class GameplaySchedule {}
 
@@ -332,6 +322,7 @@ const app = new App()
 
 app.createSchedule({
   label: GameplaySchedule,
+  world: MainWorld,
   repeat: true,
   defaultSystemGroup: CoreSystems.Main
 })
@@ -352,11 +343,12 @@ There are a few common ways to use `App`.
 - Custom loop: `App` plus your own `setRunner()` function.
 - Startup-only setup: `registerSystem(...Startup...)`.
 - Frame work: `registerSystem(...Update...)`.
-- Shared state: `setResource()` before `run()`.
-- Type setup: `registerType()` before runtime starts.
+- Shared state: `setResource()` or `setResourceByTypeId()` before `run()`.
+- World setup: `setWorld()` before runtime starts.
 - Component lifecycle: `setComponentHooks()` during startup.
+- Resource aliases: `setResourceAlias()` during startup.
 - Order-sensitive work: `registerSystemGroup()` inside a schedule.
-- Direct ECS access: `getWorld()` when the app helpers are not enough.
+- Direct ECS access: `getWorld(label)` when the app helpers are not enough.
 
 These are the shapes to reach for first.
 They cover the normal runtime cases without forcing you into internals.
@@ -387,14 +379,14 @@ It also keeps the public shape of the engine clean.
 Before you call `run()`, check the following.
 
 1. The app has the plugins it needs.
-2. The startup systems are staged.
-3. The update systems are staged.
-4. The shared resources are registered.
-5. The component hooks are in place.
-6. The types you need are registered.
-7. The runner is set.
-8. The schedule labels are ready.
-9. The world shape is complete.
+2. The worlds you need are created.
+3. The startup systems are staged.
+4. The update systems are staged.
+5. The shared resources are registered.
+6. The resource aliases are in place.
+7. The component hooks are in place.
+8. The runner is set.
+9. The schedule labels are ready.
 10. Anything that should not change later is already configured.
 
 That checklist is usually enough for a clean start.

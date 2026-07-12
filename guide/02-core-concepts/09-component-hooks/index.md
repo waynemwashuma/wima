@@ -4,7 +4,7 @@ title: Component Hooks
 
 Component hooks let the world react when component membership changes. They are the lifecycle bridge between low-level ECS storage and higher-level runtime behavior.
 
-This is one of the main reasons plugins can stay expressive without becoming magical. A plugin can register a component, attach hooks to it, and then let systems or deferred commands trigger the lifecycle behavior naturally during runtime.
+This is one of the main reasons plugins can stay expressive without becoming magical. A plugin can attach hooks to a component, and then let systems or deferred commands trigger the lifecycle behavior naturally during runtime.
 
 ## What Hooks Are For
 
@@ -26,18 +26,29 @@ For example, a hierarchy plugin can use hooks to keep parent and child links syn
 
 ## Startup Pattern
 
-Hooks are usually installed during plugin registration:
+Hooks are usually installed during plugin registration or app startup:
 
 ```ts
-app
-  .registerType(SceneInstance)
-  .setComponentHooks(SceneInstance, new ComponentHooks(
-    initSceneInstance,
-    dropSceneInstance
-  ))
+import { ComponentHooks, World } from '@wimaengine/ecs'
+
+class SceneInstance {}
+const addSceneInstance = () => {}
+const removeSceneInstance = () => {}
+const insertSceneInstance = () => {}
+
+const world = new World()
+
+world.setComponentHooks(
+  SceneInstance,
+  new ComponentHooks(
+    addSceneInstance,
+    removeSceneInstance,
+    insertSceneInstance
+  )
+)
 ```
 
-That pattern keeps lifecycle wiring close to the component definition and makes the startup path explicit. By the time [Runners](../11-runners/index.md) start advancing schedules, the world already knows which components need lifecycle behavior.
+That pattern keeps lifecycle wiring close to the component definition and makes the startup path explicit. The world records the component type when the hooks are attached, so there is no separate registration step. By the time [Runners](../11-runners/index.md) start advancing schedules, the world already knows which components need lifecycle behavior.
 
 ## Related Concepts
 

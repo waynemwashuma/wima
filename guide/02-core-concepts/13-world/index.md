@@ -2,7 +2,7 @@
 title: World
 ---
 
-The world is the ECS registry that holds entity identity, dense component storage, resources, archetypes, and the metadata needed to move data safely between them.
+The world is the ECS registry that holds entity identity, dense component storage, resources, archetypes, and the metadata needed to move data safely between them. An app can own more than one world, but this page still describes one world instance at a time.
 
 ## What The World Owns
 
@@ -14,7 +14,7 @@ The world is the ECS registry that holds entity identity, dense component storag
 - world resources and resource aliases
 - the type store that tracks component metadata and hooks
 
-That makes the world the place where "what exists?" and "where is it stored?" meet. If you already have one entity and only want to inspect it, see [Entity cells](../20-entity-cells/index.md). If you want to read many matching entities, use [Queries](../14-queries/index.md).
+That makes the world the place where "what exists?" and "where is it stored?" meet. If you already have one entity and only want to inspect it, see [Entity cells](../20-entity-cells/index.md). If you want to read many matching entities, use [Queries](../14-queries/index.md). If you need a second world in the same app, create it through `App.setWorld()` and pick the default one with `App.defaultWorld()`.
 
 ## How Data Moves
 
@@ -33,9 +33,9 @@ The first call creates a live entity with `Position` and `Velocity`. The second 
 
 ## Resources And Metadata
 
-The world also owns shared resources such as clocks, asset stores, or command queues. Those live outside entity storage and are read through `getResource()`, `hasResource()`, and `setResource()`. Resource aliases let one stored resource appear under another type id, which is useful when a package wants to hide an implementation type behind a public name.
+The world also owns shared resources such as clocks, asset stores, or command queues. Those live outside entity storage and are read through `getResource()`, `hasResource()`, and `setResource()`. `setResourceByTypeId()` is the lower-level path when you already have the type id. Resource aliases let one stored resource appear under another type id, which is useful when a package wants to hide an implementation type behind a public name.
 
-Component metadata lives alongside that storage model. `setComponentHooks()` attaches add, remove, and insert callbacks to that type. The world then fires those hooks when entity membership changes.
+Component metadata lives alongside that storage model. `setComponentHooks()` attaches add, remove, and insert callbacks to that type. The world records the component when hooks are attached or when the component first appears, then fires those hooks when entity membership changes.
 
 That is the main boundary to remember: components and entities live in tables and archetypes, while resources and type metadata live on the world itself.
 
