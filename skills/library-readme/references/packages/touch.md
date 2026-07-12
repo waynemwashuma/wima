@@ -1,6 +1,6 @@
 # Touch Package Notes
 
-`@wimaengine/touch` is the Wima engine's touch-input state layer. It turns touch pointer events into ECS-friendly contact state, stores active contacts in a compact resource, and registers that resource with the reflection system.
+`@wimaengine/touch` models touch contact state for Wima, translating touch pointer events into ECS-accessible slots with stable IDs, current position, and previous-position history.
 
 ## Capability Highlights
 

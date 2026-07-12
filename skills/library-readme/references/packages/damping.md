@@ -2,7 +2,7 @@
 title: Damping
 ---
 
-`@wimaengine/damping` supplies the ECS resources and systems that model translational and rotational damping in the Wima engine.
+`@wimaengine/damping` provides linear and angular damping resources and systems.
 
 ## Package Role Summary
 

@@ -1,6 +1,6 @@
 # Render Core Feature Notes
 
-`@wimaengine/render-core` is the shared rendering layer that sits between the engine runtime and the concrete canvas or WebGL backends. It defines the component model, render asset types, resource caches, lifecycle events, and prefab setup that the backend packages build on.
+`@wimaengine/render-core` provides the shared rendering abstractions used by the canvas and WebGL backends.
 
 ## Preferred README Shape
 

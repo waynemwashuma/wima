@@ -2,7 +2,7 @@
 
 ## Package Role
 
-`@wimaengine/hierarchy` is the engine package that supplies entity-tree structure. It models parent/child relationships and keeps those links consistent as the hierarchy changes, so higher-level systems can rely on stable structural metadata.
+`@wimaengine/hierarchy` provides parent and children components plus the hooks that keep entity trees consistent.
 
 ## Capability Highlights
 

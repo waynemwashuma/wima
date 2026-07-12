@@ -1,7 +1,7 @@
 # `@wimaengine/relationship` reference
 
 ## Package Role
-`@wimaengine/relationship` is the relationship layer for Wima's ECS-oriented entity model. It centers on relationship-aware queries and graph traversal so callers can reason about connected entities without reimplementing traversal rules in each feature.
+`@wimaengine/relationship` provides relationship queries and traversal helpers over entity graphs.
 
 ## Capability Highlights
 - Provides relationship-aware lookup helpers on top of the ECS stack.

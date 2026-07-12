@@ -1,6 +1,6 @@
 # @wimaengine/color
 
-`@wimaengine/color` is the engine color package for shared color primitives, ECS-facing type integration, and runtime plugin registration.
+`@wimaengine/color` provides a mutable RGBA color primitive plus the runtime type-registration hooks the engine uses to treat color as structured data.
 
 ## Package Role
 

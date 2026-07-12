@@ -2,7 +2,7 @@
 title: Narrowphase
 ---
 
-`@wimaengine/narrowphase` is the contact-generation layer of Wima's physics stack, turning broadphase candidate pairs into collision data, runtime state, and systems that support narrow-phase simulation.
+`@wimaengine/narrowphase` provides contact generation and collision-resolution support.
 
 ## Package Role
 

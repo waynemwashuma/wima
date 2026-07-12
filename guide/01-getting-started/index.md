@@ -3,7 +3,7 @@ title: Getting started
 ---
 
 
-This section is a tutorial path, not a reference section. Follow the chapters in order: each one explains one step, shows the smallest useful code, and leaves deeper engine internals for later sections.
+This section is a tutorial path, not a reference section. Follow the chapters in order: each one adds one step, reuses the result from the previous chapter, and leaves deeper engine internals for later sections.
 
 ## Folder Layout
 
@@ -33,13 +33,13 @@ guide/01-getting-started/
 ## Tutorial Flow
 
 1. [What you need](./01-what-you-need/index.md)
-   - Confirm the runtime prerequisites and the minimum tools you need.
+   - Confirm the minimum tools and runtime prerequisites.
 2. [Install the engine](./02-install-the-engine/index.md)
    - Add Wima to a project or work from a local checkout.
 3. [Run your first app](./03-run-your-first-app/index.md)
-   - Create an `App`, register the default runtime plugin, and start the engine.
+   - Create an `App`, register the baseline plugins, and start the engine.
 4. [Add your first system](./04-add-your-first-system/index.md)
-   - Learn how startup and update systems fit into the frame loop.
+   - Put startup and frame work on the right schedules.
 5. [Add your first component](./05-add-your-first-component/index.md)
    - Define the data your game logic will attach to entities.
 6. [Spawn an entity with components](./06-spawn-an-entity-with-components/index.md)
@@ -49,8 +49,8 @@ guide/01-getting-started/
 8. [Store shared state in a resource](./08-store-shared-state-in-a-resource/index.md)
    - Keep game-wide values in one place so any system can read them.
 9. [What to learn next](./09-what-to-learn-next/index.md)
-   - Move into core concepts once the basic flow feels familiar.
+   - Move into the core concepts once the basic loop feels familiar.
 
 ## What Comes Later
 
-This guide deliberately avoids advanced ECS details, system ordering rules, command queues, resource aliases, and plugin composition. Those topics are covered in the later concept and building sections once the basic loop is clear.
+This guide deliberately avoids advanced ECS details, system ordering rules, command queues, resource aliases, component hooks, and plugin composition. Those topics are covered in the later concept and building sections once the basic loop is clear.

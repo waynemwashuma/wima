@@ -2,7 +2,7 @@
 title: Geometry
 ---
 
-`@wimaengine/geometry` is the Wima engine's spatial-bounds package for bounding volumes, overlap checks, and ECS-facing geometry runtime support.
+`@wimaengine/geometry` provides AABB bounding volumes, overlap helpers, and geometry runtime support.
 
 ## Capability Highlights
 

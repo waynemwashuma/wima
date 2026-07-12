@@ -2,7 +2,7 @@
 title: Noise
 ---
 
-`@wimaengine/noise` is a compact deterministic sampling package for seeded 1D and 2D noise values, centered on a single static `Noise` class.
+`@wimaengine/noise` provides reusable noise-generation helpers.
 
 ## Role Summary
 

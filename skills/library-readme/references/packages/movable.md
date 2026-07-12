@@ -1,6 +1,6 @@
 # @wimaengine/movable
 
-`@wimaengine/movable` is the Wima engine motion layer: it packages 2D and 3D motion-state components, prefab helpers, and ECS plugins for movable entities.
+`@wimaengine/movable` provides 2D and 3D motion components, prefabs, and plugins.
 
 ## Capability Highlights
 

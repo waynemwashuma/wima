@@ -2,7 +2,7 @@
 title: Render WebGL
 ---
 
-`@wimaengine/render-webgl` is Wima's concrete WebGL backend: it turns renderer abstractions into GPU-backed shaders, cached render resources, and runtime systems that can participate in the engine loop.
+`@wimaengine/render-webgl` provides the WebGL rendering backend, shader programs, and GPU-facing caches.
 
 ## Package Role
 

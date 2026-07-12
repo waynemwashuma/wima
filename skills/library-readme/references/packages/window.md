@@ -1,6 +1,6 @@
 # Window Feature Notes
 
-`@wimaengine/window` is the ECS-facing windowing layer for browser-backed applications. It models window state, deferred window commands, pointer and keyboard events, file drop interactions, and the primary window entity, while `@wimaengine/window-dom` supplies the DOM implementation layer.
+`@wimaengine/window` is the ECS-facing browser window layer for Wima. It models window state, queues deferred DOM operations, and routes keyboard, pointer, file, and window events through the engine.
 
 ## Preferred README Shape
 

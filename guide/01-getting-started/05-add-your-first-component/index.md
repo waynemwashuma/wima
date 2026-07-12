@@ -30,7 +30,7 @@ class Velocity {
 
 ## What To Keep In Components
 
-Use components for state data that belongs to one entity. If the value describes only that entity and can change over time, it is a good fit for a component e.g location and motion data like the components above, and state data like `health`, `ammo`, or `active`
+Use components for state data that belongs to one entity. If the value describes only that entity and can change over time, it is a good fit for a component, such as location and motion data like the components above, or state data like `health`, `ammo`, or `active`.
 
 ## What To Leave Out
 

@@ -2,7 +2,7 @@
 title: Add your first system
 ---
 
-A system is a function the engine runs at the right time. This page builds on the app from the previous step and adds two systems: one for startup and one for the frame loop. We will use `registerSystem(...)` to connect each function to the schedule where it should run. Lets start with one function for setup and one for per-frame work.
+A system is a function the engine runs at the right time. This page builds on the app from the previous step and adds two systems: one for startup and one for the frame loop. We use `registerSystem(...)` to connect each function to the schedule where it should run. The code below assumes the `app` from the previous page and `AppSchedule` from `wima`. Let's start with one function for setup and one for per-frame work.
 
 ## `setup` in `Startup`
 
@@ -20,7 +20,7 @@ app.registerSystem({ schedule: AppSchedule.Startup, system: setup })
 
 ```js
 function update() {
-  console.log('startup runs every frame')
+  console.log('update runs every frame')
 }
 
 app.registerSystem({ schedule: AppSchedule.Update, system: update })

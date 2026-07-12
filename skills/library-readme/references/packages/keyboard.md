@@ -2,7 +2,7 @@
 title: Keyboard
 ---
 
-`@wimaengine/keyboard` is the Wima Engine package that turns keyboard input into engine-friendly state, key/location primitives, and ECS-ready runtime integration.
+`@wimaengine/keyboard` provides keyboard state, key/location primitives, and ECS integration.
 
 ## Capability Highlights
 

@@ -16,15 +16,42 @@ Components should stay data-only. Put rules, update logic, and behavior in syste
 
 That is why many package components are simple serializable classes or records with no runtime side effects. If a component needs lifecycle behavior, that behavior belongs in component hooks or systems, not in the component itself.
 
+When a package needs setup around a component, it usually registers the type first and then installs hooks during app startup. The hook callbacks live on the world, but they are part of the component setup story, not a separate runtime theory. That is the shape used by packages like `@wimaengine/hierarchy`, `@wimaengine/window-dom`, and the rendering and physics packages.
+
+```js
+import { App } from '@wimaengine/app'
+import { ComponentHooks } from '@wimaengine/ecs'
+
+class Player {}
+
+const onAdd = () => {}
+const onRemove = () => {}
+const onInsert = () => {}
+
+const app = new App()
+
+app
+  .registerType(Player)
+  .setComponentHooks(Player, new ComponentHooks(onAdd, onRemove, onInsert))
+```
+
+In practice, that means the component class stays pure while the app wires in the lifecycle behavior before runtime starts.
+
 ## Registration And Metadata
 
 The ECS world registers component types through its type store. That registration gives each component a compact id and records metadata in `ComponentInfo`, including the registered type name and any hooks bound to that component.
 
 This type metadata is what lets the ECS look up components by constructor, move them safely between tables, and fire add, remove, and insert hooks when entity membership changes.
 
+The hook path matters because it ties component behavior to the world lifecycle. A component type only gets hooks after it has been registered, and the world uses the stored metadata to decide which callbacks to fire as entities gain or lose that component. That keeps the component class itself simple while still letting the engine react to membership changes.
+
 ## How Components Are Used
 
 You usually add components when spawning an entity or when a system mutates world state. Queries then select entities by component signature, and `EntityCell` lets you inspect the components on one specific entity when you already have its handle.
+
+Component hooks are what make component-centric setup practical. A scene loader can add a component and let the hook initialize related state, a window plugin can respond when a `Window` component appears, and a physics package can attach collision bookkeeping as soon as the entity gains the relevant component. The component is still just data; the hook is the lifecycle bridge.
+
+That is why the component page and the component-hooks page should be read together. This page explains what components are for, and [Component hooks](../09-component-hooks/index.md) covers the callback shapes that run when component membership changes.
 
 ## See Also
 

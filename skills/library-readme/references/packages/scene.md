@@ -1,6 +1,6 @@
 # @wimaengine/scene reference note
 
-`@wimaengine/scene` is the scene orchestration package for Wima: it defines serializable scene assets and the runtime machinery that imports, exports, and spawns them into ECS entities.
+`@wimaengine/scene` orchestrates serialized scene assets, runtime instance state, and ECS scene composition so authored world data can move cleanly between storage and live entities.
 
 ## Package Role
 

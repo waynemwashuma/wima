@@ -2,7 +2,7 @@
 title: Integrator
 ---
 
-`@wimaengine/integrator` is the engine's motion-integration layer, providing Euler and Verlet systems behind package-level plugin entry points.
+`@wimaengine/integrator` provides Euler and Verlet motion integration systems.
 
 ## Installation
 

@@ -2,7 +2,7 @@
 title: Logger
 ---
 
-`@wimaengine/logger` is the engine's shared diagnostics layer for prefixed logs, runtime assertions, warnings, and deprecation notices.
+`@wimaengine/logger` is the engine's shared diagnostics layer for prefixed console output, runtime assertions, one-time warnings, and deprecation notices.
 
 ## Package Role Summary
 

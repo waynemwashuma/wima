@@ -2,72 +2,52 @@
 title: Setup environment
 ---
 
+Use this page when you want to get a project ready for the guides in this cluster. The docs here assume ESM imports and the root `wima` package entrypoint.
 
-## Download and installation
+## Install
 
-There are several ways to get a copy of the engine:
+For a new project, install the root package:
 
-If you are starting from a new Vite project, use [Install the engine](../../01-getting-started/02-install-the-engine/index.md) first. Stay here if you need CDN, build-from-source, or direct package installation details.
+```bash
+npm install wima
+```
 
-### Project installation
+The root package re-exports the engine surface from the `@wimaengine/*` packages, so one dependency is enough for most apps. If you want a smaller dependency graph, install the individual packages you need instead.
 
-Use the [Install the engine](../../01-getting-started/02-install-the-engine/index.md) guide to add Wima to a project. It shows the package install flow and links back here when you are done.
+## Import
 
-This requires that you have npm (the default package manager for Node.js) installed.
+The default entrypoint is `wima`:
 
-### Node Package Manager
+```js
+import { App, CorePlugin, World } from 'wima'
+```
 
-Use this method if you already have a project in which you want to use the package.
+If you are working closer to package boundaries, the same symbols are available from their package homes:
 
-For this method, you require to have npm installed and a node project already created.
+```js
+import { App } from '@wimaengine/app'
+import { CorePlugin } from '@wimaengine/core'
+import { World } from '@wimaengine/ecs'
+```
 
-1. Open the terminal and navigate to the root of your desired node project.
-2. Run the following command in the terminal:
+That split is the pattern used throughout the guide. `App` owns orchestration, `CorePlugin` installs the default runtime, and `World` holds ECS state.
 
-  ```bash
-  npm install wima
-  ```
+## Minimal Startup
 
-### CDN
+The smallest useful setup is an app plus the core plugin:
 
-In your project, add the engine library in your project using the unpkg CDN like so:
+```js
+import { App, CorePlugin } from 'wima'
 
-- For ES modules:
+const app = new App()
 
-  ```html
-  <head>
-    <script src="https://unpkg.com/wima@latest/dist/index.module.js"></script>
-  </head>
-  ```
+app
+  .registerPlugin(new CorePlugin())
+  .run()
+```
 
-- For AMD modules:
+`CorePlugin` wires the default schedules, the frame runner, and the end-of-frame command drain, so `run()` can start the app without any extra setup.
 
-    ```html
-    <head>
-      <script src="https://unpkg.com/wima@latest/dist/index.umd.js"></script>
-    </head>
-    ```
+## Read Next
 
-### Build the engine yourself
-
-For this method,you will need to follow the [build instructions](../../03-building/index.md)
-
-### Setup
-
-With the previous steps taken,open the project in your IDE or code editor.
-
-In you scripts, you can now import the symbol exported by the library in two ways:
-
-- For ESM
-  
-  ```javascript
-  import * as WIMA from 'wima';
-  ```
-
-- For AMD/CommonJs
-
-  ```javascript
-  const WIMA = require('wima'):
-  ```
-
-This guide will be using the ESM modules for simplicity.
+If you want the runtime shape behind this setup, continue to [Architecture](../02-architecture/index.md). If you want the identity model that shows up in later ECS examples, jump to [Entities and entity handles](../03-entities-and-entity-handles/index.md).

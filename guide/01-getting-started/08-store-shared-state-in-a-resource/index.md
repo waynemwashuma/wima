@@ -2,7 +2,7 @@
 title: Store shared state in a resource
 ---
 
-A resource is shared state that lives on the world instead of on an entity. Use it for configuration, timers, scores or any value many systems need to read.
+A resource is shared state that lives on the world instead of on an entity. Use it for configuration, timers, scores, or any value many systems need to read.
 
 This chapter builds on the previous query example. `Position` and `Velocity` are still entity data, while `MovementSettings` is shared state that applies to all movers.
 
@@ -19,13 +19,16 @@ A resource belongs to the world, not to a single entity. That makes it a good pl
 ## Example
 
 ```js
-import { EntityCommands, Query } from 'wima'
+import { App, Query } from 'wima'
 
 class MovementSettings {
   constructor(speed = 1) {
     this.speed = speed
   }
 }
+
+const app = new App()
+app.setResource(new MovementSettings(2))
 
 function update(world) {
   // Read the shared movement settings once, then apply them to every match.
@@ -37,8 +40,6 @@ function update(world) {
     position.y += velocity.y * settings.speed
   })
 }
-
-app.setResource(new MovementSettings(2))
 ```
 
 ## How It Works

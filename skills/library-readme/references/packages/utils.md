@@ -2,7 +2,7 @@
 
 ## Package Role
 
-`@wimaengine/utils` is the shared helper package for low-level runtime utilities and shared typedefs used across Wima engine packages. Its surface is intentionally narrow: the package groups common helpers, abstract-class guards, file string helpers, and type aliases so higher-level packages can stay focused on domain logic.
+`@wimaengine/utils` is the shared utility layer for Wima engine packages, bundling reusable runtime helpers, abstract-class guards, filename string helpers, and shared typedefs.
 
 ## README Conventions
 

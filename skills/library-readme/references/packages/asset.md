@@ -2,7 +2,7 @@
 title: Asset
 ---
 
-`@wimaengine/asset` is the engine's asset orchestration layer. It gives assets a tracked identity, connects import and export pipelines to the runtime, and reports lifecycle changes through events.
+`@wimaengine/asset` is the engine's asset orchestration layer. It gives assets stable identity, connects import and export pipelines to the runtime, and surfaces lifecycle changes through events.
 
 ## Package Role
 

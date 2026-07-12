@@ -1,6 +1,6 @@
 # Broadphase
 
-`@wimaengine/broadphase` is the ECS-oriented collision candidate stage for Wima engine. It identifies potential overlaps, tracks pair state, and hands candidate pairs to the narrowphase layer.
+`@wimaengine/broadphase` provides broad-phase collision candidate generation and pair tracking.
 
 ## Package Role Summary
 
