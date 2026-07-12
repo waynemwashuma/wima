@@ -59,9 +59,32 @@ if (world.hasResource(Clock)) {
 
 The world accepts both direct types and aliases in its lookup path. That means resource code can stay small and still present a clean API to the rest of the engine.
 
+## By Type Id
+
+`setResourceByTypeId()` is the lower-level path when you already have a `TypeId` instead of a constructor.
+That is useful for generic resource pools, package internals, and startup code that already resolved the type id before the resource exists.
+
+```js
+import { App } from '@wimaengine/app'
+import { typeid } from '@wimaengine/type'
+
+class Events {}
+class AssetStore {}
+class GameplayWorld {}
+
+const app = new App()
+
+app
+  .setResourceByTypeId(typeid(Events), new Events())
+  .setResourceByTypeId(typeid(AssetStore), new AssetStore(), GameplayWorld)
+```
+
+The optional world label lets you direct the resource to a specific world instead of the default one.
+
 ## App Flow
 
-`App` does not add its own resource-alias API. It owns the `World`, and code that needs aliases uses `getWorld()` during startup to wire them in.
+`App` can stage resource values and aliases before `run()`, then apply them to the worlds it owns.
+It still exposes `getWorld()` when you want to configure one specific world directly.
 
 That usually looks like plugin setup:
 
@@ -74,16 +97,17 @@ class SceneAssets extends AssetStore {}
 
 class AssetPlugin extends Plugin {
   register(app) {
-    const world = app.getWorld()
-
-    world.setResource(new AssetStore())
-    world.setResourceAlias(typeid(AssetStore), SceneAssets)
+    app
+      .setResource(new AssetStore())
+      .setResourceAlias(typeid(AssetStore), SceneAssets)
   }
 }
 ```
 
 That keeps alias registration close to the resource that owns the state.
 It also keeps the app layer focused on composition instead of on every ECS operation.
+
+If you want to target one world directly, use `app.getWorld(label)` and work with the world API instead. If you want the alias to apply across every world, stage it on the app and let `run()` apply it during startup.
 
 Related concepts:
 

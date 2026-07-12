@@ -2,7 +2,7 @@
 title: Architecture
 ---
 
-Wima is built from a small set of runtime pieces that work together when you build a game or simulation. The important part is not the implementation detail of each class, but how the app, plugins, world, and schedules hand work to one another.
+Wima is built from a small set of runtime pieces that work together when you build a game or simulation. The important part is not the implementation detail of each class, but how the app, plugins, world registry, and schedules hand work to one another.
 
 ```js
 import { App, CorePlugin, AppSchedule, CoreSystems } from 'wima'
@@ -36,17 +36,17 @@ That is the basic shape of a Wima app:
 
 ### App
 
-`App` is the orchestration layer. It owns the `World`, keeps track of registered plugins, forwards schedule and system registration into the scheduler builder, and starts execution when you call `run()`. In practice, it is the object that collects startup work before handing off to the runner.
+`App` is the orchestration layer. It owns the world registry, keeps track of registered plugins, forwards schedule and system registration into the scheduler builder, and starts execution when you call `run()`. In practice, it is the object that collects startup work before handing off to the runner.
 
 See [App](../12-app/index.md) for the full concept page.
 
 ### CorePlugin
 
-`CorePlugin` is the default wiring layer from `@wimaengine/core`. It installs the scheduler builder resource, sets the frame runner, creates the `Startup` and `Update` schedules, registers the `CoreSystems` phases on both schedules, seeds the type registry, and flushes deferred commands at `CoreSystems.End`. If you want the standard runtime shape, this is the plugin that supplies it.
+`CorePlugin` is the default wiring layer from `@wimaengine/core`. It installs the scheduler builder resource, creates `MainWorld` and makes it the default world, sets the frame runner, creates the `Startup` and `Update` schedules, registers the `CoreSystems` phases on both schedules, seeds the type registry, and flushes deferred commands at `CoreSystems.End`. If you want the standard runtime shape, this is the plugin that supplies it.
 
 ### World
 
-`World` holds the simulation state. It stores tables, archetypes, entities, resources, resource aliases, and the type store. Systems read from it and write to it, but the world is also where entities are spawned, moved, and despawned.
+`World` holds the simulation state. It stores tables, archetypes, entities, resources, resource aliases, and the type store. Systems read from it and write to it, but the world is also where entities are spawned, moved, and despawned. When the app needs more than one world, each one is still just a `World` entry in the app's registry.
 
 See [World](../13-world/index.md) for the full concept page.
 
@@ -71,7 +71,7 @@ See [Components](../04-components/index.md), [Resources](../05-resources/index.m
 
 ### Schedules and Groups
 
-The core runtime runs through two schedules: `AppSchedule.Startup` runs once, and `AppSchedule.Update` runs every frame. Both schedules are split into the same ordered phases through `CoreSystems`, with `Main` as the default landing zone and `End` as the place where queued commands are flushed. That structure gives downstream packages a predictable place to hook into startup and frame updates.
+The core runtime runs through two schedules: `AppSchedule.Startup` runs once, and `AppSchedule.Update` runs every frame. Both schedules are split into the same ordered phases through `CoreSystems`, with `Main` as the default landing zone and `End` as the place where queued commands are flushed. Each schedule also carries the world label it should run against, with `MainWorld` as the default target in the core runtime. That structure gives downstream packages a predictable place to hook into startup and frame updates.
 
 See [Schedules](../07-schedules/index.md), [System groups](../07-system-groups/index.md), [Plugins](../10-plugins/index.md), [Plugin groups](../24-plugin-groups/index.md), and [Runners](../11-runners/index.md).
 
@@ -79,9 +79,9 @@ See [Schedules](../07-schedules/index.md), [System groups](../07-system-groups/i
 
 A simple way to think about Wima is:
 
-- `App` assembles the game.
-- `CorePlugin` supplies the default runtime.
-- `World` stores state.
+- `App` assembles the game and its world registry.
+- `CorePlugin` supplies the default runtime and the default world.
+- `World` stores state for one labeled world.
 - `EntityHandle` identifies a thing in the world.
 - `Component`s describe that thing.
 - `Resource`s hold shared state.
