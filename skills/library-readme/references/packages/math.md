@@ -2,7 +2,7 @@
 title: Math
 ---
 
-`@wimaengine/math` is Wima's shared numeric foundation, bundling vector, matrix, rotation, transform, and utility primitives that other engine packages rely on.
+`@wimaengine/math` is Wima's shared numeric foundation, bundling mutable vectors, matrices, rotations, transforms, coordinate frames, and numeric helpers used across the engine.
 
 ## Capability Highlights
 

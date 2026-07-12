@@ -2,7 +2,7 @@
 title: Emitter
 ---
 
-`@wimaengine/emitter` is Wima's ECS particle-emission package: it stores emitter state, provides 2D and 3D prefab helpers, and wires the runtime systems that spawn and clean up particle entities.
+`@wimaengine/emitter` is Wima's ECS particle-emission layer, combining emitter state, prefab helpers, and runtime plugin wiring for 2D and 3D effects.
 
 ## Package Role
 

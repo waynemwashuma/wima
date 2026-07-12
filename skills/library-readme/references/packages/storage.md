@@ -1,6 +1,6 @@
 # Storage
 
-`@wimaengine/storage` is the engine's browser persistence layer, bundling session, cookie, and shared storage resources with ECS-oriented systems and plugin wiring.
+`@wimaengine/storage` provides session, cookie, and storage resources for persistence.
 
 ## Role Summary
 

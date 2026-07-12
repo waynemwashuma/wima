@@ -2,7 +2,7 @@
 title: Profiler
 ---
 
-`@wimaengine/profiler` is the engine's profiling and timer instrumentation package, centered on runtime measurement state rather than user-facing analysis tooling.
+`@wimaengine/profiler` provides profiling and timer resources for engine performance instrumentation.
 
 ## Package Role Summary
 

@@ -1,6 +1,6 @@
 # Device Feature Notes
 
-`@wimaengine/device` is the ECS-facing browser and platform detection layer for Wima. It packages runtime environment facts as world-readable state and provides the registration plumbing needed to seed that state during app startup.
+`@wimaengine/device` packages runtime browser, platform, and capability metadata as a typed ECS resource, with plugin wiring that detects the host environment and seeds reflection metadata for downstream systems.
 
 ## Package Role
 

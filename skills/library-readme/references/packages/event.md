@@ -1,6 +1,6 @@
 # Event Package Notes
 
-`@wimaengine/event` is the ECS-facing event layer for Wima. The package surface centers on `Signal`, `CEvent`, `Events`, `EventPlugin`, the `EventReader` typedef, and the `registerEventTypes` / `makeEventClear` systems.
+`@wimaengine/event` provides listener-driven state, buffered event batches, and ECS wiring for typed event payloads.
 
 ## Capability Highlights
 

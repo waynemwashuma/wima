@@ -2,7 +2,7 @@
 title: Type
 ---
 
-`@wimaengine/type` is the engine's shared runtime-identity package for stable type ids, generic type identifiers, and common typedefs used across the workspace.
+`@wimaengine/type` provides the engine's runtime identity helpers and shared type aliases for packages that need to turn constructors into stable ids.
 
 ## Capability Highlights
 

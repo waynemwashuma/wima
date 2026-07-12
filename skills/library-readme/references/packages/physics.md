@@ -1,6 +1,6 @@
 # Physics Package Notes
 
-`@wimaengine/physics` is the runtime assembly layer for Wima's physics stack. It packages collision detection, movement, integration, prefab helpers, and debugger wiring into a single engine-facing module rather than exposing a standalone solver API.
+`@wimaengine/physics` composes the broadphase, narrowphase, integrator, movable, and transform packages into a physics runtime.
 
 ## Package Role
 

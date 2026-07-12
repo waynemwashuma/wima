@@ -1,6 +1,6 @@
 # Reflect Feature Notes
 
-`@wimaengine/reflect` is the engine's runtime reflection layer for symbols and type metadata. It packages reflected type information, a registry for lookup and coordination, and plugin wiring so other packages can resolve metadata during normal engine startup.
+`@wimaengine/reflect` provides runtime type metadata and a registry for engine symbols.
 
 ## Preferred README Shape
 

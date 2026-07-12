@@ -2,7 +2,7 @@
 
 ## Package Role
 
-`@wimaengine/datastructures` is the engine's thin facade over `vifaa`, providing shared dense collection and index-allocation primitives under the Wima namespace. The package exists to give downstream engine code a stable package boundary without introducing a separate datastructure implementation.
+`@wimaengine/datastructures` re-exports common dense data-structure primitives from `vifaa`.
 
 ## Capability Highlights
 

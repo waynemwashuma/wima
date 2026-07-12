@@ -4,7 +4,7 @@ title: Mouse
 
 ## Package Role
 
-`@wimaengine/mouse` is the Wima engine package for mouse input state, mouse button mapping, and ECS-oriented plugin integration. The package sits at the boundary between engine input, eventing, ECS, and runtime wiring.
+`@wimaengine/mouse` packages Wima's pointer state model, button mapping, and plugin wiring for mouse-driven input.
 
 ## Capability Highlights
 

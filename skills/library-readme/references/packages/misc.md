@@ -1,6 +1,6 @@
 # Misc Package Notes
 
-`@wimaengine/misc` is the umbrella composition package for Wima's default engine stack. It gives downstream projects one install point for the common baseline instead of asking them to wire each subsystem package individually.
+`@wimaengine/misc` is the package that assembles common engine defaults into a single install point.
 
 ## Role Summary
 

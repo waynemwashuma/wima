@@ -15,7 +15,7 @@ At this point, you have enough to build small, working examples without needing 
 
 ## Recommended Next Steps
 
-The next sections go deeper into systems, command queues, resource aliases, plugin composition and other concepts. Those topics are easier to understand once the first entity loop is already familiar.
+The next sections go deeper into systems, schedules, command queues, resource aliases, component hooks, plugin composition, and other concepts. Those topics are easier to understand once the first entity loop is already familiar.
 
 - If you want to understand why the tutorial pattern works, read the [Core concepts](../../02-core-concepts/index.md): learn how the ECS pieces fit together.
 - If you want a broader view of the runtime and schedules, read the [Architecture overview](../../02-core-concepts/02-architecture/index.md): see how the runtime is organized.

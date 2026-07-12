@@ -1,6 +1,6 @@
 # Schedule Feature Notes
 
-`@wimaengine/schedule` is the engine coordination layer that groups systems, orders them, and runs them through a scheduler/runner pair.
+`@wimaengine/schedule` is the engine's ordered system execution layer, turning labeled schedules, grouped systems, and runtime policy into deterministic work pipelines.
 
 ## Preferred README Shape
 

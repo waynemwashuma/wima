@@ -2,7 +2,7 @@
 title: Input package reference
 ---
 
-`@wimaengine/input` is the app-facing input aggregation package for Wima. It combines keyboard, mouse, and touch into one runtime entry point so application code can wire the full input stack in one place instead of coordinating device packages separately.
+`@wimaengine/input` is the app-facing composition layer that installs keyboard, mouse, and touch input through a single Wima plugin.
 
 ## Package Role
 

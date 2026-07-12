@@ -1,6 +1,6 @@
 # @wimaengine/name Reference Note
 
-`@wimaengine/name` is the Wima engine package for assigning human-readable names to entities and keeping that naming data available through ECS-oriented systems and plugin registration.
+`@wimaengine/name` provides an entity naming component and supporting systems.
 
 ## Package Role
 

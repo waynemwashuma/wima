@@ -2,9 +2,9 @@
 title: Spawn an entity with components
 ---
 
-Now lets put those components on an entity.
+Now let's put those components on an entity.
 
-Use `EntityCommands` inside a system when you want to create entities. The command queue records the change first and lets the engine apply it at a safe point after the system finishes.
+Use `EntityCommands` inside a system when you want to stage entity creation. The command queue records the change first and lets the engine apply it at a safe point after the system finishes.
 
 The `Position` and `Velocity` classes in the example are the components from the previous chapter.
 

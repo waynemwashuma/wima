@@ -2,7 +2,7 @@
 title: Render Canvas2D
 ---
 
-`@wimaengine/render-canvas2d` is Wima's Canvas2D backend layer, meant to register a 2D canvas renderer into the engine and expose the backend-specific systems, helpers, and types that support it.
+`@wimaengine/render-canvas2d` provides the Canvas2D rendering backend for Wima.
 
 ## Package Role
 

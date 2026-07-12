@@ -2,83 +2,91 @@
 title: Architecture
 ---
 
-
-Wima is built from a small set of ideas that work together when you build a game or simulation. If you are new to the engine, the important thing is not the implementation details but how you use the pieces together.
+Wima is built from a small set of runtime pieces that work together when you build a game or simulation. The important part is not the implementation detail of each class, but how the app, plugins, world, and schedules hand work to one another.
 
 ```js
-import { App, DefaultPlugin, AppSchedule } from 'wima'
+import { App, CorePlugin, AppSchedule, CoreSystems } from 'wima'
 
 const app = new App()
 
 app
-  .registerPlugin(new DefaultPlugin())
-  .registerSystem({ schedule: AppSchedule.Startup, system: setup })
-  .registerSystem({ schedule: AppSchedule.Update, system: update })
+  .registerPlugin(new CorePlugin())
+  .registerSystem({
+    schedule: AppSchedule.Startup,
+    systemGroup: CoreSystems.Main,
+    system: setup
+  })
+  .registerSystem({
+    schedule: AppSchedule.Update,
+    systemGroup: CoreSystems.Main,
+    system: update
+  })
   .run()
 ```
 
-This is the basic shape of a Wima app:
+That is the basic shape of a Wima app:
 
-- Create an `App`.
-- Add features through plugins.
-- Register systems for the moments they should run.
-- Start the app.
+- create an `App`
+- install features through plugins
+- register systems for the moments they should run
+- let the core plugin supply the default runtime wiring
+- start the app
 
-## The main building blocks
+## Runtime Layers
 
 ### App
 
-The `App` is the runtime entry point. It collects plugins, registers systems, stores the world, and starts execution when you call `run()`.
+`App` is the orchestration layer. It owns the `World`, keeps track of registered plugins, forwards schedule and system registration into the scheduler builder, and starts execution when you call `run()`. In practice, it is the object that collects startup work before handing off to the runner.
 
 See [App](../12-app/index.md) for the full concept page.
 
+### CorePlugin
+
+`CorePlugin` is the default wiring layer from `@wimaengine/core`. It installs the scheduler builder resource, sets the frame runner, creates the `Startup` and `Update` schedules, registers the `CoreSystems` phases on both schedules, seeds the type registry, and flushes deferred commands at `CoreSystems.End`. If you want the standard runtime shape, this is the plugin that supplies it.
+
 ### World
 
-The `World` holds your game state. Systems read from it and write to it while the app is running, and resources also live here.
+`World` holds the simulation state. It stores tables, archetypes, entities, resources, resource aliases, and the type store. Systems read from it and write to it, but the world is also where entities are spawned, moved, and despawned.
 
 See [World](../13-world/index.md) for the full concept page.
 
-### Entity
+### EntityHandle
 
-An `Entity` is an identity for something in the world. It is useful when you want to refer to one game object, but it does not carry behavior by itself.
+An `EntityHandle` is the identity token for one thing in the world. It is stable across component changes, but it is not immortal: the generation changes when a slot is reused, which keeps stale handles from colliding with newly spawned entities.
 
 See [Entities and entity handles](../03-entities-and-entity-handles/index.md) for the full concept page.
 
-### Component
+### Components, Resources, Systems
 
-A `Component` is data attached to an entity. Use components for things like position, velocity, health, or name.
+The data flow is simple:
 
-See [Components](../04-components/index.md) for the full concept page.
+- components describe per-entity state
+- resources store shared world state
+- systems read and update both
+- commands stage deferred changes for the end of the schedule
 
-### Resource
+This is the pattern the rest of the guide builds on. A movement system updates position components, a score resource tracks global progression, and a command queue lets gameplay code stage entity changes without mutating the world immediately.
 
-A `Resource` is shared state for the whole world. Use it for data that should be available everywhere, such as score, time, or configuration.
+See [Components](../04-components/index.md), [Resources](../05-resources/index.md), [Systems](../06-systems/index.md), [Commands](../15-commands/index.md), and [Schedules](../07-schedules/index.md).
 
-See [Resources](../05-resources/index.md) for the full concept page.
+### Schedules and Groups
 
-### System
+The core runtime runs through two schedules: `AppSchedule.Startup` runs once, and `AppSchedule.Update` runs every frame. Both schedules are split into the same ordered phases through `CoreSystems`, with `Main` as the default landing zone and `End` as the place where queued commands are flushed. That structure gives downstream packages a predictable place to hook into startup and frame updates.
 
-A `System` is game logic. It is where you update components, react to world state, and make the simulation advance.
+See [Schedules](../07-schedules/index.md), [System groups](../07-system-groups/index.md), [Plugins](../10-plugins/index.md), [Plugin groups](../24-plugin-groups/index.md), and [Runners](../11-runners/index.md).
 
-See [Systems](../06-systems/index.md) and [Schedules](../07-schedules/index.md) for the full concept pages.
-
-### Plugin
-
-A `Plugin` bundles related setup. Use plugins when a feature needs several systems, resources, or other registrations.
-
-See [Plugins](../10-plugins/index.md) for the full concept page.
-
-## How They Work Together
+## How It Fits Together
 
 A simple way to think about Wima is:
 
 - `App` assembles the game.
-- `Plugin`s add reusable features.
+- `CorePlugin` supplies the default runtime.
 - `World` stores state.
-- `Entity` identifies a thing in the world.
+- `EntityHandle` identifies a thing in the world.
 - `Component`s describe that thing.
 - `Resource`s hold shared state.
 - `System`s act on the world during a schedule.
+- `Commands` apply deferred changes at a predictable point.
 
 Most of the time, you write systems that look for the data they need and then update it.
 

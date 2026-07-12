@@ -1,6 +1,6 @@
 # @wimaengine/window-dom
 
-`@wimaengine/window-dom` is the browser-facing bridge that binds DOM window, keyboard, pointer, and file APIs into the engine window layer.
+`@wimaengine/window-dom` is the browser-only bridge that turns DOM canvas, keyboard, pointer, resize, and file activity into the engine window layer.
 
 ## Capability Highlights
 

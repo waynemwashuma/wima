@@ -1,7 +1,7 @@
 # Gizmo Package Reference
 
 ## Role Summary
-`@wimaengine/gizmo` is the Wima engine's debug-visualization package. It groups gizmo state, configuration, canvas-based rendering systems, and plugin entry points for 2D and 3D integration.
+`@wimaengine/gizmo` provides debug gizmo primitives, settings, and render plugins.
 
 ## Capability Highlights
 - Provides the core state and settings needed to drive debug gizmos.

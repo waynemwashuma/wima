@@ -1,6 +1,6 @@
 # App Package Notes
 
-`@wimaengine/app` is the application orchestration layer for Wima. It binds a `World`, schedule builder state, plugin composition, and the runtime runner so higher-level packages can assemble startup and frame-loop behavior around a single app instance.
+`@wimaengine/app` is Wima's application orchestration layer. It owns the runtime `World`, stages plugins and system configuration, and hands control to a scheduler runner when the app starts.
 
 ## Capability Highlights
 

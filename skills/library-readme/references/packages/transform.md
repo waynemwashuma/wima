@@ -2,7 +2,7 @@
 title: Transform
 ---
 
-`@wimaengine/transform` is the engine's spatial-state package: it owns 2D and 3D transform components, resolves global transform state through hierarchy relationships, and provides the runtime pieces that keep those values coherent.
+`@wimaengine/transform` owns the engine's 2D and 3D spatial state, composes local values into global transforms through hierarchy-aware systems, and keeps remote transform mirrors aligned with their source entities.
 
 ## Package Role
 

@@ -2,14 +2,15 @@
 title: Input Core
 ---
 
-`@wimaengine/input-core` is the shared low-level button-state layer that keyboard, mouse, and touch input packages build on.
+`@wimaengine/input-core` is the shared low-level button-state layer for Wima input packages, centered on a generic `Buttons` container.
 
 ## Capability Highlights
 
-- Tracks button lifecycle changes across a frame with pressed, just-pressed, and just-released states.
-- Provides common helpers for inspecting current input state without duplicating device-specific logic.
-- Serves as the reusable foundation for higher-level input packages that need a consistent button model.
-- Keeps input handling device-agnostic so downstream packages can focus on source events instead of state bookkeeping.
+- Tracks held, newly pressed, and newly released buttons in separate `Set`s.
+- Distinguishes sustained button state from transient frame transitions.
+- Provides single-button queries and variadic `any*` helpers for polling groups of buttons.
+- Exposes clearing methods for both transient transition sets and the held set.
+- Supplies the common button model used by keyboard, mouse, and touch packages.
 
 ## Core Concepts
 

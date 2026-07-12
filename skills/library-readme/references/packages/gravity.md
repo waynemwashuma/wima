@@ -2,7 +2,7 @@
 title: Gravity
 ---
 
-`@wimaengine/gravity` provides the Wima engine's gravity resource state, runtime gravity systems, and ECS registration hooks for motion simulation.
+`@wimaengine/gravity` provides gravity resources and systems for motion simulation.
 
 ## Capability Highlights
 

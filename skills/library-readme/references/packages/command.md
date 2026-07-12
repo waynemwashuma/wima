@@ -1,6 +1,6 @@
 # @wimaengine/command
 
-`@wimaengine/command` is the deferred world-mutation layer for Wima. It lets systems describe changes as commands, stage them in a queue, and let the runtime apply those changes later instead of mutating the world inline during system execution.
+`@wimaengine/command` provides deferred world mutation through commands and queues. It keeps mutation logic separate from the systems that request it.
 
 ## Capability Highlights
 

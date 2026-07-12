@@ -1,6 +1,6 @@
 # Audio Package Notes
 
-`@wimaengine/audio` is the engine's audio runtime package. It provides the ECS-facing pieces needed to represent playback state, route sounds through graph and importer resources, and run audio behavior through systems instead of a standalone imperative API.
+`@wimaengine/audio` is the engine's ECS-driven audio runtime package. It models playback state as components, coordinates routing through shared resources, and keeps audio behavior synchronized with world systems.
 
 ## Capability Highlights
 

@@ -2,7 +2,7 @@
 title: Tween
 ---
 
-`@wimaengine/tween` packages ECS tweening for transform animation, pairing animated component state with easing helpers, interpolation contracts, and runtime system/plugin integration.
+`@wimaengine/tween` provides tween components and easing helpers for animated motion, scale, and orientation.
 
 ## Capability Highlights
 

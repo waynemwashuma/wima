@@ -1,5 +1,7 @@
 # ECS Feature Notes
 
+`@wimaengine/ecs` is the entity-component layer behind Wima. It owns entity storage, component lookup, archetype resolution, and typed world resources that higher-level engine packages build on.
+
 ## Preferred README Shape
 
 - YAML frontmatter `title: ECS`

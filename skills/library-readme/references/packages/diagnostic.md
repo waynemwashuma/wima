@@ -1,6 +1,6 @@
 # Diagnostic package reference
 
-`@wimaengine/diagnostic` is the lightweight runtime-diagnostics slice of Wima, focused on frame-rate visibility, ECS entity counts, and shared timing state rather than a full profiler workflow.
+`@wimaengine/diagnostic` provides runtime diagnostics such as FPS reporting and entity counts.
 
 ## Package Role Summary
 

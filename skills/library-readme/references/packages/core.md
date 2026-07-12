@@ -1,6 +1,6 @@
 # Core Feature Notes
 
-`@wimaengine/core` is the runtime layer that wires app scheduling, deferred commands, reflection metadata, and snapshot protocols into the engine's default execution loop.
+`@wimaengine/core` is the engine's runtime integration layer, wiring app startup, frame scheduling, deferred entity commands, reflection metadata, and snapshot protocols into the default execution path.
 
 ## Preferred README Shape
 
