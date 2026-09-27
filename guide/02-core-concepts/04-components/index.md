@@ -2,7 +2,7 @@
 title: Components
 ---
 
-Components are the data attached to entities in Wima's ECS. The ECS package stores them on entities, groups them into archetypes and tables, and uses their types to decide how queries and component hooks behave.
+Components are the data attached to entities in Wima. The engine stores them on entities, groups them into archetypes and tables, and uses their types to decide how queries and component hooks behave.
 
 ## What A Component Is
 
@@ -16,11 +16,10 @@ Components should stay data-only. Put rules, update logic, and behavior in syste
 
 That is why many package components are simple serializable classes or records with no runtime side effects. If a component needs lifecycle behavior, that behavior belongs in component hooks or systems, not in the component itself.
 
-When a package needs setup around a component, it usually installs hooks during app startup and lets the world record the component type as part of that setup. The hook callbacks live on the world, but they are part of the component setup story, not a separate runtime theory. That is the shape used by packages like `@wimaengine/hierarchy`, `@wimaengine/window-dom`, and the rendering and physics packages.
+When a feature needs setup around a component, it usually installs hooks during app startup and lets the world record the component type as part of that setup. The hook callbacks live on the world, but they are part of the component setup story, not a separate runtime theory. That is the shape used by hierarchy, windowing, rendering, and physics features.
 
 ```js
-import { App } from '@wimaengine/app'
-import { ComponentHooks } from '@wimaengine/ecs'
+import { App, ComponentHooks } from 'wima'
 
 class Player {}
 
@@ -38,9 +37,9 @@ In practice, that means the component class stays pure while the app wires in th
 
 ## Registration And Metadata
 
-The ECS world registers component types through its type store. That registration gives each component a compact id and records metadata in `ComponentInfo`, including the type name and any hooks bound to that component.
+The world registers component types through its type store. That registration gives each component a compact id and records metadata in `ComponentInfo`, including the type name and any hooks bound to that component.
 
-This type metadata is what lets the ECS look up components by constructor, move them safely between tables, and fire add, remove, and insert hooks when entity membership changes.
+This type metadata is what lets the engine look up components by constructor, move them safely between tables, and fire add, remove, and insert hooks when entity membership changes.
 
 The hook path matters because it ties component behavior to the world lifecycle. The world uses the stored metadata to decide which callbacks to fire as entities gain or lose that component, and it can record the type as soon as hooks are attached or the component first appears. That keeps the component class itself simple while still letting the engine react to membership changes.
 

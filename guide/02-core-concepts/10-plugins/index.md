@@ -4,7 +4,7 @@ title: Plugins
 
 Plugins bundle reusable engine setup. They are how a package turns "here are the systems, resources, hooks, and worlds I need" into one reusable registration step.
 
-That makes plugins the practical boundary between a feature package and the app startup sequence. A plugin does not run the feature directly. It prepares the world and the scheduler so the feature can run later through [Schedules](../07-schedules/index.md) and [Systems](../06-systems/index.md).
+That makes plugins the practical boundary between a feature package and the [App](../12-app/index.md) startup sequence. A plugin does not run the feature directly. It prepares the world and the scheduler so the feature can run later through [Schedules](../07-schedules/index.md) and [Systems](../06-systems/index.md).
 
 ## Why Plugins Exist
 
@@ -20,7 +20,7 @@ A plugin can contribute almost anything that shapes runtime behavior:
 - world setup and default-world selection
 - component hooks
 - system registrations
-- system groups and schedules
+- [system groups](../07-system-groups/index.md) and schedules
 - nested plugins
 
 The `App` keeps those registrations staged until `run()`. That means a plugin is setup code, not an immediate execution path.
@@ -40,12 +40,6 @@ The order matters. Core establishes the base runtime contract, and feature plugi
 
 ## Plugins And Hooks
 
-Plugins are where component hooks usually get installed. That is not an accident: hooks are part of the feature's startup contract, so they belong with the plugin that owns the component, not in a one-off helper somewhere else.
+Plugins are where [component hooks](../09-component-hooks/index.md) usually get installed. That is not an accident: hooks are part of the feature's startup contract, so they belong with the plugin that owns the component, not in a one-off helper somewhere else.
 
 This is especially visible in packages that need lifecycle coordination, such as hierarchy, animation, audio, and scene. Those packages use plugin registration to bind component behavior, world setup, and resource aliases to the app before the scheduler starts running systems.
-
-## Related Concepts
-
-- [App](../12-app/index.md) for the container that stages plugin registration
-- [System groups](../07-system-groups/index.md) for the phases a plugin can target
-- [Component hooks](../09-component-hooks/index.md) for lifecycle behavior installed by plugins

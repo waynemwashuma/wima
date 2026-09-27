@@ -6,9 +6,9 @@ Tables hold the actual component rows for one exact archetype. If archetypes des
 
 ## Dense Column Storage
 
-Each table owns one column per component type id. Every row in the table belongs to the same component layout, so the world can read a component by column and row instead of searching for it entity by entity.
+Each table owns one column per component type. Every row in the table belongs to the same component layout, so the world can read a component by column and row instead of searching for it entity by entity.
 
-That is why tables are the cache-friendly part of ECS storage. A query can walk a table row-by-row, and the row already lines up with the queried component order.
+That is why tables are the cache-friendly part of component storage. A query can walk a table row-by-row, and the row already lines up with the queried component order.
 
 ```js
 const table = new Table([typeid(Position), typeid(Velocity)])

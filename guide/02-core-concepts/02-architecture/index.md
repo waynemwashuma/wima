@@ -42,7 +42,7 @@ See [App](../12-app/index.md) for the full concept page.
 
 ### CorePlugin
 
-`CorePlugin` is the default wiring layer from `@wimaengine/core`. It installs the scheduler builder resource, creates `MainWorld` and makes it the default world, sets the frame runner, creates the `Startup` and `Update` schedules, registers the `CoreSystems` phases on both schedules, seeds the type registry, and flushes deferred commands at `CoreSystems.End`. If you want the standard runtime shape, this is the plugin that supplies it.
+`CorePlugin` is the default wiring layer for the engine. It installs the scheduler builder resource, creates `MainWorld` and makes it the default world, sets the frame runner, creates the `Startup` and `Update` schedules, registers the `CoreSystems` phases on both schedules, seeds the type registry, and flushes deferred commands at `CoreSystems.End`. If you want the standard runtime shape, this is the plugin that supplies it.
 
 ### World
 

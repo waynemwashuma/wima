@@ -2,11 +2,11 @@
 title: World
 ---
 
-The world is the ECS registry that holds entity identity, dense component storage, resources, archetypes, and the metadata needed to move data safely between them. An app can own more than one world, but this page still describes one world instance at a time.
+The world is the registry that holds entity identity, dense component storage, resources, archetypes, and the metadata needed to move data safely between them. An app can own more than one world, but this page still describes one world instance at a time.
 
 ## What The World Owns
 
-`World` is the shared storage boundary for ECS state. It owns:
+`World` is the shared storage boundary for components and resources. It owns:
 
 - entity slots and generations
 - tables for dense component rows
@@ -41,4 +41,4 @@ That is the main boundary to remember: components and entities live in tables an
 
 ## Rule Of Thumb
 
-Use `World` when you need to create, mutate, or remove ECS state. Use [Queries](../14-queries/index.md) when you need to iterate over matching rows, [Commands](../15-commands/index.md) when you want to stage writes for later, and [Reflection and type metadata](../22-reflection-and-type-metadata/index.md) when you need runtime type descriptions for the data you are storing.
+Use `World` when you need to create, mutate, or remove components and resources. Use [Queries](../14-queries/index.md) when you need to iterate over matching rows, [Commands](../15-commands/index.md) when you want to stage writes for later, and [Reflection and type metadata](../22-reflection-and-type-metadata/index.md) when you need runtime type descriptions for the data you are storing.

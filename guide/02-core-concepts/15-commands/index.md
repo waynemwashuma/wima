@@ -2,13 +2,13 @@
 title: Commands
 ---
 
-Commands are the deferred write path for ECS state. They let systems request entity changes now and let the runtime apply those changes at a controlled flush point later.
+Commands are the deferred write path for components and resources. They let systems request entity changes now and let the runtime apply those changes at a controlled flush point later.
 
 ## Why The Engine Defers Writes
 
 Direct world mutation is fast, but it creates ordering problems when several systems want to change the same entity in one frame. The command path avoids that by staging the mutation first and applying it after the main systems have run.
 
-In the core runtime, `executeCommands()` drains the shared `CommandQueue` at the end of each schedule. That means systems can keep reading a stable world during the frame, then let the queued changes land together.
+In the core runtime, drains the command queue at the end of each schedule. That means systems can keep reading a stable world during the frame, then let the queued changes land together.
 
 ## EntityCommands
 

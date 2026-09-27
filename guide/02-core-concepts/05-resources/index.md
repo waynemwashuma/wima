@@ -2,117 +2,119 @@
 title: Resources
 ---
 
-Resources are world-owned shared state in Wima's ECS. A resource is not attached to an entity; it lives on the `World` and is read or written through the world API. The ECS package treats resources as typed state with direct lookup, alias resolution, and removal.
+Resources are world-owned shared state in Wima. A resource is not attached to an entity; it lives on a `World` and is read or written through the world API. The engine stores resources by `TypeId`, while higher-level features use them for state that belongs to a whole world rather than to one entity.
 
-Use resources for engine-wide state that many systems need to share, such as clocks, asset servers, input state, windows, audio routing, event buffers, or physics and simulation state.
+Use resources for engine-wide state that many systems need to share, such as clocks, asset servers, input state, windows, audio routing, event buffers, or physics and simulation state. For example, the event feature installs an `Events<T>` buffer resource for each event type, and the time feature installs a `VirtualClock` resource that timer systems consume.
 
-In practice, resources are how packages keep cross-cutting state available without turning it into components on a specific entity. For example, `@wimaengine/event` stores `Events<T>` as a resource, `@wimaengine/window` stores `Windows`, and `@wimaengine/time` stores `VirtualClock`.
+Resources are deliberately separate from components: components describe entity state and participate in queries, while resources are accessed directly from the world. A system that needs shared state can obtain it from the world without adding a synthetic entity just to hold that state.
 
 ## Resource Aliases
 
-Resource aliases let one resource stand in for another type at lookup time. The `World` stores the actual resource under its concrete type id, then maps alias type ids to that resource when you ask for the alias. That gives packages a way to publish a stable, intention-revealing name without duplicating the state itself.
+Resource aliases let one resource be read through another type. The world stores the resource under its concrete type id and stores an alias mapping from the alias type id to that concrete id. Looking up the alias returns the same object; it does not create a second resource.
 
-This is useful when the stored type is more specific than the API you want to expose. A package can keep the real resource internal, then register a public alias that downstream code reads through `getResource()`. The alias resolves through the world, so consumers can use either the concrete resource or the alias depending on how much implementation detail they need.
+This is useful when a package wants to hide an implementation type behind an intention-revealing API. Asset-oriented packages use this pattern: an `Assets<...>` resource can be registered once, then exposed through aliases such as `AudioAssets` or `ImageAssets` for systems that consume a particular asset kind.
 
 ```js
-import { typeid } from '@wimaengine/type'
-import { App } from '@wimaengine/app'
+import { World, typeid } from 'wima'
 
 class AssetStore {}
-class SceneAssets extends AssetStore {}
+class SceneAssets {}
 
-const app = new App()
-const world = app.getWorld()
+const world = new World()
+const assets = new AssetStore()
 
-world.setResource(new AssetStore())
+world.setResource(assets)
 world.setResourceAlias(typeid(AssetStore), SceneAssets)
 
-const assets = world.getResource(SceneAssets)
+world.getResource(AssetStore) === world.getResource(SceneAssets) // true
 ```
 
-In the example above, `SceneAssets` behaves like a readable handle for the underlying `AssetStore`. The world still owns the actual resource; the alias only changes how other code reaches it.
+The first argument to `setResourceAlias()` is the `TypeId` of the stored resource. The second argument is the constructor used as the public alias. Both the concrete type and the alias can be used with `getResource()` and `hasResource()`.
 
-Aliases are part of the world storage model, not a separate registry. You install them on the `World`, and the app exposes that world through `getWorld()` when bootstrap code needs to wire them in. That makes aliases a startup concern, usually inside a plugin or other setup path rather than inside systems.
-
-Removing a resource clears the resource entry and its alias entry together, so aliases do not outlive the state they point to.
+Aliases belong to the world that receives them. `World.removeResource(type)` removes the resource entry when passed the concrete type, and removes an alias entry when passed the alias type; it does not automatically remove every alias that points to a resource. App-level alias setup is different: `App.setResourceAlias()` stages the mapping and applies it to every world during `run()`.
 
 ## Reading Resources
 
-Resource access is simple once a resource is in the world.
-Use `getResource()` when you know the type.
-Use `hasResource()` when you only need to check presence.
-Use `removeResource()` when the shared state should disappear.
+Resource access is direct once a resource is in the world.
+Use `getResource()` when the resource must exist; it asserts if the resource or alias is missing.
+Use `getOptionalResource()` when absence is allowed.
+Use `hasResource()` when you only need a presence check.
+Use `removeResource()` when the world should stop exposing that resource or alias.
 
 ```js
-import { App } from '@wimaengine/app'
+import { World } from 'wima'
 
 class Clock {}
 
-const world = new App().getWorld()
-
+const world = new World()
 world.setResource(new Clock())
 
 if (world.hasResource(Clock)) {
   const clock = world.getResource(Clock)
 }
+
+const maybeClock = world.getOptionalResource(Clock)
 ```
 
-The world accepts both direct types and aliases in its lookup path. That means resource code can stay small and still present a clean API to the rest of the engine.
+The constructor form is the usual API. Resource values are mutable objects, so reading a resource gives systems access to the shared instance owned by the world.
 
 ## By Type Id
 
-`setResourceByTypeId()` is the lower-level path when you already have a `TypeId` instead of a constructor.
-That is useful for generic resource pools, package internals, and startup code that already resolved the type id before the resource exists.
+The `ByTypeId` methods are the lower-level path when code already has a `TypeId` rather than a constructor. This is useful for generic resource families and package internals that construct ids with `typeid()` or `typeidGeneric()`.
 
 ```js
-import { App } from '@wimaengine/app'
-import { typeid } from '@wimaengine/type'
+import { World, typeid } from 'wima'
 
 class Events {}
 class AssetStore {}
-class GameplayWorld {}
 
-const app = new App()
+const world = new World()
 
-app
-  .setResourceByTypeId(typeid(Events), new Events())
-  .setResourceByTypeId(typeid(AssetStore), new AssetStore(), GameplayWorld)
+world.setResourceByTypeId(typeid(Events), new Events())
+world.setResourceByTypeId(typeid(AssetStore), new AssetStore())
+
+const assets = world.getResourceByTypeId(typeid(AssetStore))
+const maybeEvents = world.getOptionalResourceByTypeId(typeid(Events))
+const hasEvents = world.hasResourceByTypeId(typeid(Events))
 ```
 
-The optional world label lets you direct the resource to a specific world instead of the default one.
+`getResourceByTypeId()` has the same required-resource behavior as `getResource()`, while `getOptionalResourceByTypeId()` returns `undefined` when the id is not present. The caller is responsible for ensuring that the `TypeId` matches the value's actual type.
 
 ## App Flow
 
-`App` can stage resource values and aliases before `run()`, then apply them to the worlds it owns.
-It still exposes `getWorld()` when you want to configure one specific world directly.
+`App` stages resources and aliases before `run()`, then applies them during startup. Resource registration is guarded after initialization, so plugins and other bootstrap code should configure resources before the runner starts.
 
-That usually looks like plugin setup:
+`App.setResource(resource)` targets the default world. Pass a world label as the second argument to `setResource()` or `setResourceByTypeId()` when the resource belongs to a particular world. A world label is a constructor whose `TypeId` identifies the world in the app's world registry.
 
 ```js
-import { Plugin } from '@wimaengine/app'
-import { typeid } from '@wimaengine/type'
+import { App, Plugin, typeid } from 'wima'
 
+class GameplayWorld {}
 class AssetStore {}
-class SceneAssets extends AssetStore {}
+class SceneAssets {}
 
 class AssetPlugin extends Plugin {
   register(app) {
     app
-      .setResource(new AssetStore())
+      .setResourceByTypeId(typeid(AssetStore), new AssetStore(), GameplayWorld)
       .setResourceAlias(typeid(AssetStore), SceneAssets)
   }
 }
+
+const app = new App()
+app.setWorld(GameplayWorld).defaultWorld(GameplayWorld)
+app.registerPlugin(new AssetPlugin())
 ```
 
-That keeps alias registration close to the resource that owns the state.
-It also keeps the app layer focused on composition instead of on every ECS operation.
+The app-level alias is applied to every world when startup flushes its staged configuration. The resource itself is applied only to the selected world in this example. If code needs to configure one world directly, use `app.getWorld(GameplayWorld)` and call the `World` resource methods; `app.getWorld()` returns the app's default world.
 
-If you want to target one world directly, use `app.getWorld(label)` and work with the world API instead. If you want the alias to apply across every world, stage it on the app and let `run()` apply it during startup.
+Plugins are the normal package integration point. `TimePlugin` registers time types, installs a `VirtualClock`, and schedules clock and timer updates. `EventPlugin` registers an event payload type, installs its typed `Events<T>` resource, and can schedule automatic buffer clearing. These packages demonstrate the typical resource lifecycle: register the type, install the resource during setup, and let systems read or update it during schedules.
 
 Related concepts:
 
-- [World](../13-world/index.md) owns resources and other runtime state.
+- [World](../13-world/index.md) owns resources, aliases, entities, and other runtime state.
 - [Components](../04-components/index.md) live on entities instead of the world.
 - [Queries](../14-queries/index.md) read entity data, not world resources.
-- [Commands](../15-commands/index.md) are the deferred path for world changes.
+- [Commands](../15-commands/index.md) provide deferred world changes, including resource alias commands.
+- [Plugins](../10-plugins/index.md) package resource installation and system setup.
 - [Systems](../06-systems/index.md) are the usual place to read and update shared resources.

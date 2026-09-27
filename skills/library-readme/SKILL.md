@@ -29,3 +29,16 @@ For package READMEs, prefer this outline unless the package clearly needs a diff
 - Expand `## Core Concepts` into separate subheadings for major primitives when the package has multiple distinct building blocks, and explain each one in a short paragraph
 - `## Exported Surface` if the package has many public symbols
 - `## Notes` for constraints, integration points, or implementation traits
+
+## Concept-First Guide Workflow
+
+When updating the engine guide, preserve its existing concept-based structure. Do not create a package catalog or reorganize the guide around package names.
+
+Treat each concept page as an independent documentation task:
+
+1. Select one existing concept page, such as resources, queries, rendering, or scenes.
+2. Read the relevant package README and package reference notes as source material.
+3. Update only that concept page with the feature behavior, terminology, and integration points confirmed by those packages.
+4. Link to neighboring concepts when the behavior crosses boundaries, but keep the explanation centered on the selected concept.
+
+Packages are implementation and capability references; the guide explains the engine mental model. Avoid repeating package README inventories in guide pages.

@@ -12,7 +12,7 @@ For a new project, install the root package:
 npm install wima
 ```
 
-The root package re-exports the engine surface from the `@wimaengine/*` packages, so one dependency is enough for most apps. If you want a smaller dependency graph, install the individual packages you need instead.
+The root package exposes the engine through one interface, so one dependency is enough for most apps.
 
 ## Import
 
@@ -22,15 +22,7 @@ The default entrypoint is `wima`:
 import { App, CorePlugin, World } from 'wima'
 ```
 
-If you are working closer to package boundaries, the same symbols are available from their package homes:
-
-```js
-import { App } from '@wimaengine/app'
-import { CorePlugin } from '@wimaengine/core'
-import { World } from '@wimaengine/ecs'
-```
-
-That split is the pattern used throughout the guide. `App` owns orchestration, `CorePlugin` installs the default runtime, and `World` holds ECS state.
+`App` owns orchestration, `CorePlugin` installs the default runtime, and `World` holds ECS state.
 
 ## Minimal Startup
 

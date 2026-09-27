@@ -10,7 +10,7 @@ That separation is why schedules matter to both [Systems](../06-systems/index.md
 
 Without schedules, every system would need its own timing policy. Startup work, per-frame updates, and one-off setup would all blur together. Schedules split those concerns so the engine can say, "this work happens once when the app starts" and "this work repeats every frame" without mixing the two.
 
-`@wimaengine/core` uses that split directly with `AppSchedule.Startup` and `AppSchedule.Update`. Startup is the one-time lane for bootstrapping the world. Update is the repeating lane for the actual runtime loop. Both schedules run against `MainWorld` by default in the core runtime, unless you point the schedule at another world.
+The core runtime uses that split directly with `AppSchedule.Startup` and `AppSchedule.Update`. Startup is the one-time lane for bootstrapping the world. Update is the repeating lane for the actual runtime loop. Both schedules run against `MainWorld` by default, unless you point the schedule at another world.
 
 ```ts
 import { App, AppSchedule, CoreSystems, MainWorld } from 'wima'
@@ -32,13 +32,13 @@ app
   })
 ```
 
-That pattern is common because it keeps engine setup predictable. Startup systems can register resources, aliases, and hooks before gameplay begins. Update systems then run against a world that already has its runtime shape.
+That pattern is common because it keeps engine setup predictable. Startup systems can register resources, aliases, and hooks before gameplay begins. Update systems then run against a world that already has its runtime shape. Within each lane, [system groups](../07-system-groups/index.md) provide the next layer of ordering by nesting related systems and controlling their sequence.
 
 ## How Schedules Are Built
 
 The app does not assemble schedules by hand. It stages schedule labels, system registrations, and system groups through `SchedulerBuilder`, then pushes that staged state into a `Scheduler` during `run()`. The builder resolves ordering, group nesting, world labels, and defaults before a schedule is made runnable.
 
-This means the schedule definition phase and the execution phase are separate:
+This means the schedule definition phase and the execution phase are separate. [Plugins](../10-plugins/index.md) commonly contribute systems, groups, and schedule setup during the definition phase, so an application can assemble features without placing every registration in one central file:
 
 - The app records what should exist.
 - The builder turns those registrations into ordered schedules.
@@ -50,10 +50,4 @@ That separation makes the runtime easier to reason about. Plugins can contribute
 
 A schedule label identifies the lane, while the schedule config also controls when, how often, and on which world that lane executes. Core uses a one-shot startup schedule and a repeating update schedule, but the underlying schedule layer also supports delays and custom error handling, which makes it flexible enough for non-frame work.
 
-The practical result is that a schedule is a named unit of work with a runtime policy attached to it. It is the thing you hand to a runner, not the thing the runner invents.
-
-## Related Concepts
-
-- [System groups](../07-system-groups/index.md) for ordering inside a schedule
-- [Plugins](../10-plugins/index.md) for staging schedule and system setup
-- [Runners](../11-runners/index.md) for advancing schedules at runtime
+The practical result is that a schedule is a named unit of work with a runtime policy attached to it. It is the thing you hand to a [runner](../11-runners/index.md), which advances the schedule at runtime, not the thing the runner invents.

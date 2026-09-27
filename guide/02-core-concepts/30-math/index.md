@@ -2,7 +2,7 @@
 title: Math
 ---
 
-`@wimaengine/math` is the engine's shared numeric foundation. It supplies the mutable vectors, matrices, angles, affines, bases, and helper functions that other packages use for transforms, interpolation, projections, and general spatial work.
+Math is the engine's shared numeric foundation. It supplies the mutable vectors, matrices, angles, affines, bases, and helper functions that other features use for transforms, interpolation, projections, and general spatial work.
 
 ## Shared Types
 
@@ -25,4 +25,4 @@ In other words, the math package is not just where values are stored. It is also
 
 `MathPlugin` only registers math types at startup, but that is still important. It lets the app and reflection layer treat the math primitives as first-class runtime types instead of anonymous objects. That makes serialization, snapshots, and type-driven systems easier to keep aligned across the engine.
 
-The result is a small package with a broad effect: once math types are registered, almost every other engine package can move the same values through ECS, assets, snapshots, and runtime systems without converting between incompatible representations.
+The result is a small feature with a broad effect: once math types are registered, almost every other engine feature can move the same values through components, resources, assets, snapshots, and runtime systems without converting between incompatible representations.

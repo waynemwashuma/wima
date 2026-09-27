@@ -2,11 +2,11 @@
 title: Audio
 ---
 
-`@wimaengine/audio` is the engine's ECS-driven audio runtime. It keeps playback state on entities, routes sound through an audio graph resource, and loads audio through the asset pipeline so playback stays synchronized with the world.
+Audio is the engine's component-driven audio runtime. It keeps playback state on entities, routes sound through an audio graph resource, and loads audio through the asset pipeline so playback stays synchronized with the world.
 
-## ECS-Driven Playback
+## Component-Driven Playback
 
-The main entity-level primitives are `AudioPlayer` and `AudioOscillator`. They hold the state that a system needs to start, stop, attach, or retarget audio without leaving ECS. That makes audio behave like the rest of the engine: state lives on entities, and systems turn that state into runtime behavior.
+The main entity-level primitives are `AudioPlayer` and `AudioOscillator`. They hold the state that a system needs to start, stop, attach, or retarget audio without leaving the component model. That makes audio behave like the rest of the engine: state lives on entities, and systems turn that state into runtime behavior.
 
 `AudioPlayer` is the handle-based path. It points at an `Audio` asset and stores playback node state. `AudioOscillator` is the procedural path. It stores oscillator settings directly and lets the runtime create and maintain the Web Audio node behind the component.
 
@@ -26,4 +26,4 @@ There is also a browser-specific detail that matters: the plugin resumes the aud
 
 Scenes can snapshot and restore audio playback state, which is why the package uses handle snapshots instead of raw buffer references. That makes it possible to move audio-rich content through [Scenes](../31-scenes/index.md) without losing the connection between the entity and the audio asset.
 
-The practical rule is: assets supply sound data, ECS components store playback state, the audio graph owns runtime wiring, and systems keep the two in sync.
+The practical rule is: assets supply sound data, components store playback state, the audio graph owns runtime wiring, and systems keep the two in sync.

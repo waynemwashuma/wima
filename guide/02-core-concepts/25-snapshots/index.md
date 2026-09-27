@@ -2,17 +2,17 @@
 title: Snapshots
 ---
 
-Snapshots are the serialization boundary for live ECS state. They turn components and resources into transportable data, then rebuild that data back into world-aware objects later.
+Snapshots are the serialization boundary for entities and resources. They turn enitities and resources into transportable data, then rebuild that data back into world-aware objects later.
 
 ## What A Snapshot Is
 
-A snapshot is not the world itself. It is a representation of world state that can be saved, moved, or restored without keeping direct pointers into live ECS storage.
+A snapshot is not the world itself. It is a representation of world state that can be saved, moved, or restored without keeping direct pointers into live component storage.
 
 That distinction matters. The live world owns entity locations, tables, and archetypes. A snapshot captures the shape and values of some of that state so it can cross a serialization boundary.
 
 ## The Core Contract
 
-`@wimaengine/core` defines two abstract base classes:
+The core runtime defines two abstract base classes:
 
 - `ToSnapshot` for values that can produce snapshot data from a live `World`
 - `FromSnapshot` for values that can rebuild themselves from snapshot data with world context

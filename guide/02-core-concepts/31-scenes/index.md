@@ -2,7 +2,7 @@
 title: Scenes
 ---
 
-`@wimaengine/scene` is the bridge between authored world data and live ECS state. It serializes entities and resources into scene assets, then restores them back into a running world with handle remapping, component hooks, and spawn coordination.
+Scenes are the bridge between authored world data and live component and resource state. They serialize entities and resources into scene assets, then restore them back into a running world with handle remapping, component hooks, and spawn coordination.
 
 ## Scene Assets
 
@@ -25,7 +25,7 @@ The important part is the runtime flow:
 
 The package supports JSON import and export, so scene data can move in and out of storage without changing the runtime model. During restore, the `TypeRegistry` is used to find snapshot methods, and the `AssetSceneMap` keeps nested asset handles stable when a scene references other assets.
 
-That is the piece that makes scenes useful across the engine. A scene can include render state, audio state, or animation state and still come back with the right handles and type-aware snapshots. [Rendering](../27-rendering/index.md), [Audio](../32-audio/index.md), and [Animation](../33-animation/index.md) all benefit from that because their runtime state is already stored in ECS-friendly forms.
+That is the piece that makes scenes useful across the engine. A scene can include render state, audio state, or animation state and still come back with the right handles and type-aware snapshots. [Rendering](../27-rendering/index.md), [Audio](../32-audio/index.md), and [Animation](../33-animation/index.md) all benefit from that because their runtime state is already stored in component- and resource-friendly forms.
 
 ## Scene Shape
 

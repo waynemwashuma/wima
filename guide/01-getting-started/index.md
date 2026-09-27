@@ -53,4 +53,4 @@ guide/01-getting-started/
 
 ## What Comes Later
 
-This guide deliberately avoids advanced ECS details, system ordering rules, command queues, resource aliases, component hooks, and plugin composition. Those topics are covered in the later concept and building sections once the basic loop is clear.
+This guide deliberately avoids advanced storage details, system ordering rules, command queues, resource aliases, component hooks, and plugin composition. Those topics are covered in the later concept and building sections once the basic loop is clear.

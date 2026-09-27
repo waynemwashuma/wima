@@ -4,7 +4,7 @@ title: Plugin Groups
 
 Plugin groups bundle multiple plugins into one reusable unit. They are the packaging layer above [Plugins](../10-plugins/index.md): instead of asking callers to register a long list of feature plugins by hand, a group registers that list for them in a controlled order.
 
-This is the pattern behind broad engine presets. The `@wimaengine/misc` package, for example, ships a `DefaultPlugin` group that assembles the common engine stack into one install point.
+This is the pattern behind broad engine presets. The `misc` feature, for example, ships a `DefaultPlugin` group that assembles the common engine stack into one install point.
 
 ## Why Plugin Groups Exist
 
@@ -14,7 +14,7 @@ Plugin groups also keep startup readable. The caller sees one registration step,
 
 ## How Groups Behave
 
-`PluginGroup` is itself a plugin, so it can be registered anywhere a normal plugin can. Inside the group, nested plugins are stored in a `Map`, then replayed into the app in insertion order during registration.
+`PluginGroup` is itself a plugin, so it can be registered anywhere a normal plugin can. Inside the group, nested plugins are stored in a `Map`, then replayed into the [App](../12-app/index.md) in insertion order during registration.
 
 That means order is part of the API. If a group installs core runtime support first and feature plugins later, the group is declaring that dependency for the caller.
 
@@ -34,10 +34,4 @@ Plugin groups usually appear at the top of app setup:
 app.registerPlugin(new DefaultPlugin())
 ```
 
-The app still replays the group's contents during `run()`, so the group does not change the startup model. It only changes how the startup model is packaged.
-
-## Related Concepts
-
-- [App](../12-app/index.md) for the container that replays plugin groups
-- [Plugins](../10-plugins/index.md) for the individual units that groups compose
-- [Runners](../11-runners/index.md) for the execution phase that starts after the group has registered everything
+The app still replays the group's contents during `run()`, handing control to the [Runners](../11-runners/index.md) execution phase after the group has registered everything. The group does not change the startup model. It only changes how the startup model is packaged.

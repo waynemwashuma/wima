@@ -14,7 +14,7 @@ That is useful for parent/child hierarchies, scene instance graphs, ownership ch
 
 ## Querying Connected Entities
 
-`@wimaengine/relationship` exposes a relationship-aware query shape rather than a separate graph library. `RelationshipQuery` ties a relationship component to a target component set, then walks through the connected entities while still giving you the component data you need on each side of the connection.
+The relationship feature exposes a relationship-aware query shape rather than a separate graph library. `RelationshipQuery` ties a relationship component to a target component set, then walks through the connected entities while still giving you the component data you need on each side of the connection. This makes it a natural input for [systems](../06-systems/index.md) that process connected entities as part of their runtime work.
 
 The important distinction is that the query is not only filtering for components. It is using a relationship component as the traversal edge. That keeps the model inside the ECS world instead of splitting it into a separate data structure.
 
@@ -27,14 +27,8 @@ The package supports both shapes, which makes it useful across different engine 
 - tree traversal for strict parent/child structures
 - graph traversal for more general connected entity sets
 
-That distinction is why the package is helpful for both content structure and simulation structure. A scene graph and a constraint graph do not need the same traversal rules, even if they both live in ECS.
+That distinction is why the package is helpful for both content structure and simulation structure. A scene graph and a constraint graph do not need the same traversal rules, even if they both live in ECS. When traversal feeds several stages of a frame, [system groups](../07-system-groups/index.md) can keep that relationship work in the appropriate phase.
 
 ## Shared Traversal Contract
 
-The package also exposes a small traversal interface so relationship-like types can provide `visit()` and `map()` behavior in a common shape. That keeps the traversal code generic and makes relationship components easier to compose with the rest of the engine's graph-oriented systems.
-
-## Related Concepts
-
-- [Systems](../06-systems/index.md) for runtime work that often consumes relationship traversal
-- [System groups](../07-system-groups/index.md) for placing relationship work in the right phase
-- [Plugins](../10-plugins/index.md) for registering the component hooks and systems that maintain relationship links
+The package also exposes a small traversal interface so relationship-like types can provide `visit()` and `map()` behavior in a common shape. That keeps the traversal code generic and makes relationship components easier to compose with the rest of the engine's graph-oriented systems. In applications where those links are maintained automatically, [plugins](../10-plugins/index.md) can register the component hooks and systems that keep the relationship state up to date.

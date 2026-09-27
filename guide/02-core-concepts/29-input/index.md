@@ -2,7 +2,7 @@
 title: Input
 ---
 
-`@wimaengine/input` is the top-level bundle for keyboard, mouse, and touch input. It does not define a new input model; it wires the device-specific plugins into the app so the rest of the engine can consume input through one registration point.
+Input is the top-level bundle for keyboard, mouse, and touch input. It does not define a new input model; it wires the device-specific plugins into the app so the rest of the engine can consume input through one registration point.
 
 ## What The Bundle Does
 

@@ -2,7 +2,7 @@
 title: Runners
 ---
 
-Runners are the handoff point between the app and the scheduler. The app stages setup, the scheduler holds ordered schedules, and the runner decides when those schedules actually advance and which world they run against.
+Runners are the handoff point between the [App](../12-app/index.md) and the scheduler. The app stages setup, the scheduler holds ordered schedules, and the runner decides when those schedules actually advance and which world they run against.
 
 That makes runners the timing layer of the runtime. They do not define behavior themselves; they decide when the behavior that lives in [Systems](../06-systems/index.md) and [Schedules](../07-schedules/index.md) gets a turn.
 
@@ -10,7 +10,7 @@ That makes runners the timing layer of the runtime. They do not define behavior 
 
 The app is intentionally not a game loop. It prepares the worlds, registers plugins, pushes staged schedule state into the scheduler, and then hands control to a runner. In the standard core runtime, `CorePlugin` creates `MainWorld` and makes it the default target world.
 
-The default engine path uses `defaultRunner` from `@wimaengine/core`. That runner is browser-oriented and advances schedules from `requestAnimationFrame()`, which is a good fit for the standard frame loop.
+The default engine path uses `defaultRunner`. That runner is browser-oriented and advances schedules from `requestAnimationFrame()`, which is a good fit for the standard frame loop.
 
 ## What The Runner Sees
 
@@ -28,7 +28,7 @@ At that point, the runner is responsible for the loop. `App.run()` does not keep
 
 ## Default Runner Behavior
 
-The default runner in `@wimaengine/core` keeps per-executable state, initializes each schedule's next run time, and then advances runnable schedules on each animation frame. Repeating schedules are rescheduled after they run. One-shot schedules are marked inactive after their first execution. Before each run, it asks `worlds.getWorld(executable.world)` for the target world.
+The default runner keeps per-executable state, initializes each schedule's next run time, and then advances runnable schedules on each animation frame. Repeating schedules are rescheduled after they run. One-shot schedules are marked inactive after their first execution. Before each run, it asks `worlds.getWorld(executable.world)` for the target world. When a schedule runs, its [system groups](../07-system-groups/index.md) provide the phases that determine the order of the work within that schedule.
 
 That behavior is what makes `AppSchedule.Startup` and `AppSchedule.Update` feel different even though both are just schedules. Startup runs once. Update keeps stepping with the frame loop.
 
@@ -48,9 +48,3 @@ app.setRunner((scheduler, worlds) => {
 ```
 
 The key point is that the runner is the only part that owns advancement policy. Everything else in the runtime can stay focused on declaring what should happen rather than how often it should be polled.
-
-## Related Concepts
-
-- [App](../12-app/index.md) for the startup handoff into the runner
-- [Schedules](../07-schedules/index.md) for the ordered work the runner advances
-- [System groups](../07-system-groups/index.md) for the phases inside each schedule
