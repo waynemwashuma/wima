@@ -10,7 +10,7 @@ import { SceneInstance } from './components'
 import { SceneAdded, SceneDropped, SceneModified } from './events'
 import { initSceneInstance, dropSceneInstance } from './hooks'
 import { JSONSceneExporter, JSONSceneImporter, SceneAssets, SceneFilterAssets, SceneSpawner } from './resources'
-import { registerSceneTypes, spawnScenes } from './systems'
+import { refreshModifiedScenes, registerSceneTypes, spawnScenes } from './systems'
 
 export class ScenePlugin extends Plugin {
 
@@ -44,7 +44,20 @@ export class ScenePlugin extends Plugin {
         dropSceneInstance
       ))
       .registerSystem({ schedule: AppSchedule.Startup, systemGroup: CoreSystems.Start, system: registerSceneTypes })
-      .registerSystem({ schedule: AppSchedule.Update, systemGroup: CoreSystems.End, system: spawnScenes })
+      .registerSystem({
+        label: 'refreshModifiedScenes',
+        schedule: AppSchedule.Update,
+        systemGroup: CoreSystems.End,
+        system: refreshModifiedScenes,
+        after: [`clearEvents<${typeid(SceneModified)}>`],
+        before: [spawnScenes]
+      })
+      .registerSystem({
+        schedule: AppSchedule.Update,
+        systemGroup: CoreSystems.End,
+        system: spawnScenes,
+        after: [`updateAssetEvents<${typeid(Scene)}>`]
+      })
       .setResourceAlias(typeidGeneric(Assets, [Scene]), SceneAssets)
       .setResourceAlias(typeidGeneric(Assets, [SceneFilter]), SceneFilterAssets)
   }

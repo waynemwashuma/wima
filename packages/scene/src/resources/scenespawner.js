@@ -18,11 +18,14 @@ export class SceneSpawner {
    */
   add(id, entity) {
     const list = this.map.get(id)
+    const entityId = entity.id()
 
     if (list) {
-      list.push(entity.id())
+      if (!list.includes(entityId)) {
+        list.push(entityId)
+      }
     } else {
-      this.map.set(id, [entity.id()])
+      this.map.set(id, [entityId])
     }
   }
 
