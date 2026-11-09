@@ -27,12 +27,12 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "astro dev",
-    "dev": "astro dev",
+    "start": "npm run dev",
+    "dev": "astro dev --config .config/astro.config.mjs",
     "eslint": "eslint --config .config/eslint.config.js --ignore-pattern '**/*.test.js'",
     "types:root": "tsc -p .config/tsc.type.json",
     "build:root": "vite build --config .config/vite.config.js",
-    "build:docs": "astro build",
+    "build:docs": "astro build --config .config/astro.config.mjs",
     "types": "turbo run types //#types:root",
     "test": "turbo run test",
     "build": "turbo run build && turbo run //#build:root //#build:docs",
@@ -48,7 +48,6 @@
     "lint:examples": "npm run lint:examples-dry -- --fix",
     "tsc:lint": "tsc -p .config/tsc.lint.json",
     "watch:src": "vite build --watch --config .config/vite.config.js",
-    "watch:docs": "astro dev",
     "clean:build": "rm -rf dist types packages/*/types packages/*/dist"
   },
   "keywords": [
