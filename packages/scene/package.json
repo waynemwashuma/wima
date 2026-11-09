@@ -34,6 +34,7 @@
     "@wimaengine/asset": "0.3.0",
     "@wimaengine/core": "0.3.0",
     "@wimaengine/ecs": "0.3.0",
+    "@wimaengine/event": "0.3.0",
     "@wimaengine/hierarchy": "0.3.0",
     "@wimaengine/logger": "0.3.0",
     "@wimaengine/reflect": "0.3.0",
