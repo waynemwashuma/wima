@@ -1,0 +1,98 @@
+import {
+  createCamera3D,
+  Mesh,
+  Position3D,
+  Rotation3D,
+  World,
+  EntityCommands,
+  BasicMaterial,
+  createBasicMesh3D,
+  createRawMovable3D,
+  Query,
+  BasicMaterialAssets,
+  MeshAssets,
+  App,
+  AppSchedule,
+  DefaultPlugin,
+  DOMWindowPlugin,
+  FPSDebugger,
+  WebglRendererPlugin
+} from 'wima'
+
+const app = new App()
+
+app
+  .registerPlugin(new WebglRendererPlugin())
+  .registerPlugin(new DefaultPlugin())
+  .registerPlugin(new DOMWindowPlugin())
+  .registerDebugger(new FPSDebugger())
+  .registerSystem({ schedule: AppSchedule.Startup, system: spawnMeshes })
+  .registerSystem({ schedule: AppSchedule.Startup, system: addDefaultCamera3D })
+  .registerSystem({ schedule: AppSchedule.Update, system: update })
+  .run()
+
+/**
+ * @param {World} world
+ */
+function addDefaultCamera3D(world) {
+  const commands = new EntityCommands(world)
+
+  commands
+    .spawn()
+    .insertPrefab([...createCamera3D(0, 0, 2)])
+    .build()
+}
+
+/**
+ * @param {World} world
+ */
+function spawnMeshes(world) {
+  const commands = new EntityCommands(world)
+  const meshes = world.getResource(MeshAssets)
+  const materials = world.getResource(BasicMaterialAssets)
+
+  const geometries = [
+    meshes.add(Mesh.triangle3D()),
+    meshes.add(Mesh.plane3D()),
+    meshes.add(Mesh.circle3D()),
+    meshes.add(Mesh.ring3D()),
+    meshes.add(Mesh.cone()),
+    meshes.add(Mesh.cube(0.7071, 0.7071, 0.7071)),
+    meshes.add(Mesh.uvSphere()),
+    meshes.add(Mesh.torus()),
+    meshes.add(Mesh.cylinder())
+  ]
+  const material = materials.add(new BasicMaterial())
+
+  const offsetX = -2.1,
+    offsetY = 2,
+    width = 1.1,
+    height = 1.2,
+    numX = 4
+
+  for (let i = 0; i < geometries.length; i++) {
+    commands
+      .spawn()
+      .insertPrefab([
+        ...createBasicMesh3D(geometries[i], material),
+        ...createRawMovable3D()])
+      .insert(new Position3D(
+        offsetX + width * (i % numX),
+        offsetY - Math.floor(i / numX) * height,
+        -1
+      ))
+      .insert(new Rotation3D())
+      .build()
+  }
+}
+
+/**
+ * @param {World} world
+ */
+function update(world) {
+  const rotable = new Query(world, [Rotation3D])
+
+  rotable.each(([rotation]) => {
+    rotation.y = Math.PI / 4
+  })
+}

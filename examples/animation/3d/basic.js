@@ -1,0 +1,132 @@
+import {
+  createCamera3D,
+  Mesh,
+  World,
+  AnimationClip,
+  AnimationTrack,
+  AnimationTarget,
+  AnimationPlayer,
+  PlaybackRepeat,
+  EntityCommands,
+  MeshAssets,
+  BasicMaterialAssets,
+  BasicMaterial,
+  HALF_PI,
+  PI,
+  TAU,
+  createBasicMesh3D,
+  Orientation3DAnimationEffector,
+  Position3DAnimationEffector,
+  Scale3DAnimationEffector,
+  Quaternion,
+  Vector3,
+  AnimationClipAssets,
+  App,
+  AppSchedule,
+  DefaultPlugin,
+  DOMWindowPlugin,
+  FPSDebugger,
+  WebglRendererPlugin,
+  AnimationPlugin
+} from 'wima'
+
+const app = new App()
+
+app
+  .registerPlugin(new WebglRendererPlugin())
+  .registerPlugin(new DefaultPlugin())
+  .registerPlugin(new AnimationPlugin())
+  .registerPlugin(new DOMWindowPlugin())
+  .registerDebugger(new FPSDebugger())
+  .registerSystem({ schedule: AppSchedule.Startup, system: init })
+  .registerSystem({ schedule: AppSchedule.Startup, system: addDefaultCamera3D })
+  .run()
+
+/**
+ * @param {World} world
+ */
+function addDefaultCamera3D(world) {
+  const commands = new EntityCommands(world)
+
+  commands
+    .spawn()
+    .insertPrefab([...createCamera3D(0, 0, 2)])
+    .build()
+}
+
+/**
+ * @param {World} world
+ */
+export function init(world) {
+  const commands = new EntityCommands(world)
+  const clips = world.getResource(AnimationClipAssets)
+  const meshes = world.getResource(MeshAssets)
+  const materials = world.getResource(BasicMaterialAssets)
+
+  const rawClip = createClip()
+  const clip = clips.add(rawClip)
+  const mesh = meshes.add(Mesh.cube(0.5, 0.5, 0.5))
+  const material = materials.add(new BasicMaterial())
+  const targetname = '/bone'
+  const animationplayer = new AnimationPlayer()
+
+  animationplayer.set(clip, {
+    duration: rawClip.duration,
+    repeatMode: PlaybackRepeat.Forever
+  })
+  const player = commands
+    .spawn()
+    .insert(animationplayer)
+    .build()
+
+  commands
+    .spawn()
+    .insertPrefab([
+      ...createBasicMesh3D(mesh, material, 1, 1),
+      new AnimationTarget(player, targetname)])
+    .build()
+}
+
+/**
+ *@returns {AnimationClip}
+ */
+function createClip() {
+  const clip = new AnimationClip()
+
+  const translate = new AnimationTrack(Position3DAnimationEffector)
+  const rotate = new AnimationTrack(Orientation3DAnimationEffector)
+  const scale = new AnimationTrack(Scale3DAnimationEffector)
+
+  translate.times = [0, 2, 4, 6, 8]
+  rotate.times = [0, 2, 4, 6, 8]
+  scale.times = [0, 2, 4, 6, 8]
+
+  translate.keyframes = [
+    ...Vector3.set(-1, 1, 0),
+    ...Vector3.set(-1, -1, 0),
+    ...Vector3.set(1, -1, 0),
+    ...Vector3.set(1, 1, 0),
+    ...Vector3.set(-1, 1, 0)
+  ].map((n) => n / 2)
+  rotate.keyframes = [
+    ...Quaternion.fromEuler(0, 0, TAU),
+    ...Quaternion.fromEuler(0, 0, HALF_PI * 3),
+    ...Quaternion.fromEuler(0, 0, PI),
+    ...Quaternion.fromEuler(0, 0, HALF_PI),
+    ...Quaternion.fromEuler(0, 0, 0)
+  ]
+  scale.keyframes = [
+    ...Vector3.set(1, 1, 1),
+    ...Vector3.set(2, 2, 2),
+    ...Vector3.set(1, 1, 1),
+    ...Vector3.set(2, 2, 2),
+    ...Vector3.set(1, 1, 1)
+  ]
+
+  clip.add('/bone', translate)
+  clip.add('/bone', rotate)
+  clip.add('/bone', scale)
+  clip.calculateDuration()
+
+  return clip
+}
