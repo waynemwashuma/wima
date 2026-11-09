@@ -1,0 +1,76 @@
+import {
+  createCamera2D,
+  BasicMaterial,
+  Mesh,
+  World,
+  EntityCommands,
+  createBasicMesh2D,
+  createRawMovable2D,
+  Rotation2D,
+  Meshed,
+  PI,
+  Query,
+  BasicMaterialAssets,
+  MeshAssets,
+  AppSchedule,
+  Canvas2DRendererPlugin,
+  DefaultPlugin,
+  DOMWindowPlugin,
+  FPSDebugger,
+  App
+} from 'wima'
+
+const app = new App()
+
+app
+  .registerPlugin(new DefaultPlugin())
+  .registerPlugin(new DOMWindowPlugin())
+  .registerPlugin(new Canvas2DRendererPlugin())
+  .registerSystem({ schedule: AppSchedule.Startup, system: addmesh })
+  .registerSystem({ schedule: AppSchedule.Startup, system: addDefaultCamera2D })
+  .registerSystem({ schedule: AppSchedule.Update, system: update })
+  .registerDebugger(new FPSDebugger())
+  .run()
+
+/**
+ * @param {World} world
+ */
+function addDefaultCamera2D(world) {
+  const commands = new EntityCommands(world)
+
+  commands
+    .spawn()
+    .insertPrefab([...createCamera2D()])
+    .build()
+}
+
+/**
+ * @param {World} world
+ */
+function addmesh(world) {
+  const commands = new EntityCommands(world)
+  const meshes = world.getResource(MeshAssets)
+  const materials = world.getResource(BasicMaterialAssets)
+
+  const mesh = meshes.add(Mesh.quad2D(0.25, 0.25))
+  const material = materials.add(new BasicMaterial())
+
+  commands
+    .spawn()
+    .insertPrefab([
+      ...createBasicMesh2D(mesh, material),
+      ...createRawMovable2D()])
+    .insert(new Rotation2D(PI))
+    .build()
+}
+
+/**
+ * @param {World} world
+ */
+function update(world) {
+  const query = new Query(world, [Rotation2D, Meshed])
+
+  query.each(([rotation]) => {
+    rotation.value = PI
+  })
+}

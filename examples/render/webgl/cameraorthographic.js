@@ -1,0 +1,78 @@
+import {
+  Mesh,
+  OrthographicProjection,
+  Rotation3D,
+  Camera,
+  World,
+  createCamera3D,
+  EntityCommands,
+  BasicMaterial,
+  createBasicMesh3D,
+  createRawMovable3D,
+  Query,
+  BasicMaterialAssets,
+  MeshAssets,
+  App,
+  AppSchedule,
+  DefaultPlugin,
+  DOMWindowPlugin,
+  FPSDebugger,
+  WebglRendererPlugin
+} from 'wima'
+
+const app = new App()
+
+app
+  .registerPlugin(new WebglRendererPlugin())
+  .registerPlugin(new DefaultPlugin())
+  .registerPlugin(new DOMWindowPlugin())
+  .registerDebugger(new FPSDebugger())
+  .registerSystem({ schedule: AppSchedule.Startup, system: spawnMesh })
+  .registerSystem({ schedule: AppSchedule.Startup, system: addCamera3D })
+  .registerSystem({ schedule: AppSchedule.Update, system: update })
+  .run()
+
+/**
+ * @param {World} world
+ */
+function addCamera3D(world) {
+  const commands = new EntityCommands(world)
+  const projection = new OrthographicProjection()
+
+  commands
+    .spawn()
+    .insertPrefab([
+      ...createCamera3D(0, 0, 1)])
+    .insert(new Camera(projection))
+    .build()
+}
+
+/**
+ * @param {World} world
+ */
+function spawnMesh(world) {
+  const commands = new EntityCommands(world)
+  const meshes = world.getResource(MeshAssets)
+  const materials = world.getResource(BasicMaterialAssets)
+  const mesh = meshes.add(Mesh.triangle3D())
+  const material = materials.add(new BasicMaterial())
+
+  commands
+    .spawn()
+    .insertPrefab([
+      ...createBasicMesh3D(mesh, material),
+      ...createRawMovable3D()])
+    .insert(new Rotation3D(0, Math.PI / 10, 0))
+    .build()
+}
+
+/**
+ * @param {World} world
+ */
+function update(world) {
+  const rotable = new Query(world, [Rotation3D])
+
+  rotable.each(([torque]) => {
+    torque.y = Math.PI / 2
+  })
+}

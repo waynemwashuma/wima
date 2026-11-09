@@ -42,11 +42,6 @@ export default defineConfig({
         }
       ]
     },
-    server: {
-      port: 8082,
-      strictPort: true,
-      open: '/examples/index.html'
-    }
   } : {}),
   plugins: [
     jsCommentStripPlugin(),

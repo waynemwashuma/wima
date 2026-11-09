@@ -1,5 +1,6 @@
 node_modules
 .turbo
+.astro
 /types/
 /packages/*/types
 dist
@@ -8,3 +9,4 @@ docs
 # Temp files
 *.txt
 !LICENSE.txt
+todo/
