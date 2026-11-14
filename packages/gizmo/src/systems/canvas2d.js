@@ -13,9 +13,52 @@ import {
 } from '../core'
 
 /**
+ * Creates the canvas drawing system for a labelled {@linkcode Gizmo2D} resource.
+ *
+ * This is an ordinary system factory. It does not register a plugin or a
+ * system itself; {@linkcode Gizmo2DPlugin} calls it and registers the returned
+ * function in {@linkcode AppSchedule.Update}. The `label` is combined with
+ * `Gizmo2D` through `typeidGeneric(Gizmo2D, [label])`, so it must be the same
+ * constructor used when the gizmo resource was installed.
+ *
+ * Each invocation looks up that resource, the {@linkcode Windows} canvas resource,
+ * and the first entity matching `[EntityHandle, Window]`. With the default
+ * {@linkcode WindowPlugin} setup, this is the primary window entity. The query
+ * does not require the `MainWindow` marker, so applications that manage their
+ * own windows can provide any matching `Window` entity. `Windows` must contain
+ * a canvas for the entity, as provided by {@linkcode DOMWindowPlugin}; the canvas
+ * must also expose a 2D rendering context.
+ *
+ * The system returns without drawing when there is no matching window, no
+ * canvas mapped to that window, or no 2D context. These early returns leave
+ * the gizmo buffer unchanged. A labelled {@linkcode Gizmo2D} resource and the
+ * {@linkcode Windows} resource are required by the world; the factory does not
+ * install either one.
+ *
+ * Before drawing, the system maps {@linkcode GizmoSettings} to the canvas context:
+ * line width, cap, join, dash pattern, and dash offset. Entries in
+ * {@linkcode GizmoBuffer#positions} and {@linkcode GizmoBuffer#colors} are consumed in
+ * pairs as independent gradient lines. Entries in
+ * {@linkcode GizmoBuffer#stripPositions} and {@linkcode GizmoBuffer#stripColors} are
+ * consumed as adjacent pairs; the NaN sentinel written by
+ * {@linkcode Gizmo2D#lineStrip} and {@linkcode Gizmo2D#lineStripGradient} prevents a segment from connecting separate strips.
+ * After a successful draw, the buffer is cleared and the canvas state is
+ * restored. The returned {@linkcode SystemFunc} accepts a world and returns
+ * `undefined`.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { genenerateDrawGizmo2Dsystem } from '@wimaengine/gizmo'
+ *
+ * class PhysicsDebug {}
+ * const drawPhysicsGizmo = genenerateDrawGizmo2Dsystem(PhysicsDebug)
+ * app.registerSystem({ schedule: AppSchedule.Update, system: drawPhysicsGizmo })
+ * ```
+ *
  * @template T
  * @param {Constructor<T>} label
- * @returns {SystemFunc}
+ * @returns {SystemFunc} A system that draws the labelled gizmo on the active canvas.
  */
 export function genenerateDrawGizmo2Dsystem(label) {
   const gizmotypeid = typeidGeneric(Gizmo2D, [label])
@@ -99,9 +142,31 @@ export function genenerateDrawGizmo2Dsystem(label) {
 }
 
 /**
+ * Creates the canvas-2D fallback system for a labelled {@linkcode Gizmo3D} resource.
+ *
+ * Canvas 2D cannot render 3D gizmos, so this factory calls {@linkcode warn} immediately
+ * when it is created. The `label` is combined with `Gizmo3D` through
+ * `typeidGeneric(Gizmo3D, [label])`; use the same constructor that identifies the
+ * resource installed in the world.
+ *
+ * The returned system looks up that labelled {@linkcode Gizmo3D} resource, clears its
+ * {@linkcode GizmoBuffer} every time it runs, and performs no rendering. It accepts a
+ * world and returns `undefined`. The factory does not install the resource or
+ * register the returned system in a schedule.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { genenerateDrawGizmo3Dsystem } from '@wimaengine/gizmo'
+ *
+ * class PhysicsDebug {}
+ * const discardPhysicsGizmo = genenerateDrawGizmo3Dsystem(PhysicsDebug)
+ * app.registerSystem({ schedule: AppSchedule.Update, system: discardPhysicsGizmo })
+ * ```
+ *
  * @template T
  * @param {Constructor<T>} label
- * @returns {SystemFunc}
+ * @returns {SystemFunc} A system that clears the labelled 3D gizmo buffer without rendering.
  */
 export function genenerateDrawGizmo3Dsystem(label) {
   warn('Canvas 2d rendering backend does not support 3d gizmos.')
