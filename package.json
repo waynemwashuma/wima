@@ -70,7 +70,7 @@
     "typescript": "^5.8.3",
     "vite": "^7.0.0",
     "vitest": "^4.1.10",
-    "wima-docs-website-template": "^0.4.0"
+    "wima-docs-website-template": "^0.5.1"
   },
   "files": [
     "dist/**/*"
