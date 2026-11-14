@@ -1,6 +1,6 @@
 /** @import { TableId, TableRow } from '../typedef'*/
 /** @import { TypeId, TupleConstructor  } from '@wimaengine/type'*/
-/** @import { ApplyFilters } from './filters' */
+/** @import { ApplyFilters, Has, Optional, Without } from './filters' */
 
 import { typeid } from '@wimaengine/type'
 import { Archetype } from '../archetype'
@@ -16,21 +16,42 @@ import { QueryFilter } from './filters'
  */
 
 /**
- * Enables operations to be performed on entities matching the
- * given component constructors on a {@link World}.
- * The world does not need the component types to be pre-registered.
+ * Selects entities in a {@linkcode World} by component type and exposes their
+ * component values as ordered tuples.
+ *
+ * Use a query for repeated component reads or iteration. Pass
+ * {@linkcode QueryFilter} instances to refine which entities participate. The
+ * query's matching component combinations are established when it is
+ * constructed and refreshed only by {@linkcode Query#update}; entities using a
+ * new component combination are not included until `update()` is called.
+ *
  * @example
- * ```ts
- * class A {}
- * class B {}
+ * ```js
+ * import { Query, World, optional } from '@wimaengine/ecs'
+ *
+ * class Position {
+ *   constructor(x = 0) {
+ *     this.x = x
+ *   }
+ * }
+ * class Velocity {
+ *   constructor(x = 0) {
+ *     this.x = x
+ *   }
+ * }
  *
  * const world = new World()
- * const query = new Query(world, [A, B])
+ * const entity = world.spawn([new Position()])
+ * const query = new Query(world, [Position, Velocity], [optional(Velocity)])
  *
- * // you can now use the query to perform operations
- * // on entities with components `A` and `B`
- * // see the {@link Query} methods to know what operations
- * // are available
+ * world.spawn([new Position(10), new Velocity(1)])
+ * query.update()
+ *
+ * query.each(([position, velocity]) => {
+ *   position.x += velocity?.x ?? 0
+ * })
+ * const first = query.single()
+ * const entityComponents = query.get(entity)
  * ```
  *
  * @template {unknown[]} T
@@ -39,39 +60,79 @@ import { QueryFilter } from './filters'
 export class Query {
 
   /**
+   * World whose entities this query reads.
+   *
    * @private
    * @type {World}
    */
   world
 
   /**
+   * Component type IDs in the order supplied to the constructor.
+   *
+   * Query results use this order, so each tuple entry corresponds to the
+   * component constructor at the same position.
+   *
    * @readonly
    * @type {TypeId[]}
    */
   descriptors = []
 
   /**
+   * Component type IDs that an entity must have to match by default.
+   *
+   * A component type ID remains in this list only when every configured filter's
+   * {@linkcode QueryFilter#isRequired} result is `true`. The built-in
+   * {@linkcode Optional} filter makes its targeted component optional; filters
+   * such as {@linkcode Has} and {@linkcode Without} still constrain which entities
+   * match without changing the returned tuple.
+   *
    * @readonly
    * @type {TypeId[]}
    */
   requiredDescriptors = []
 
   /**
+   * Filters applied when the query's matching entities are refreshed.
+   *
+   * Every configured filter must accept an entity's component combination for
+   * it to match. The supplied filters remain the query's configuration; call
+   * {@linkcode Query#update} after changing the world in a way that creates a new
+   * component combination.
+   *
    * @readonly
    * @type {U}
    */
   filters
 
   /**
+   * Matching component combinations identified by the most recent refresh.
+   * Query operations use these matches until {@linkcode Query#update} replaces
+   * them; combinations created later are not discovered implicitly.
+   *
    * @private
    * @type {TableId[]}
    */
   tableIds = []
 
   /**
-   * @param {World} world
-   * @param {[...TupleConstructor<T>]} componentTypes
-   * @param {[...U]} filters
+   * Creates a query for a world and an ordered component signature.
+   *
+   * Component constructors are converted to type IDs in the order supplied,
+   * and that order is retained in every returned tuple. A component is
+   * required when every filter reports it as required through
+   * {@linkcode QueryFilter#isRequired}. The built-in {@linkcode Optional},
+   * {@linkcode Has}, and {@linkcode Without} filters refine matching entities
+   * without adding entries to the result tuple; all configured filters must
+   * accept an entity's component combination for it to match.
+   *
+   * The query's matching selection is established immediately. Construction
+   * does not add entities or components to the world, and the component types
+   * do not need to have appeared in the world beforehand.
+   *
+   * @param {World} world - World whose entities the query reads.
+   * @param {[...TupleConstructor<T>]} componentTypes - Component constructors in the order returned by query operations.
+   * @param {[...U]} [filters=[]] - Filters that refine which component combinations match.
    */
   constructor(
     world,
@@ -90,6 +151,20 @@ export class Query {
   }
 
   /**
+   * Refreshes the query's matching component combinations from the current
+   * world.
+   *
+   * Matching component combinations are considered in their creation order.
+   * A combination is selected only when it contains every required component
+   * and every configured filter accepts it. The previous selection is
+   * replaced, not appended to. The constructor calls this method once; call it
+   * after a world mutation creates a new component combination that should be
+   * considered. Entities added to a combination already selected are visible
+   * without another update.
+   *
+   * This method changes only what the query selects. It does not change
+   * entities, components, or the world.
+   *
    * @returns {void}
    */
   update() {
@@ -111,10 +186,19 @@ export class Query {
   }
 
   /**
-   * Gets the components of a given entity.
+   * Gets the components of an entity when its current component combination
+   * matches the query.
    *
-   * @param {EntityHandle} entity
-   * @returns {QueryComponents<T,U> | null}
+   * The returned tuple follows the component order supplied to the constructor
+   * and is a new array for each call. Values are read from the entity's current
+   * component combination; an optional component is `undefined` when that
+   * component is absent. Returns `null` for a stale or unknown
+   * {@linkcode EntityHandle}, a non-matching entity, an unavailable matching
+   * combination, or an invalid entity location. This method does not refresh
+   * the query's selection.
+   *
+   * @param {EntityHandle} entity - Entity handle to check against the query.
+   * @returns {QueryComponents<T,U> | null} The matching components, or `null`.
    */
   get(entity) {
     const { world, descriptors, tableIds } = this
@@ -140,7 +224,20 @@ export class Query {
   }
 
   /**
-   * @param {EachFunc<QueryComponents<T,U>>} callback
+   * Calls a callback once for every entity in the query's current matching
+   * selection.
+   *
+   * Matching component combinations are visited in selection order, with
+   * entities in increasing order within each combination. The callback
+   * receives one component tuple in constructor order; the entity handle is
+   * not passed separately, so include {@linkcode EntityHandle} in
+   * `componentTypes` when it is needed. The same tuple array is reused and
+   * overwritten for the next callback, so do not retain that array; the
+   * component objects in it are the live values owned by the world. This
+   * method does not refresh the query's selection.
+   *
+   * @param {EachFunc<QueryComponents<T,U>>} callback - Function called for each matching entity.
+   * @returns {void}
    */
   each(callback) {
     const { tableIds, descriptors } = this
@@ -164,7 +261,18 @@ export class Query {
   }
 
   /**
-   * @param {EachCombinationFunc<QueryComponents<T,U>>} callback
+   * Calls a callback for every unique unordered pair of matching entities.
+   *
+   * Each callback receives two component tuples in constructor order. The
+   * nested traversal visits later matching component combinations and, within
+   * one combination, only entities after the first entity, so pairs are not
+   * repeated with their order reversed and an entity is never paired with
+   * itself. The two tuple arrays are reused and overwritten for the next
+   * callback; do not retain them. This method does not refresh the query's
+   * selection.
+   *
+   * @param {EachCombinationFunc<QueryComponents<T,U>>} callback - Function called for each distinct pair.
+   * @returns {void}
    */
   eachCombination(callback) {
     const { tableIds, descriptors } = this
@@ -204,7 +312,15 @@ export class Query {
   }
 
   /**
-   * @returns {QueryComponents<T,U> | null}
+   * Returns the components of the first matching entity.
+   *
+   * The first entity is the first available entity in query traversal order,
+   * so this method does not require the query to contain exactly one entity.
+   * It returns a new tuple array, does not refresh the selection, and returns
+   * `null` when no matching entity is available. Use {@linkcode Query#count} when
+   * the number of matches matters.
+   *
+   * @returns {QueryComponents<T,U> | null} The first matching components, or `null` when there are no matches.
    */
   single() {
     const { descriptors, world, tableIds } = this
@@ -229,9 +345,14 @@ export class Query {
   }
 
   /**
-   * Returns the number of entities on this query.
+   * Counts entities in the query's current matching selection.
    *
-   * @returns {number}
+   * It reflects current entity membership in matching component combinations,
+   * but a new combination created after the last {@linkcode Query#update} is not
+   * included. Missing matching combinations contribute zero, and this method
+   * does not refresh or re-filter the selection.
+   *
+   * @returns {number} The number of entities in the current matching selection.
    */
   count() {
     const { tableIds } = this
