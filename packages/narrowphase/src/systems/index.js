@@ -20,8 +20,52 @@ const
   tmp4 = new Vector2(),
   tmp5 = new Vector2()
 
+/* eslint-disable jsdoc/check-tag-names */
 /**
- * @param {World} world
+ * Builds the current 2D collision contacts from broadphase candidate pairs.
+ *
+ * {@linkcode NarrowPhase2DPlugin} registers
+ * this function directly in the repeating
+ * {@linkcode AppSchedule.Update}
+ * schedule. It requires the {@linkcode CollisionPairs}, {@linkcode SATNarrowphase2D}, and {@linkcode Contacts}
+ * resources. Its query accepts only entities with
+ * {@linkcode Position2D},
+ * {@linkcode Velocity2D},
+ * {@linkcode Rotation2D},
+ * {@linkcode Collider2D}, and
+ * {@linkcode PhysicsProperties}.
+ *
+ * The system clears {@linkcode Contacts} at the start of every run. It skips pair
+ * entries whose entities no longer satisfy the query or whose linked
+ * {@linkcode PhysicsProperties} fail the collision filter. Accepted pairs wake
+ * both bodies, get a stable pair ID, and reuse their persistent manifold from
+ * {@linkcode SATNarrowphase2D} when one already exists. The system resets and
+ * rebuilds that manifold's collision data with the current collider shapes;
+ * non-overlapping or incomplete SAT results are not published to
+ * {@linkcode Contacts}.
+ *
+ * For a confirmed collision, the system updates the manifold's restitution,
+ * kinetic friction, inverse masses, and inverse inertias from the two
+ * {@linkcode PhysicsProperties} components before appending it to {@linkcode Contacts}.
+ * The collision data's overlap, axis, tangent, support vertices, contact
+ * points, and contact count are also rebuilt for the current update. The
+ * function returns no value; read the refreshed {@linkcode Contacts} resource
+ * after the Update schedule reaches this system.
+ *
+ * @example
+ * ```js
+ * import { NarrowPhase2DPlugin, Contacts } from '@wimaengine/narrowphase'
+ *
+ * // The plugin installs getSATContacts in AppSchedule.Update.
+ * app.registerPlugin(new NarrowPhase2DPlugin())
+ * // After an update, Contacts contains only the current confirmed contacts.
+ * const contacts = world.getResource(Contacts)
+ * ```
+ *
+ * @param {World} world - World containing the collision-pair resource, SAT
+ * state, contacts, and queried body components.
+ * @returns {void}
+ * @category system
  */
 export function getSATContacts(world) {
   const narrowphase = world.getResource(SATNarrowphase2D)
@@ -81,6 +125,7 @@ export function getSATContacts(world) {
     contacts.push(manifold)
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
 
 export * from './types'
 
