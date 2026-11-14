@@ -1,3 +1,5 @@
+/** @import {TypeId} from '@wimaengine/type' */
+
 import { App, Plugin } from '@wimaengine/app'
 import { CorePlugin, AppSchedule } from '@wimaengine/core'
 import { ReflectPlugin } from '@wimaengine/reflect'
@@ -6,10 +8,50 @@ import { Browser, PlatformOS } from './core'
 import { Device } from './resources'
 import { registerDeviceTypes } from './systems'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Adds a browser-aware {@linkcode Device} resource to an {@linkcode App}.
+ *
+ * Register this plugin when application code needs browser rendering
+ * capabilities and detected {@linkcode PlatformOS} and {@linkcode Browser} values.
+ * It populates the resource from the current browser environment and keeps it
+ * available for application code to read. The WebAudio capability remains
+ * available for application-managed state.
+ *
+ * This plugin depends on {@linkcode CorePlugin} and {@linkcode ReflectPlugin}.
+ * Register those plugins before this plugin as shown in the example.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { CorePlugin } from '@wimaengine/core'
+ * import { ReflectPlugin } from '@wimaengine/reflect'
+ * import { Device, DevicePlugin } from '@wimaengine/device'
+ *
+ * const app = new App()
+ * app
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .registerPlugin(new DevicePlugin())
+ *   .run()
+ *
+ * // Read the resource from the app's world.
+ * function chooseRenderer(world) {
+ *   const device = world.getResource(Device)
+ *   return device.capabilities.webgl ? 'webgl' : 'canvas'
+ * }
+ * ```
+ *
+ * @category plugin
+ */
 export class DevicePlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Adds the {@linkcode Device} resource and detects the browser capabilities,
+   * platform, and browser used by the application.
+   *
+   * @param {App} app - {@linkcode App} to configure.
+   * @returns {void}
    */
   register(app) {
     const device = new Device()
@@ -54,7 +96,14 @@ export class DevicePlugin extends Plugin {
     }
   }
 
+  /**
+   * Returns the plugin IDs for the {@linkcode CorePlugin} and
+   * {@linkcode ReflectPlugin} dependencies.
+   *
+   * @returns {TypeId[]} Required plugin {@linkcode TypeId} values.
+   */
   requires() {
     return [typeid(CorePlugin), typeid(ReflectPlugin)]
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
