@@ -1,3 +1,5 @@
+/** @import { DOMWindowPlugin } from '@wimaengine/window-dom' */
+/** @import { TypeId } from '@wimaengine/type' */
 import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { World } from '@wimaengine/ecs'
@@ -10,10 +12,75 @@ import { MouseButton } from './core'
 import { Mouse, MouseButtons } from './resources'
 import { registerMouseTypes } from './systems'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Adds mouse input support to an {@linkcode App}.
+ *
+ * The plugin provides {@linkcode Mouse} and {@linkcode MouseButtons} resources in
+ * the app's default world. Use {@linkcode Mouse} for pointer position and
+ * movement, and {@linkcode MouseButtons} for held, just-pressed, and
+ * just-released {@linkcode MouseButton} values.
+ *
+ * Only pointer events whose `pointerType` is `'mouse'` affect these resources.
+ * The latest matching {@linkcode PointerMove} event supplies the pointer
+ * position and movement delta; matching {@linkcode PointerDown} and
+ * {@linkcode PointerUp} events update the button transitions. Other pointer
+ * types are ignored.
+ *
+ * {@linkcode WindowPlugin} provides the typed pointer events consumed by this
+ * plugin. In browser applications, add {@linkcode DOMWindowPlugin} to bridge
+ * native pointer events into those resources. This plugin requires
+ * {@linkcode CorePlugin}, {@linkcode ReflectPlugin}, {@linkcode MathPlugin}, and
+ * {@linkcode WindowPlugin}; register those dependencies before running the app.
+ * Required plugins are not installed automatically.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { CommandsPlugin } from '@wimaengine/command'
+ * import { CorePlugin } from '@wimaengine/core'
+ * import { MathPlugin } from '@wimaengine/math'
+ * import { Mouse, MouseButton, MouseButtons, MousePlugin } from '@wimaengine/mouse'
+ * import { ReflectPlugin } from '@wimaengine/reflect'
+ * import { DOMWindowPlugin } from '@wimaengine/window-dom'
+ * import { WindowPlugin } from '@wimaengine/window'
+ *
+ * const app = new App()
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .registerPlugin(new MathPlugin())
+ *   .registerPlugin(new CommandsPlugin())
+ *   .registerPlugin(new WindowPlugin())
+ *   .registerPlugin(new DOMWindowPlugin())
+ *   .registerPlugin(new MousePlugin())
+ * app.run()
+ *
+ * const world = app.getWorld()
+ * const mouse = world.getResource(Mouse)
+ * const buttons = world.getResource(MouseButtons)
+ *
+ * if (mouse.moved()) {
+ *   console.log(mouse.position.x, mouse.position.y)
+ * }
+ *
+ * if (buttons.justPressed(MouseButton.Left)) {
+ *   console.log('left button pressed')
+ * }
+ * ```
+ *
+ * @category plugin
+ */
 export class MousePlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Adds {@linkcode Mouse} and {@linkcode MouseButtons} resources to the app's
+   * default world.
+   *
+   * The resources expose current mouse position, movement, and button
+   * transitions from matching pointer events.
+   *
+   * @param {App} app - {@linkcode App} to configure.
+   * @returns {void}
    */
   register(app) {
 
@@ -25,10 +92,20 @@ export class MousePlugin extends Plugin {
       .registerSystem({ schedule: AppSchedule.Update, systemGroup: CoreSystems.Start, system: updateMouseButtons })
   }
 
+  /**
+   * Returns the plugin dependencies required by mouse input.
+   *
+   * Register {@linkcode CorePlugin}, {@linkcode ReflectPlugin}, {@linkcode MathPlugin},
+   * and {@linkcode WindowPlugin} before this plugin. Registering
+   * {@linkcode MousePlugin} does not install them automatically.
+   *
+   * @returns {TypeId[]} Required plugin {@linkcode TypeId} values.
+   */
   requires() {
     return [typeid(CorePlugin), typeid(ReflectPlugin), typeid(MathPlugin), typeid(WindowPlugin)]
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
 
 /**
  * @param {World} world
