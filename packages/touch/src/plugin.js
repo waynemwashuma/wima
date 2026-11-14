@@ -1,3 +1,5 @@
+/** @import {TypeId} from '@wimaengine/type' */
+
 import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { World } from '@wimaengine/ecs'
@@ -9,10 +11,61 @@ import { TouchPointer } from './core'
 import { Touches } from './resources'
 import { registerTouchTypes } from './systems'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Adds touch input tracking to an {@linkcode App}.
+ *
+ * The plugin provides a {@linkcode Touches} resource in the app's default world.
+ * It tracks touch contacts from pointer input and ignores pointers whose type
+ * is not `touch`. Read the resource with `world.getResource(Touches)` to
+ * inspect the active contacts.
+ *
+ * Each active contact is represented by a {@linkcode TouchPointer}. A touch
+ * start creates a pointer with its current and previous positions set to the
+ * start position. On later moves, the previous position is retained in
+ * `lastposition` while the current position follows the contact. A pointer is
+ * removed when its touch ends or is canceled.
+ *
+ * The plugin consumes typed {@linkcode PointerDown}, {@linkcode PointerMove},
+ * {@linkcode PointerUp}, and {@linkcode PointerCancel} events from
+ * {@linkcode WindowPlugin}. Only events whose `pointerType` is `touch` affect
+ * the touch resource.
+ *
+ * The plugin requires {@linkcode CorePlugin}, {@linkcode ReflectPlugin}, and
+ * {@linkcode WindowPlugin}. Register these dependencies before registering this
+ * plugin; it does not install them automatically.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { CorePlugin } from '@wimaengine/core'
+ * import { ReflectPlugin } from '@wimaengine/reflect'
+ * import { TouchPlugin, Touches } from '@wimaengine/touch'
+ * import { WindowPlugin } from '@wimaengine/window'
+ *
+ * const app = new App()
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .registerPlugin(new WindowPlugin({ initPrimaryWindow: false }))
+ *   .registerPlugin(new TouchPlugin())
+ *   .run()
+ *
+ * const touches = app.getWorld().getResource(Touches)
+ * console.log(touches.getActive())
+ * ```
+ *
+ * @category plugin
+ */
 export class TouchPlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Adds touch input state to the app's default world.
+   *
+   * The app gains a {@linkcode Touches} resource for reading active
+   * {@linkcode TouchPointer} values.
+   *
+   * @param {App} app - {@linkcode App} to configure.
+   * @returns {void}
    */
   register(app) {
     app
@@ -21,10 +74,20 @@ export class TouchPlugin extends Plugin {
       .registerSystem({ schedule: AppSchedule.Startup, systemGroup: CoreSystems.Start, system: registerTouchTypes })
   }
 
+  /**
+   * Returns the plugin dependencies required for touch input.
+   *
+   * The returned IDs identify {@linkcode CorePlugin}, {@linkcode ReflectPlugin},
+   * and {@linkcode WindowPlugin}. Register these plugins before this plugin;
+   * registering {@linkcode TouchPlugin} does not install them automatically.
+   *
+   * @returns {TypeId[]} Required plugin {@linkcode TypeId} values.
+   */
   requires() {
     return [typeid(CorePlugin), typeid(ReflectPlugin), typeid(WindowPlugin)]
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
 
 /**
  * @param {World} world
