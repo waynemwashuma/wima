@@ -1,3 +1,7 @@
+/** @import { DefaultPlugin } from '@wimaengine/misc' */
+/** @import { TypeId } from '@wimaengine/type' */
+/** @import { Transform3DPlugin } from '@wimaengine/transform' */
+/** @import { DOMWindowPlugin } from '@wimaengine/window-dom' */
 import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { EntityHandle, Query, World } from '@wimaengine/ecs'
@@ -11,10 +15,59 @@ import { AttributeMap, ClearColor, MeshCache, UBOCache, WebglProgramCache } from
 import { basicMaterial3DFragment, basicMaterial3DVertex } from './shaders'
 import { disposeDroppedMeshes, queueMeshes, registerWebglTypes } from './systems'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Provides the WebGL 2 rendering backend for an {@linkcode App}.
+ *
+ * Register this plugin to render mesh and material assets through the WebGL 2
+ * context associated with the app's main {@linkcode Window}. In a browser
+ * application, register {@linkcode DOMWindowPlugin} to connect that window to an
+ * {@linkcode HTMLCanvasElement}; this plugin does not create a canvas.
+ *
+ * The plugin includes a built-in 3D pipeline for {@linkcode BasicMaterial}.
+ * Register another {@linkcode WebglMaterialPlugin} for a different material type
+ * and matching shader pair. The built-in material configuration also requires
+ * {@linkcode Transform3DPlugin}.
+ *
+ * Register {@linkcode DefaultPlugin} or the required dependencies before app
+ * startup. Dependencies are checked but are not installed automatically.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { DefaultPlugin } from '@wimaengine/misc'
+ * import { DOMWindowPlugin } from '@wimaengine/window-dom'
+ * import { WebglRendererPlugin } from '@wimaengine/render-webgl'
+ *
+ * new App()
+ *   .registerPlugin(new DefaultPlugin())
+ *   .registerPlugin(new DOMWindowPlugin())
+ *   .registerPlugin(new WebglRendererPlugin())
+ *   .run()
+ * ```
+ *
+ * @category plugin
+ */
 export class WebglRendererPlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Stages the renderer resources and built-in material configuration in an
+   * {@linkcode App}.
+   *
+   * The default world receives {@linkcode ProgramCache}, {@linkcode MeshCache},
+   * {@linkcode UBOCache}, {@linkcode ClearColor}, {@linkcode AttributeMap}, and
+   * {@linkcode WebglProgramCache}. The attribute map starts with built-in
+   * {@linkcode MeshAttribute} descriptors for position, normal, tangent, UV, UVB,
+   * and color data.
+   *
+   * The built-in {@linkcode BasicMaterial} configuration uses
+   * {@linkcode WebglMaterialPlugin} with the bundled 3D shaders. Register another
+   * {@linkcode WebglMaterialPlugin} when an app needs a different material and
+   * shader pair. Rendering uses the canvas for the main {@linkcode Window} in
+   * {@linkcode Windows}; the canvas must provide a WebGL 2 context.
+   *
+   * @param {App} app - The {@linkcode App} to configure with this renderer.
+   * @returns {void}
    */
   register(app) {
     const attribute = new AttributeMap()
@@ -38,6 +91,20 @@ export class WebglRendererPlugin extends Plugin {
       .registerSystem({ schedule: AppSchedule.Update, systemGroup: CoreSystems.PostMain, system: queueMeshes })
   }
 
+  /**
+   * Returns this renderer's direct plugin dependencies.
+   *
+   * Register {@linkcode CorePlugin}, {@linkcode ReflectPlugin},
+   * {@linkcode RenderCorePlugin}, and {@linkcode WindowPlugin} before startup.
+   * The nested {@linkcode WebglMaterialPlugin} registered for
+   * {@linkcode BasicMaterial} separately requires {@linkcode Transform3DPlugin};
+   * that dependency is not included in this return value. Dependencies are
+   * checked but are not installed automatically.
+   *
+   * @returns {TypeId[]} Type IDs for {@linkcode CorePlugin},
+   * {@linkcode ReflectPlugin}, {@linkcode RenderCorePlugin}, and
+   * {@linkcode WindowPlugin}.
+   */
   requires() {
     return [
       typeid(CorePlugin),
@@ -47,6 +114,7 @@ export class WebglRendererPlugin extends Plugin {
     ]
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
 
 /**
  * @param {AttributeMap} attributeMap
