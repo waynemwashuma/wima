@@ -12,8 +12,35 @@ import {
 } from '@wimaengine/window'
 
 /**
- * @param {World} world
- * @param {HTMLElement} target
+ * Attaches browser pointer and wheel listeners to a DOM target. Each listener
+ * resolves the matching typed {@linkcode Events} resource with `typeidGeneric`,
+ * constructs the corresponding window event from the browser event, and writes
+ * it to that resource.
+ *
+ * The listeners map browser event names to window event values:
+ *
+ * - `pointerdown` → {@linkcode PointerDown}.
+ * - `pointerup` → {@linkcode PointerUp}.
+ * - `pointermove` → {@linkcode PointerMove}.
+ * - `pointercancel` → {@linkcode PointerCancel}.
+ * - `pointerenter` → {@linkcode PointerEnter}.
+ * - `pointerleave` → {@linkcode PointerLeave}.
+ * - `wheel` → {@linkcode PointerWheel}.
+ *
+ * The target must provide `addEventListener`; a {@linkcode HTMLElement} such as
+ * a canvas can be used. The {@linkcode World} must already contain an
+ * {@linkcode Events} resource for each listed event type. Calling this helper
+ * again adds another set of listeners; it does not return a cleanup function.
+ *
+ * @example
+ * ```js
+ * // Forward input from a canvas into the world's typed event resources.
+ * setupPointerEvents(world, canvas)
+ * ```
+ *
+ * @param {World} world - {@linkcode World} containing the typed event resources.
+ * @param {HTMLElement} target - {@linkcode HTMLElement} receiving pointer and wheel events.
+ * @returns {void}
  */
 export function setupPointerEvents(world, target) {
   target.addEventListener('pointerdown', (e) => {
