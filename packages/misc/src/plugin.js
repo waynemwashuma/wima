@@ -25,6 +25,25 @@ import { Transform2DPlugin, Transform3DPlugin } from '@wimaengine/transform'
 import { DefaultTweenPlugin } from '@wimaengine/tween'
 import { WindowPlugin } from '@wimaengine/window'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Groups the engine's standard plugins into one registration unit.
+ *
+ * The plugins are added in the order expected by the engine and are registered
+ * with the app when this group is registered.
+ *
+ * @category plugin-group
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { DefaultPlugin } from '@wimaengine/misc'
+ *
+ * const app = new App()
+ * app.registerPlugin(new DefaultPlugin())
+ * app.run()
+ * ```
+ */
 export class DefaultPlugin extends PluginGroup {
   constructor() {
     super()
@@ -60,3 +79,4 @@ export class DefaultPlugin extends PluginGroup {
     this.add(new ScenePlugin())
   }
 }
+/* eslint-enable jsdoc/check-tag-names */

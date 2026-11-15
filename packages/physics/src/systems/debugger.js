@@ -7,8 +7,37 @@ import { vertices } from '@wimaengine/render-canvas2d'
 import { Position2D } from '@wimaengine/transform'
 import { MainWindow, Windows } from '@wimaengine/window'
 
+/* eslint-disable jsdoc/check-tag-names */
 /**
- * @param {World} world
+ * Draws the current {@linkcode PhysicsHitbox} bounds on the main window canvas.
+ *
+ * {@linkcode Physics2DDebuggerPlugin} registers this exact function directly in the
+ * repeating {@linkcode AppSchedule.Update} schedule when its `drawBounds` option is enabled. The
+ * system queries every entity with a {@linkcode PhysicsHitbox}, then draws its
+ * `min`/`max` rectangle with a red, 3-pixel stroke. It reads the values already
+ * stored by the physics systems; it does not calculate or update the bounds.
+ *
+ * The system finds the entity matching {@linkcode MainWindow} together with its
+ * {@linkcode EntityHandle}, then looks up that handle in the {@linkcode Windows}
+ * resource. The world must provide that main-window match and resource. If the
+ * handle has no registered canvas, or the canvas cannot provide a 2D context,
+ * the function returns without drawing.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { drawBounds } from '@wimaengine/physics'
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: drawBounds
+ * })
+ * // Physics2DDebuggerPlugin registers this when drawBounds is enabled.
+ * ```
+ *
+ * @param {World} world - World containing PhysicsHitbox components and the main window.
+ * @returns {void}
+ * @category system
  */
 export function drawBounds(world) {
   const query = new Query(world, [PhysicsHitbox])
@@ -44,7 +73,34 @@ export function drawBounds(world) {
 }
 
 /**
- * @param {World} world
+ * Draws a white marker at every entity's current {@linkcode Position2D}.
+ *
+ * {@linkcode Physics2DDebuggerPlugin} registers this exact function directly in the
+ * repeating {@linkcode AppSchedule.Update} schedule when its `drawPosition` option is enabled. The
+ * query requires {@linkcode Position2D}; each matching position becomes a filled
+ * white circle with radius `4` on the main window's 2D canvas.
+ *
+ * As with the other debugger overlays, the system finds the entity matching
+ * {@linkcode MainWindow} together with its {@linkcode EntityHandle} and resolves its
+ * canvas through the {@linkcode Windows} resource. The world must provide that
+ * main-window match and resource. A missing canvas or unavailable 2D context
+ * causes an immediate return without drawing.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { drawPosition } from '@wimaengine/physics'
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: drawPosition
+ * })
+ * // Physics2DDebuggerPlugin registers this when drawPosition is enabled.
+ * ```
+ *
+ * @param {World} world - World containing Position2D components and the main window.
+ * @returns {void}
+ * @category system
  */
 export function drawPosition(world) {
   const query = new Query(world, [Position2D])
@@ -70,7 +126,36 @@ export function drawPosition(world) {
 }
 
 /**
- * @param {World} world
+ * Draws each entity's velocity as a cyan vector from its
+ * {@linkcode Position2D}.
+ *
+ * {@linkcode Physics2DDebuggerPlugin} registers this exact function directly in the
+ * repeating {@linkcode AppSchedule.Update} schedule when its `drawVelocity` option is enabled. The
+ * query requires both {@linkcode Position2D} and {@linkcode Velocity2D}. For each
+ * match, the system draws from `(position.x, position.y)` to that point plus
+ * the velocity vector, then strokes the shared path in cyan.
+ *
+ * The main-window entity is found through {@linkcode EntityHandle} and
+ * {@linkcode MainWindow}, and its canvas is resolved through the {@linkcode Windows}
+ * resource. The world must provide that main-window match and resource. If no
+ * canvas is registered for the handle, or the canvas has no 2D context, the
+ * function returns without drawing.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { drawVelocity } from '@wimaengine/physics'
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: drawVelocity
+ * })
+ * // Physics2DDebuggerPlugin registers this when drawVelocity is enabled.
+ * ```
+ *
+ * @param {World} world - World containing Position2D/Velocity2D pairs and the main window.
+ * @returns {void}
+ * @category system
  */
 export function drawVelocity(world) {
   const query = new Query(world, [Position2D, Velocity2D])
@@ -97,7 +182,37 @@ export function drawVelocity(world) {
 }
 
 /**
- * @param {World} world
+ * Draws the current {@linkcode Collider2D} geometry on the main window canvas.
+ *
+ * {@linkcode Physics2DDebuggerPlugin} registers this exact function directly in the
+ * repeating {@linkcode AppSchedule.Update} schedule when its `drawShapes` option is enabled. The
+ * system queries every entity with a collider and uses its current `vertices`
+ * rather than the collider's original geometry. Polygon paths are closed and
+ * stroked in light green. Circle colliders use `vertices[0]` as the center and
+ * `vertices[1].x` as the radius; they also draw a radius-length orientation
+ * arm from the angle stored in `shape.angle`.
+ *
+ * Before querying colliders, the system finds the entity matching
+ * {@linkcode MainWindow} together with its {@linkcode EntityHandle} and resolves its
+ * canvas through the {@linkcode Windows} resource. The world must provide that
+ * main-window match and resource. A missing canvas or unavailable 2D context
+ * causes an immediate return without drawing.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { drawShapes } from '@wimaengine/physics'
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: drawShapes
+ * })
+ * // Physics2DDebuggerPlugin enables this overlay by default.
+ * ```
+ *
+ * @param {World} world - World containing Collider2D components and the main window.
+ * @returns {void}
+ * @category system
  */
 export function drawShapes(world) {
   const windows = new Query(world, [EntityHandle, MainWindow])
@@ -140,7 +255,38 @@ export function drawShapes(world) {
 }
 
 /**
- * @param {World} world
+ * Draws yellow arms from colliding bodies to their current contact points.
+ *
+ * {@linkcode Physics2DDebuggerPlugin} registers this exact function directly in the
+ * repeating {@linkcode AppSchedule.Update} schedule when its `drawCollisionArm` option is enabled.
+ * The system reads the current {@linkcode Contacts} resource. For every manifold,
+ * it resolves each body's {@linkcode Position2D} with the manifold's entity
+ * handles, then draws a line from each position to every contact point covered
+ * by {@linkcode CollisionData#contactNo}. All lines are stroked together in yellow.
+ *
+ * The main-window entity is found through {@linkcode EntityHandle} and
+ * {@linkcode MainWindow}, and its canvas is resolved through the {@linkcode Windows}
+ * resource. The world must provide the {@linkcode Contacts} and {@linkcode Windows}
+ * resources and a main-window match. A missing canvas or unavailable 2D
+ * context returns without drawing. If either contact body has no
+ * {@linkcode Position2D}, the function also returns immediately before stroking
+ * the path, so earlier lines from that invocation are not rendered.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { drawArms } from '@wimaengine/physics'
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: drawArms
+ * })
+ * // Physics2DDebuggerPlugin maps drawCollisionArm to drawArms.
+ * ```
+ *
+ * @param {World} world - World containing Contacts, Position2D components, and the main window.
+ * @returns {void}
+ * @category system
  */
 export function drawArms(world) {
   const windows = new Query(world, [EntityHandle, MainWindow])
@@ -176,7 +322,38 @@ export function drawArms(world) {
 }
 
 /**
- * @param {World} world
+ * Draws white markers for the current contact points in {@linkcode Contacts}.
+ *
+ * {@linkcode Physics2DDebuggerPlugin} registers this exact function directly in the
+ * repeating {@linkcode AppSchedule.Update} schedule when its `drawContacts` option is enabled. The
+ * system reads each manifold's `contactData.contactPoints` and uses
+ * {@linkcode CollisionData#contactNo} to decide whether to draw the second point. The
+ * first contact slot is always drawn; a second slot is drawn only when
+ * `contactNo === 2`. Each marker is a white filled arc with radius `5` from
+ * angle `0` to `Math.PI`, so the implementation draws semicircular markers,
+ * not full circles.
+ *
+ * The main-window entity is found through {@linkcode EntityHandle} and
+ * {@linkcode MainWindow}, and its canvas is resolved through the {@linkcode Windows}
+ * resource. The world must provide the {@linkcode Contacts} and {@linkcode Windows}
+ * resources and a main-window match. A missing canvas or unavailable 2D
+ * context causes an immediate return without drawing any contact markers.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { drawContacts } from '@wimaengine/physics'
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: drawContacts
+ * })
+ * // Physics2DDebuggerPlugin registers this when drawContacts is enabled.
+ * ```
+ *
+ * @param {World} world - World containing Contacts and the main window.
+ * @returns {void}
+ * @category system
  */
 export function drawContacts(world) {
   const windows = new Query(world, [EntityHandle, MainWindow])

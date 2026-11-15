@@ -1,4 +1,5 @@
 /** @import { App } from '@wimaengine/app' */
+/** @import { TypeId } from '@wimaengine/type' */
 import { Plugin } from '@wimaengine/app'
 import { ReflectPlugin } from '@wimaengine/reflect'
 import { SchedulerBuilder } from '@wimaengine/schedule'
@@ -6,10 +7,51 @@ import { typeid } from '@wimaengine/type'
 import { AppSchedule, CoreSystems, MainWorld, defaultRunner } from './core'
 import { registerCoreTypes, registerPrimitiveTypes } from './systems'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Provides the core runtime foundation for an {@linkcode App}.
+ *
+ * Registering {@linkcode CorePlugin} selects {@linkcode MainWorld} as the app's
+ * default world, stages the shared {@linkcode SchedulerBuilder.Instance}
+ * scheduler, and sets {@linkcode defaultRunner} as the app runner.
+ *
+ * It creates the {@linkcode AppSchedule.Startup} and
+ * {@linkcode AppSchedule.Update} schedules. Both use the core phase ordering and
+ * default group.
+ * During startup, it also prepares the core and primitive type metadata used
+ * by the app's reflection support.
+ *
+ * {@linkcode CorePlugin} requires {@linkcode ReflectPlugin}. Register that plugin
+ * before the core plugin; registering the core plugin does not install it.
+ *
+ * @example
+ * ```js
+ * import { App, CorePlugin, ReflectPlugin } from 'wima'
+ *
+ * const app = new App()
+ * app
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .run()
+ * ```
+ *
+ * @category plugin
+ */
 export class CorePlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Applies the core world, scheduler, runner, schedule, and group setup to an
+   * {@linkcode App}.
+   *
+   * The app uses {@linkcode MainWorld} as its default world, stages
+   * {@linkcode SchedulerBuilder.Instance}, and uses {@linkcode defaultRunner}. It
+   * creates {@linkcode AppSchedule.Startup} and {@linkcode AppSchedule.Update};
+   * both use the core phase ordering and default group. Startup also prepares
+   * the core and primitive type metadata used by the app's reflection support.
+   *
+   * @inheritdoc
+   * @param {App} app - App to configure.
+   * @returns {void}
    */
   register(app) {
     app
@@ -86,7 +128,16 @@ export class CorePlugin extends Plugin {
       })
   }
 
+  /**
+   * Returns the type ID for the required {@linkcode ReflectPlugin} dependency.
+   * The app validates this dependency before final setup; registering
+   * {@linkcode CorePlugin} does not install {@linkcode ReflectPlugin} automatically.
+   *
+   * @inheritdoc
+   * @returns {TypeId[]} Required plugin {@linkcode TypeId} values.
+   */
   requires() {
     return [typeid(ReflectPlugin)]
   }
 }
+/* eslint-enable jsdoc/check-tag-names */

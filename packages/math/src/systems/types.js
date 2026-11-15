@@ -1,3 +1,5 @@
+/** @import {AppSchedule} from '@wimaengine/core' */
+/** @import {MathPlugin} from '../plugin' */
 import { World } from '@wimaengine/ecs'
 import { Field, StructInfo, TypeRegistry } from '@wimaengine/reflect'
 import { typeid } from '@wimaengine/type'
@@ -20,8 +22,39 @@ import {
   Vector4
 } from 'hisabati'
 
+/* eslint-disable jsdoc/check-tag-names */
 /**
- * @param {World} world
+ * Registers Hisabati reflection metadata in the world's
+ * {@linkcode TypeRegistry}.
+ *
+ * {@linkcode MathPlugin} registers this exact
+ * function directly in the one-shot
+ * {@linkcode AppSchedule.Startup} schedule. The system only reads
+ * {@linkcode TypeRegistry} from `world` and adds
+ * metadata to it; it does not create math values, add resources, or register
+ * systems. A world without {@linkcode TypeRegistry} fails when the resource is
+ * requested.
+ *
+ * The registered Hisabati types are {@linkcode Angle}, {@linkcode Rotary},
+ * {@linkcode Quaternion}, {@linkcode Affine2}, {@linkcode Affine3}, {@linkcode Basis2},
+ * {@linkcode Basis3}, {@linkcode Vector2}, {@linkcode Vector3}, {@linkcode Vector4},
+ * {@linkcode BVector2}, {@linkcode BVector3}, {@linkcode BVector4}, {@linkcode Matrix2},
+ * {@linkcode Matrix3}, and {@linkcode Matrix4}. Their scalar, boolean, vector, and
+ * matrix fields are described with {@linkcode Field} entries in the
+ * {@linkcode StructInfo} metadata stored in the registry.
+ *
+ * @example
+ * ```js
+ * import { MathPlugin } from '@wimaengine/math'
+ *
+ * app.registerPlugin(new MathPlugin())
+ * // MathPlugin registers the Hisabati types during AppSchedule.Startup.
+ * ```
+ *
+ * @param {World} world - Startup world containing the {@linkcode TypeRegistry}.
+ * @returns {void}
+ * @throws {Error} If the world does not contain {@linkcode TypeRegistry}.
+ * @category system
  */
 export function registerMathTypes(world) {
   const registry = world.getResource(TypeRegistry)
@@ -136,3 +169,4 @@ export function registerMathTypes(world) {
     p: new Field(typeid(Number))
   }))
 }
+/* eslint-enable jsdoc/check-tag-names */

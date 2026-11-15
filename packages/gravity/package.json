@@ -35,6 +35,7 @@
     "@wimaengine/ecs": "0.3.0",
     "@wimaengine/math": "0.3.0",
     "@wimaengine/movable": "0.3.0",
+    "@wimaengine/narrowphase": "0.3.0",
     "@wimaengine/physics": "0.3.0",
     "@wimaengine/reflect": "0.3.0",
     "@wimaengine/type": "0.3.0"

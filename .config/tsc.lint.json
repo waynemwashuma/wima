@@ -3,7 +3,9 @@
     "../src",
     "../examples"
   ],
-  "exclude": [],
+  "exclude": [
+    "../src/content.config.ts"
+  ],
   "compilerOptions": {
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

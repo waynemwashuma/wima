@@ -1,0 +1,30 @@
+---
+title: Getting started
+description: "Follow Wima’s beginner tutorial to build an ECS app step by step with components, resources, commands, and queries."
+ogImage: /branding/logo/wima-logo-dark.png
+---
+
+## Tutorial Flow
+
+1. [What you need](./01-what-you-need/index.md)
+   - Confirm the minimum tools and runtime prerequisites.
+2. [Install the engine](./02-install-the-engine/index.md)
+   - Add Wima to a project or work from a local checkout.
+3. [Run your first app](./03-run-your-first-app/index.md)
+   - Create an `App`, register the baseline plugins, and start the engine.
+4. [Add your first system](./04-add-your-first-system/index.md)
+   - Put startup and frame work on the right schedules.
+5. [Add your first component](./05-add-your-first-component/index.md)
+   - Define the data your game logic will attach to entities.
+6. [Spawn an entity with components](./06-spawn-an-entity-with-components/index.md)
+   - Create live entities and attach component data to them.
+7. [Use a query to update entities](./07-use-a-query-to-update-entities/index.md)
+   - Find matching entities and update them in a system.
+8. [Store shared state in a resource](./08-store-shared-state-in-a-resource/index.md)
+   - Keep game-wide values in one place so any system can read them.
+9. [What to learn next](./09-what-to-learn-next/index.md)
+   - Move into the core concepts once the basic loop feels familiar.
+
+## What Comes Later
+
+This guide deliberately avoids advanced storage details, system ordering rules, command queues, resource aliases, component hooks, and plugin composition. Those topics are covered in the later concept and building sections once the basic loop is clear.

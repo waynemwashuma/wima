@@ -1,4 +1,5 @@
 /** @import { SystemFunc } from "@wimaengine/ecs" */
+/** @import { World } from "@wimaengine/ecs" */
 /** @import { Constructor } from "@wimaengine/type" */
 /** @import { CrossWorldSystemFunc } from "./crossworldsystem" */
 
@@ -45,7 +46,7 @@
  * @property {Constructor} sourceWorld
  * @property {number | undefined} [delay]
  * @property {boolean | undefined} [repeat]
- * @property {(error: Error, world: import("@wimaengine/ecs").World) => void | undefined} [errorHandler]
+ * @property {(error: Error, world: World) => void | undefined} [errorHandler]
  */
 
 export {}

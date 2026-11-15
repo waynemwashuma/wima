@@ -35,6 +35,7 @@
     "@wimaengine/core": "0.3.0",
     "@wimaengine/datastructures": "0.3.0",
     "@wimaengine/ecs": "0.3.0",
+    "@wimaengine/event": "0.3.0",
     "@wimaengine/reflect": "0.3.0",
     "@wimaengine/time": "0.3.0",
     "@wimaengine/type": "0.3.0"

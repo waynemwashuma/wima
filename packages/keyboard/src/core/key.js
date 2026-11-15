@@ -1,4 +1,33 @@
 /**
+ * Defines the numeric engine codes for keyboard keys.
+ *
+ * Use these values with {@linkcode Keyboard} and its inherited
+ * {@linkcode Buttons} queries. The keyboard plugin maps recognized browser code
+ * strings to this set and uses {@linkcode KeyCode.Unidentified} for an
+ * unrecognized key. The values are engine-defined numbers rather than the
+ * browser code strings themselves.
+ *
+ * The set groups into letter keys ({@linkcode KeyCode.KeyA} through
+ * {@linkcode KeyCode.KeyZ}), top-row digits ({@linkcode KeyCode.Digit1} through
+ * {@linkcode KeyCode.Digit0}), function keys ({@linkcode KeyCode.F1} through
+ * {@linkcode KeyCode.F12}), modifiers and navigation keys, numpad keys, and
+ * common editing or punctuation keys such as
+ * {@linkcode KeyCode.BackTick}, {@linkcode KeyCode.Space}, and
+ * {@linkcode KeyCode.BackSpace}.
+ *
+ * @example
+ * ```js
+ * import { Keyboard, KeyCode } from '@wimaengine/keyboard'
+ *
+ * function handleInput(world) {
+ *   const keyboard = world.getResource(Keyboard)
+ *
+ *   if (keyboard.justPressed(KeyCode.Space)) {
+ *     console.log('jump')
+ *   }
+ * }
+ * ```
+ *
  * @readonly
  * @enum {number}
  */

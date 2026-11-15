@@ -1,4 +1,5 @@
 /** @import { Constructor } from '@wimaengine/type' */
+/** @import {SystemFunc} from '@wimaengine/ecs' */
 
 import { Color } from '@wimaengine/color'
 import { Vector2, Vector3 } from '@wimaengine/math'
@@ -7,9 +8,43 @@ import { setTypeId, typeid, typeidGeneric } from '@wimaengine/type'
 import { Gizmo2D, Gizmo3D, GizmoBuffer, GizmoLineCap, GizmoLineJoin, GizmoLineStyle, GizmoSettings } from '../core'
 
 /**
+ * Creates the Startup system that registers reflection metadata for 2D gizmos.
+ * The `label` constructor is part of the generic {@linkcode Gizmo2D} type ID, so
+ * use the same label when constructing or retrieving the corresponding
+ * {@linkcode Gizmo2D} resource. The exported function is a factory; the returned
+ * function is the system that receives a world and uses its {@linkcode TypeRegistry}.
+ *
+ * The returned system registers `Array<Vector2>` and `Array<Color>` with
+ * {@linkcode ArrayInfo}, then registers the exact enum IDs `GizmoLineCap`,
+ * `GizmoLineJoin`, and `GizmoLineStyle` (created with `setTypeId`) with
+ * {@linkcode EnumInfo}. It registers `GizmoBuffer<Vector2>` with fields
+ * `positions: Array<Vector2>`, `colors: Array<Color>`,
+ * `stripPositions: Array<Vector2>`, and `stripColors: Array<Color>`. It
+ * registers {@linkcode GizmoSettings} with numeric `lineWidth` and
+ * `lineDashOffset` fields plus enum-typed `lineCap`, `lineJoin`, and
+ * `lineStyle` fields. Finally, it registers the generic ID produced by
+ * `typeidGeneric(Gizmo2D, [label])` with `type: Function`,
+ * `buffer: GizmoBuffer<Vector2>`, and `settings: GizmoSettings` fields.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { registerGizmo2DTypes } from '@wimaengine/gizmo'
+ *
+ * class DebugGizmo {}
+ * app.registerSystem({
+ *   schedule: AppSchedule.Startup,
+ *   system: registerGizmo2DTypes(DebugGizmo)
+ * })
+ * // The plugin normally registers this Startup system for its configured label.
+ * ```
+ *
  * @template T
- * @param {Constructor<T>} label
- * @returns {import('@wimaengine/ecs').SystemFunc}
+ * @param {Constructor<T>} label - Constructor used as the generic `Gizmo2D`
+ * type label. It must match the label used by the gizmo plugin or resource
+ * lookup.
+ * @returns {SystemFunc} A system that registers the 2D gizmo type IDs and
+ * {@linkcode StructInfo} metadata in the world's {@linkcode TypeRegistry}.
  */
 export function registerGizmo2DTypes(label) {
   return function registerGizmo2DTypes(world) {
@@ -51,9 +86,43 @@ export function registerGizmo2DTypes(label) {
 }
 
 /**
+ * Creates the Startup system that registers reflection metadata for 3D gizmos.
+ * The `label` constructor is part of the generic {@linkcode Gizmo3D} type ID, so
+ * use the same label when constructing or retrieving the corresponding
+ * {@linkcode Gizmo3D} resource. The exported function is a factory; the returned
+ * function is the system that receives a world and uses its {@linkcode TypeRegistry}.
+ *
+ * The returned system registers `Array<Vector3>` and `Array<Color>` with
+ * {@linkcode ArrayInfo}, then registers the exact enum IDs `GizmoLineCap`,
+ * `GizmoLineJoin`, and `GizmoLineStyle` (created with `setTypeId`) with
+ * {@linkcode EnumInfo}. It registers `GizmoBuffer<Vector3>` with fields
+ * `positions: Array<Vector3>`, `colors: Array<Color>`,
+ * `stripPositions: Array<Vector3>`, and `stripColors: Array<Color>`. It
+ * registers {@linkcode GizmoSettings} with numeric `lineWidth` and
+ * `lineDashOffset` fields plus enum-typed `lineCap`, `lineJoin`, and
+ * `lineStyle` fields. Finally, it registers the generic ID produced by
+ * `typeidGeneric(Gizmo3D, [label])` with `type: Function`,
+ * `buffer: GizmoBuffer<Vector3>`, and `settings: GizmoSettings` fields.
+ *
+ * @example
+ * ```js
+ * import { AppSchedule } from '@wimaengine/core'
+ * import { registerGizmo3DTypes } from '@wimaengine/gizmo'
+ *
+ * class DebugGizmo {}
+ * app.registerSystem({
+ *   schedule: AppSchedule.Startup,
+ *   system: registerGizmo3DTypes(DebugGizmo)
+ * })
+ * // The plugin normally registers this Startup system for its configured label.
+ * ```
+ *
  * @template T
- * @param {Constructor<T>} label
- * @returns {import('@wimaengine/ecs').SystemFunc}
+ * @param {Constructor<T>} label - Constructor used as the generic `Gizmo3D`
+ * type label. It must match the label used by the gizmo plugin or resource
+ * lookup.
+ * @returns {SystemFunc} A system that registers the 3D gizmo type IDs and
+ * {@linkcode StructInfo} metadata in the world's {@linkcode TypeRegistry}.
  */
 export function registerGizmo3DTypes(label) {
   return function registerGizmo3DTypes(world) {

@@ -1,23 +1,54 @@
 import { clamp } from '@wimaengine/math'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Stores mutable time and cycle state for an application timer.
+ *
+ * Each update advances the timer while it is active, and its cycle behavior
+ * determines whether time stops at the end of the first cycle or wraps into
+ * subsequent cycles. Pausing preserves the current position; restarting
+ * begins again from zero.
+ *
+ * @category component
+ *
+ * @example
+ * ```js
+ * import { Timer, TimerMode } from '@wimaengine/time'
+ *
+ * const timer = new Timer({ duration: 2, mode: TimerMode.Once })
+ *
+ * timer.update(0.5)
+ * timer.pause()
+ * timer.play()
+ * timer.update(1.5)
+ *
+ * if (timer.completed()) {
+ *   console.log('timer finished')
+ * }
+ * ```
+ */
 export class Timer {
 
   /**
+   * Timer behavior for a single cycle.
    * @type {TimerMode}
    */
   mode
 
   /**
+   * Length of one timer cycle in seconds.
    * @type {number}
    */
   duration
 
   /**
+   * Multiplier applied to each delta passed to {@linkcode Timer#update}.
    * @type {number}
    */
   speed
 
   /**
+   * Whether updates currently leave the timer's elapsed time unchanged.
    * @type {boolean}
    */
   paused
@@ -67,7 +98,9 @@ export class Timer {
   playbackResolved = false
 
   /**
-   * @param {TimerOptions} options
+   * Creates a timer with an optional duration, mode, speed, and paused state.
+   *
+   * @param {TimerOptions} [options]
    */
   constructor({
     duration = 1,
@@ -184,36 +217,94 @@ export class Timer {
       typeof value.playbackResolved === 'boolean'
   }
 
+  /**
+   * Returns the elapsed time in the current cycle, in seconds.
+   *
+   * This reads the current value without changing the timer. In
+   * {@linkcode TimerMode.Once} mode it reaches `duration` when the timer
+   * finishes; in {@linkcode TimerMode.Repeat} mode it wraps when a cycle
+   * ends.
+   *
+   * @returns {number} Elapsed seconds in the current cycle.
+   *
+   * @example
+   * ```js
+   * timer.update(0.25)
+   * console.log(timer.elapsed()) // 0.25
+   * ```
+   */
   elapsed() {
     return this.elapsedTime
   }
 
+  /**
+   * Returns elapsed time as a ratio of the configured cycle duration.
+   *
+   * This is the raw division of {@linkcode Timer#elapsed} by
+   * {@linkcode Timer#duration}; it does not mutate the timer or clamp the
+   * result. A zero duration therefore produces `NaN` for zero elapsed time or
+   * an infinite result for non-zero elapsed time.
+   *
+   * @returns {number} Elapsed-to-duration ratio, where `1` represents one full cycle.
+   */
   progress() {
     return this.elapsedTime / this.duration
   }
 
+  /**
+   * Resumes progression without resetting the current elapsed time.
+   */
   play() {
     this.paused = false
     this.requestPlayback()
   }
 
+  /**
+   * Pauses progression without resetting the current elapsed time.
+   */
   pause() {
     this.paused = true
     this.requestPlayback()
   }
 
+  /**
+   * Restarts the timer from the beginning and resumes progression.
+   *
+   * This clears the completed-cycle count and elapsed seconds, then delegates
+   * to {@linkcode Timer#play}; the playback-change request is therefore
+   * resolved by the next {@linkcode Timer#update}.
+   *
+   * @returns {void}
+   */
   start() {
     this.elapsedCount = 0
     this.elapsedTime = 0
     this.play()
   }
 
+  /**
+   * Stops the timer and resets its cycle state.
+   *
+   * This clears the completed-cycle count and elapsed seconds, then delegates
+   * to {@linkcode Timer#pause}; the timer is paused and its finished state is
+   * cleared through the resulting playback request.
+   *
+   * @returns {void}
+   */
   stop() {
     this.elapsedCount = 0
     this.elapsedTime = 0
     this.pause()
   }
 
+  /**
+   * Resets the timer by delegating to {@linkcode Timer#start}.
+   *
+   * The timer therefore resumes from zero, clears its completed-cycle count,
+   * and requests a playback change.
+   *
+   * @returns {void}
+   */
   reset() {
     this.start()
   }
@@ -226,17 +317,44 @@ export class Timer {
     this.requestPlayback()
   }
 
+  /**
+   * Requests playback state resolution on the next timer update.
+   *
+   * The request flag is set and the finished state is cleared. This method
+   * does not change {@linkcode Timer#paused} or elapsed time; callers such
+   * as {@linkcode Timer#play}, {@linkcode Timer#pause}, and
+   * {@linkcode Timer#seek} control those values separately.
+   *
+   * @returns {void}
+   */
   requestPlayback() {
     this.playbackRequested = true
     this.finished = false
   }
 
+  /**
+   * Reports whether the most recent timer update resolved a playback request.
+   *
+   * The result is `true` only during the update in which a pending request was
+   * consumed; the next {@linkcode Timer#update} clears the resolved flag.
+   * Calling this method does not mutate the timer.
+   *
+   * @returns {boolean} Whether the latest update resolved a playback request.
+   */
   playbackChanged() {
     return this.playbackResolved
   }
 
   /**
-   * @param {number} dt
+   * Advances the timer by a frame delta in seconds.
+   *
+   * The delta is multiplied by {@linkcode Timer#speed}. Paused or finished
+   * timers do not advance. A repeating timer can complete multiple cycles in
+   * one update; use {@linkcode Timer#cyclesCompletedThisFrame} or
+   * {@linkcode Timer#cycleEnded} to inspect that update.
+   *
+   * @param {number} dt - Frame delta in seconds.
+   * @returns {void}
    */
   update(dt) {
     const previousElapsedTime = this.elapsedTime
@@ -303,12 +421,17 @@ export class Timer {
   }
 
   /**
-   * @returns {boolean}
+   * Reports whether a one-shot timer has reached its duration.
+   *
+   * Repeating timers continue cycling and therefore do not report completion.
+   *
+   * @returns {boolean} `true` after a `Once` timer finishes; otherwise `false`.
    */
   completed() {
     return this.finished
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
 
 /**
  * @typedef TimerSerial
@@ -326,11 +449,39 @@ export class Timer {
  */
 
 /**
+ * Defines how {@linkcode Timer} behaves when a cycle reaches its duration.
+ *
+ * One-shot behavior stops at the duration and reports completion. Repeating
+ * behavior wraps to the next cycle and continues counting completed cycles.
+ *
+ * @example
+ * ```js
+ * import { Timer, TimerMode } from '@wimaengine/time'
+ *
+ * const once = new Timer({ duration: 1, mode: TimerMode.Once })
+ * once.update(1.25)
+ * console.log(once.elapsed(), once.completed()) // 1, true
+ *
+ * const repeat = new Timer({ duration: 1, mode: TimerMode.Repeat })
+ * repeat.update(1.25)
+ * console.log(repeat.elapsed(), repeat.cyclesCompleted()) // 0.25, 1
+ * ```
+ *
  * @readonly
  * @enum {number}
  */
 export const TimerMode = {
+
+  /**
+   * Complete after the first duration and remain at the duration.
+   * @readonly
+   */
   Once: 0,
+
+  /**
+   * Wrap at each duration and continue counting completed cycles.
+   * @readonly
+   */
   Repeat: 1
 }
 

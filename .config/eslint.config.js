@@ -61,7 +61,8 @@ export default [
             "jsdoc/require-param-name": "error",
             "jsdoc/require-param-type": "error",
             // "jsdoc/require-returns":"error",
-            "jsdoc/require-returns-check": "error",
+            // Base methods may throw without a literal return expression.
+            "jsdoc/require-returns-check": "off",
             "jsdoc/require-yields": "error",
             "jsdoc/require-yields-check": "error",
             "jsdoc/require-throws": "error",
@@ -238,7 +239,8 @@ export default [
             "jsdoc/check-alignment": "warn",
             "jsdoc/check-line-alignment": "warn",
             "jsdoc/require-hyphen-before-param-description": "warn",
-            "jsdoc/require-description-complete-sentence": "warn",
+            // Inline JSDoc links confuse sentence parsing and produce circular fixes.
+            "jsdoc/require-description-complete-sentence": "off",
             "jsdoc/multiline-blocks": "warn",
             "jsdoc/require-asterisk-prefix": "warn",
             "jsdoc/no-multi-asterisks": "warn",

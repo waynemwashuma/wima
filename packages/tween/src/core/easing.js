@@ -1,11 +1,34 @@
 /** @import { EasingFn } from '../typedef' */
 /**
+ * Built-in easing functions for mapping normalized tween progress to a curve.
+ *
+ * Each function accepts a progress value `x`, normally in the inclusive range
+ * `0` to `1`, and returns the corresponding eased progress. Names ending in
+ * `In` accelerate from the start, names ending in `Out` decelerate into the
+ * end, and names ending in `InOut` combine both phases. Back and elastic
+ * curves can overshoot during the transition, while bounce curves add a
+ * rebound effect with slight endpoint offsets. These functions do not clamp
+ * or validate `x`.
+ *
+ * Pass a member directly wherever a {@linkcode EasingFn} is accepted, such as the
+ * `easing` argument of {@linkcode Tween}.
+ *
+ * @example
+ * ```js
+ * import { Easing } from '@wimaengine/tween'
+ *
+ * const ease = Easing.quadraticOut
+ * const progress = ease(0.25) // 0.4375
+ * ```
+ *
  * @readonly
  * @enum {EasingFn}
  */
 export const Easing = {
 
   /**
+   * Returns the input progress unchanged.
+   *
    * @type {EasingFn}
    */
   linear(x) {
@@ -13,6 +36,8 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with a quadratic curve.
+   *
    * @type {EasingFn}
    */
   quadraticIn(x) {
@@ -20,6 +45,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with a quadratic curve.
+   *
    * @type {EasingFn}
    */
   quadraticOut(x) {
@@ -27,6 +54,8 @@ export const Easing = {
   },
 
   /**
+   * Combines quadratic acceleration and deceleration around the midpoint.
+   *
    * @type {EasingFn}
    */
   quadraticInOut(x) {
@@ -40,6 +69,8 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with a cubic curve.
+   *
    * @type {EasingFn}
    */
   cubicIn(x) {
@@ -47,6 +78,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with a cubic curve.
+   *
    * @type {EasingFn}
    */
   cubicOut(x) {
@@ -56,6 +89,8 @@ export const Easing = {
   },
 
   /**
+   * Combines cubic acceleration and deceleration around the midpoint.
+   *
    * @type {EasingFn}
    */
   cubicInOut(x) {
@@ -71,6 +106,8 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with a quartic curve.
+   *
    * @type {EasingFn}
    */
   quarticIn(x) {
@@ -78,6 +115,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with a quartic curve.
+   *
    * @type {EasingFn}
    */
   quarticOut(x) {
@@ -87,6 +126,8 @@ export const Easing = {
   },
 
   /**
+   * Combines quartic acceleration and deceleration around the midpoint.
+   *
    * @type {EasingFn}
    */
   quarticInOut(x) {
@@ -102,6 +143,8 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with a quintic curve.
+   *
    * @type {EasingFn}
    */
   quinticIn(x) {
@@ -109,6 +152,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with a quintic curve.
+   *
    * @type {EasingFn}
    */
   quinticOut(x) {
@@ -118,6 +163,8 @@ export const Easing = {
   },
 
   /**
+   * Combines quintic acceleration and deceleration around the midpoint.
+   *
    * @type {EasingFn}
    */
   quinticInOut(x) {
@@ -133,6 +180,8 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with a half-sine curve.
+   *
    * @type {EasingFn}
    */
   sinusoidalIn(x) {
@@ -140,6 +189,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with a half-sine curve.
+   *
    * @type {EasingFn}
    */
   sinusoidalOut(x) {
@@ -147,6 +198,8 @@ export const Easing = {
   },
 
   /**
+   * Combines sinusoidal acceleration and deceleration around the midpoint.
+   *
    * @type {EasingFn}
    */
   sinusoidalInOut(x) {
@@ -154,6 +207,9 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with an exponential curve and returns exactly
+   * `0` when `x` is `0`.
+   *
    * @type {EasingFn}
    */
   exponentialIn(x) {
@@ -161,6 +217,9 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with an exponential curve and returns exactly `1`
+   * when `x` is `1`.
+   *
    * @type {EasingFn}
    */
   exponentialOut(x) {
@@ -168,6 +227,9 @@ export const Easing = {
   },
 
   /**
+   * Combines exponential acceleration and deceleration, returning exactly `0`
+   * and `1` at the corresponding endpoints.
+   *
    * @type {EasingFn}
    */
   exponentialInOut(x) {
@@ -188,6 +250,8 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start along a circular curve.
+   *
    * @type {EasingFn}
    */
   circularIn(x) {
@@ -195,6 +259,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end along a circular curve.
+   *
    * @type {EasingFn}
    */
   circularOut(x) {
@@ -204,6 +270,8 @@ export const Easing = {
   },
 
   /**
+   * Combines circular acceleration and deceleration around the midpoint.
+   *
    * @type {EasingFn}
    */
   circularInOut(x) {
@@ -219,6 +287,9 @@ export const Easing = {
   },
 
   /**
+   * Accelerates with an elastic curve that oscillates and can overshoot below
+   * `0` before reaching `1`; returns exactly `0` and `1` at the endpoints.
+   *
    * @type {EasingFn}
    */
   elasticIn(x) {
@@ -233,6 +304,9 @@ export const Easing = {
   },
 
   /**
+   * Decelerates with an elastic curve that can overshoot above `1` before
+   * settling at the end; returns exactly `0` and `1` at the endpoints.
+   *
    * @type {EasingFn}
    */
   elasticOut(x) {
@@ -247,6 +321,9 @@ export const Easing = {
   },
 
   /**
+   * Combines elastic acceleration and deceleration, with possible overshoot on
+   * either side of the midpoint; returns exactly `0` and `1` at the endpoints.
+   *
    * @type {EasingFn}
    */
   elasticInOut(x) {
@@ -267,6 +344,9 @@ export const Easing = {
   },
 
   /**
+   * Accelerates from the start with a backtrack that overshoots below `0`
+   * before progressing toward the end.
+   *
    * @type {EasingFn}
    */
   backIn(x) {
@@ -276,6 +356,8 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end with a backtrack that overshoots beyond `1`.
+   *
    * @type {EasingFn}
    */
   backOut(x) {
@@ -286,6 +368,9 @@ export const Easing = {
   },
 
   /**
+   * Combines backtrack acceleration and deceleration, overshooting around the
+   * midpoint.
+   *
    * @type {EasingFn}
    */
   backInOut(x) {
@@ -302,6 +387,10 @@ export const Easing = {
   },
 
   /**
+   * Mirrors {@linkcode Easing.bounceOut} so the curve bounces into the
+   * start before accelerating toward the end. Because of the mirrored
+   * `bounceOut` coefficients, `bounceIn(0)` returns `0.005625`.
+   *
    * @type {EasingFn}
    */
   bounceIn(x) {
@@ -309,6 +398,9 @@ export const Easing = {
   },
 
   /**
+   * Decelerates into the end through a piecewise parabolic bounce curve. Its
+   * final branch returns `0.994375` at `x = 1` and can slightly overshoot `1`.
+   *
    * @type {EasingFn}
    */
   bounceOut(x) {
@@ -331,6 +423,9 @@ export const Easing = {
   },
 
   /**
+   * Combines bounce-in and bounce-out behavior around the midpoint, inheriting
+   * the bounce family's slight overshoot and endpoint offsets.
+   *
    * @type {EasingFn}
    */
   bounceInOut(x) {

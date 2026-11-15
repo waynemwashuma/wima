@@ -1,16 +1,68 @@
+/** @import { Matrix4 } from '@wimaengine/math' */
+/** @import { ProjectionSerial } from '../core' */
+/** @import { RenderLists2D, RenderLists3D } from './renderlists' */
 import { OrthographicProjection, Projection, PerspectiveProjection } from '../core'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Camera component that maps view-space coordinates into clip space and defines
+ * the visible depth range for an entity.
+ *
+ * Add {@linkcode Camera} to an entity with a transform and either a
+ * {@linkcode RenderLists2D} or {@linkcode RenderLists3D} component. The default
+ * {@linkcode PerspectiveProjection} uses a field of view of `Math.PI / 2` and an
+ * aspect ratio of `1`; choose an {@linkcode OrthographicProjection} for fixed
+ * view bounds, as the 2D camera prefab does.
+ *
+ * @category component
+ * @example
+ * ```js
+ * import { World } from '@wimaengine/ecs'
+ * import { createCamera3D } from '@wimaengine/render-core'
+ *
+ * const world = new World()
+ * const cameraEntity = world.spawn(createCamera3D(0, 0, 5))
+ * ```
+ */
 export class Camera {
 
   /**
+   * Projection used to build this camera's projection matrix.
+   *
+   * Accepts {@linkcode Projection} values, including the built-in
+   * {@linkcode PerspectiveProjection} and {@linkcode OrthographicProjection}
+   * implementations.
+   *
    * @type {Projection}
    */
   projection
 
   /**
-   * @param {Projection} projection
-   * @param {number} near
-   * @param {number} far
+   * Near clipping distance passed to the active projection's
+   * {@linkcode Projection.asProjectionMatrix} method.
+   *
+   * @type {number}
+   */
+  near
+
+  /**
+   * Far clipping distance passed to the active projection's
+   * {@linkcode Projection.asProjectionMatrix} method.
+   *
+   * @type {number}
+   */
+  far
+
+  /**
+   * Creates a camera configuration with the supplied projection and clipping
+   * distances.
+   *
+   * Defaults to a {@linkcode PerspectiveProjection} with `fov = Math.PI / 2`,
+   * `aspect = 1`, `near = 0.1`, and `far = 1000`.
+   *
+   * @param {Projection} [projection=new PerspectiveProjection()] - Projection used to build the camera matrix.
+   * @param {number} [near=0.1] - Near clipping distance.
+   * @param {number} [far=1000] - Far clipping distance.
    */
   constructor(projection = new PerspectiveProjection(), near = 0.1, far = 1000) {
     this.projection = projection
@@ -19,8 +71,19 @@ export class Camera {
   }
 
   /**
+   * Copies a camera into a target camera.
+   *
+   * The near and far distances are copied directly. Built-in
+   * {@linkcode PerspectiveProjection} and {@linkcode OrthographicProjection}
+   * values are recreated with their current settings, so the copied camera
+   * does not share those projection objects with its source. For another
+   * {@linkcode Projection} implementation, no projection-specific copy is
+   * performed: the default target retains the source projection object, while
+   * an explicitly supplied target retains its own projection object.
+   *
    * @param {Camera} source
-   * @param {Camera} target
+   * @param {Camera} [target]
+   * @returns {Camera}
    */
   static copy(source, target = new Camera(source.projection, source.near, source.far)) {
     const { projection } = source
@@ -38,16 +101,37 @@ export class Camera {
   }
 
   /**
+   * Creates a copied camera with the same clipping distances and projection
+   * settings as the supplied camera.
+   *
+   * This calls {@linkcode Camera.copy} without an explicit target. For the
+   * built-in projection classes, the returned camera owns a new projection
+   * object. Custom {@linkcode Projection} implementations retain their source
+   * projection object.
+   *
    * @param {Camera} target
+   * @returns {Camera}
    */
   static clone(target) {
     return Camera.copy(target)
   }
 
   /**
+   * Converts a camera to its {@linkcode CameraSerial} representation.
+   *
+   * {@linkcode OrthographicProjection} values are serialized with the
+   * `orthographic` shape. Every other projection is passed to
+   * {@linkcode PerspectiveProjection.serialize} and is therefore represented
+   * with the `perspective` shape. The returned object contains exactly the
+   * nested `projection`, `near`, and `far` fields.
+   *
    * @param {Camera} value
+   * @returns {CameraSerial}
    */
   static serialize(value) {
+
+    /** @type {ProjectionSerial} */
+    // @ts-ignore The projection serializers infer their discriminant as `string`.
     const projection = value.projection instanceof OrthographicProjection ?
       OrthographicProjection.serialize(value.projection) :
 
@@ -62,8 +146,21 @@ export class Camera {
   }
 
   /**
+   * Reconstructs a {@linkcode Camera} from {@linkcode CameraSerial} data.
+   *
+   * A nested `type` of `perspective` or `orthographic` selects the matching
+   * built-in projection deserializer. Any other nested projection type replaces
+   * the output projection with a default {@linkcode PerspectiveProjection}. The
+   * method expects `value.projection` to exist and copies `near` and `far` as
+   * provided; it does not validate or fill in missing clipping values.
+   *
+   * When `out` is supplied, that camera object is updated and returned, but
+   * its projection is replaced with a newly deserialized or fallback
+   * projection.
+   *
    * @param {CameraSerial} value
    * @param {Camera} [out]
+   * @returns {Camera}
    */
   static deserialize(value, out = new Camera()) {
     if (value.projection.type === 'perspective') {
@@ -79,15 +176,29 @@ export class Camera {
 
     return out
   }
+
+  /**
+   * Builds a {@linkcode Matrix4} projection matrix for the current clipping
+   * distances.
+   *
+   * This calls {@linkcode Projection.asProjectionMatrix} with the current
+   * `near` and `far` values each time, so the result reflects the active
+   * projection and clipping distances. The camera does not cache or mutate a
+   * matrix.
+   *
+   * @returns {Matrix4}
+   */
   projectionMatrix() {
     return this.projection.asProjectionMatrix(this.near, this.far)
   }
 }
 
 /**
+ * Serialized form produced by {@linkcode Camera.serialize}.
+ *
  * @typedef CameraSerial
- * @property {import('../core').ProjectionSerial} projection
+ * @property {ProjectionSerial} projection
  * @property {number} near
  * @property {number} far
- * @property {string} projectionType
  */
+/* eslint-enable jsdoc/check-tag-names */

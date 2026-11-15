@@ -1,12 +1,47 @@
+/** @import { TypeId } from '@wimaengine/type' */
+
 import { App, Plugin } from '@wimaengine/app'
 import { CorePlugin, AppSchedule, CoreSystems } from '@wimaengine/core'
 import { World, EntityHandle, Query } from '@wimaengine/ecs'
 import { typeid } from '@wimaengine/type'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Adds a browser overlay that displays the number of entities in the app's
+ * default world.
+ *
+ * In a browser, the overlay appears near the top-right corner and refreshes
+ * during app updates with text such as `42 entities`.
+ *
+ * The plugin requires {@linkcode CorePlugin} to provide the app's default world.
+ * Register that dependency before this plugin; it is not added automatically.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { CorePlugin } from '@wimaengine/core'
+ * import { EntityCountDiagnosticPlugin } from '@wimaengine/diagnostic'
+ * import { ReflectPlugin } from '@wimaengine/reflect'
+ *
+ * new App()
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .registerDebugger(new EntityCountDiagnosticPlugin())
+ *   .run()
+ * ```
+ *
+ * @category plugin
+ */
 export class EntityCountDiagnosticPlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Installs the entity-count overlay for the app's default world.
+   *
+   * The overlay is appended to `document.body` and refreshed during app
+   * updates.
+   *
+   * @param {App} app - {@linkcode App} to configure.
+   * @returns {void}
    */
   register(app) {
     app
@@ -14,10 +49,20 @@ export class EntityCountDiagnosticPlugin extends Plugin {
       .registerSystem({ schedule: AppSchedule.Update, systemGroup: CoreSystems.End, system: updateEntityCount })
   }
 
+  /**
+   * Returns the plugin dependency required by this diagnostic.
+   *
+   * The returned ID identifies {@linkcode CorePlugin}, which provides the app's
+   * default world. The app validates this dependency but does not install it
+   * automatically.
+   *
+   * @returns {TypeId[]} Required plugin {@linkcode TypeId} values.
+   */
   requires() {
     return [typeid(CorePlugin)]
   }
 }
+/* eslint-enable jsdoc/check-tag-names */
 
 /**
  *

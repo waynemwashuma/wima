@@ -1,3 +1,5 @@
+/** @import {AppSchedule} from '@wimaengine/core' */
+/** @import {NarrowPhase2DPlugin} from '../plugin' */
 import { World, EntityHandle } from '@wimaengine/ecs'
 import { Angle, Vector2 } from '@wimaengine/math'
 import { ArrayInfo, EnumInfo, Field, MapInfo, StructInfo, TypeRegistry } from '@wimaengine/reflect'
@@ -7,8 +9,45 @@ import { CollisionData, CollisionManifold, Geometry, Jacobian } from '../core'
 import { Contacts, SATNarrowphase2D } from '../resources'
 import { ShapeType } from '../settings'
 
+/* eslint-disable jsdoc/check-tag-names */
 /**
- * @param {World} world
+ * Registers the narrowphase types used by reflection-aware engine systems.
+ *
+ * {@linkcode NarrowPhase2DPlugin} registers this exact function directly in the
+ * one-shot {@linkcode AppSchedule.Startup} schedule. When Startup runs, the
+ * function obtains the world's {@linkcode TypeRegistry} and registers the reflection
+ * metadata for the narrowphase collision types, resources, collider components,
+ * and soft-body components used by this package. It also registers the
+ * `ShapeType` and `BigInt` type IDs and the generic array and map IDs required by those
+ * metadata entries.
+ *
+ * The function attaches the existing copy, clone, serialize, and deserialize
+ * methods to the reflected {@linkcode Collider2D}, {@linkcode PhysicsProperties},
+ * {@linkcode SoftBody2D}, and {@linkcode SoftBody3D} entries. It changes the world's
+ * type registry only; it does not create resources or collision data.
+ *
+ * Install {@linkcode NarrowPhase2DPlugin} to run this system automatically during
+ * startup.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { CorePlugin } from '@wimaengine/core'
+ * import { NarrowPhase2DPlugin } from '@wimaengine/narrowphase'
+ * import { ReflectPlugin } from '@wimaengine/reflect'
+ *
+ * new App()
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .registerPlugin(new NarrowPhase2DPlugin())
+ *   .run()
+ * // Startup registers the narrowphase types with TypeRegistry.
+ * ```
+ *
+ * @param {World} world - Startup world containing the {@linkcode TypeRegistry}.
+ * @returns {void}
+ * @throws {Error} If the world does not contain a {@linkcode TypeRegistry}.
+ * @category system
  */
 export function registerNarrowphase2DTypes(world) {
   const registry = world.getResource(TypeRegistry)
@@ -109,3 +148,4 @@ export function registerNarrowphase2DTypes(world) {
   registry.get(SoftBody3D)?.setMethod(SoftBody3D.serialize)
   registry.get(SoftBody3D)?.setMethod(SoftBody3D.deserialize)
 }
+/* eslint-enable jsdoc/check-tag-names */

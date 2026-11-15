@@ -10,10 +10,44 @@ import { typeidGeneric, typeid } from '@wimaengine/type'
 import { MainWindow, Windows, Window } from '@wimaengine/window'
 
 /**
+ * Creates a Canvas 2D render system for one material constructor.
+ *
+ * The returned system expects typed {@linkcode Assets} resources for
+ * {@linkcode Mesh} and the generic `T` material, a {@linkcode TextureCache} for
+ * image textures, a {@linkcode Windows} resource, and a main-window entity with
+ * {@linkcode EntityHandle}, {@linkcode Window}, and {@linkcode MainWindow}. It visits cameras that have
+ * {@linkcode GlobalTransform2D}, {@linkcode RenderLists2D}, and {@linkcode Camera}.
+ *
+ * For each camera, the system applies its orthographic projection and view
+ * transform, then resolves or creates the camera's opaque pass for `type`. It
+ * calls `renderMaterial` for entries whose mesh and material handles resolve,
+ * passing the drawing context, material, mesh, and shared texture cache.
+ * Missing asset values are skipped, and the existing render list is not
+ * cleared or rebuilt by this system.
+ *
+ * If no main-window entity is found, the system warns and stops. It also stops
+ * when the window has no registered canvas. A canvas without a 2D context
+ * produces a warning. A camera using a non-orthographic projection throws
+ * because this renderer supports {@linkcode OrthographicProjection} only.
+ * Missing required resources cause the returned system's resource lookup to
+ * fail.
+ *
+ * @example
+ * ```js
+ * const renderSystem = genrender(BasicMaterial, (ctx, material, mesh, textures) => {
+ *   // Draw `mesh` with `material`, using `textures` when needed.
+ * })
+ *
+ * app.registerSystem({
+ *   schedule: AppSchedule.Update,
+ *   system: renderSystem
+ * })
+ * ```
+ *
  * @template {Material} T
- * @param {Constructor<T>} type
- * @param {Canvas2DFunction<T>} renderMaterial
- * @returns {SystemFunc}
+ * @param {Constructor<T>} type - Material constructor whose opaque pass is rendered.
+ * @param {Canvas2DFunction<T>} renderMaterial - Callback that draws one material and mesh.
+ * @returns {SystemFunc} System that renders the material's 2D opaque pass.
  */
 export function genrender(type, renderMaterial) {
   const meshid = typeidGeneric(Assets, [Mesh])

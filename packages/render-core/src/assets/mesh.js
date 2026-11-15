@@ -1,30 +1,67 @@
+/** @import { MeshAttributeDataSerial } from '../core' */
 import { Vector2, Vector3 } from '@wimaengine/math'
 import { MeshAttributeData } from '../core'
 
-/** */
+/**
+ * Represents vertex geometry as a mesh asset.
+ *
+ * @example
+ * ```js
+ * import { Mesh, MeshAssets, MeshAttributeData } from '@wimaengine/render-core'
+ *
+ * const mesh = Mesh.quad2D(2, 1)
+ * mesh.setAttribute('uv', new MeshAttributeData(new Float32Array([
+ *   0, 0, 0, 1, 1, 1, 1, 0
+ * ])))
+ *
+ * const handle = world.getResource(MeshAssets).add(mesh)
+ * // Pass `handle` to `new Meshed(handle)` when attaching the asset to an entity.
+ * ```
+ */
 export class Mesh {
 
   /**
-   * @private
+   * Optional index buffer for the mesh.
+   *
+   * The supplied `Uint16Array` is stored directly, so `undefined` represents
+   * a non-indexed mesh and mutations to the array are visible through the
+   * mesh.
+   *
    * @type {Uint16Array | undefined}
    */
   indices
 
   /**
-   * @private
+   * Named mesh attributes held by the mesh.
+   *
+   * The map is initialized empty. Its values are {@linkcode MeshAttributeData}
+   * instances, and both the map and its values are stored directly rather
+   * than copied.
+   *
    * @type {Map<string,MeshAttributeData>}
    */
   attributes = new Map()
 
   /**
-   * @returns {Uint16Array | undefined}
+   * Returns the mesh's current index buffer without copying it.
+   *
+   * The returned value is the same `Uint16Array` stored in `indices`, or
+   * `undefined` for a non-indexed mesh.
+   *
+   * @returns {Uint16Array | undefined} The current index buffer, if present.
    */
   getIndices() {
     return this.indices
   }
 
   /**
+   * Replaces the mesh's index buffer and returns this mesh for chaining.
+   *
+   * Passing `undefined` clears the buffer and makes the mesh non-indexed. A
+   * supplied `Uint16Array` is stored as-is and is not copied.
+   *
    * @param {Uint16Array | undefined} indices
+   * @returns {Mesh} This mesh.
    */
   setIndices(indices) {
     this.indices = indices
@@ -33,16 +70,27 @@ export class Mesh {
   }
 
   /**
+   * Returns the {@linkcode MeshAttributeData} stored under `name`.
+   *
+   * The stored value is returned directly; `undefined` is returned when the
+   * name has no entry.
+   *
    * @param {string} name
-   * @returns {MeshAttributeData | undefined}
+   * @returns {MeshAttributeData | undefined} The named attribute, if present.
    */
   getAttribute(name) {
     return this.attributes.get(name)
   }
 
   /**
+   * Adds or replaces a named {@linkcode MeshAttributeData}.
+   *
+   * The supplied attribute is stored directly without copying, and this mesh
+   * is returned for chaining.
+   *
    * @param {string} name
    * @param {MeshAttributeData} attribute
+   * @returns {Mesh} This mesh.
    */
   setAttribute(name, attribute) {
     this.attributes.set(name, attribute)
@@ -51,21 +99,40 @@ export class Mesh {
   }
 
   /**
-   * @returns {Readonly<Map<string,MeshAttributeData>>}
+   * Returns the live map of all named {@linkcode MeshAttributeData} values.
+   *
+   * This is the mesh's actual attribute collection, not a copy. Changes to the
+   * returned map therefore change the mesh.
+   *
+   * @returns {Map<string,MeshAttributeData>} The mesh's attribute map.
    */
   getAttributes() {
     return this.attributes
   }
 
   /**
+   * Removes the named attribute if it exists.
+   *
+   * If no entry has `name`, the method does nothing. It always returns
+   * `undefined`.
+   *
    * @param {string} name
+   * @returns {void}
    */
   deleteAttribute(name) {
     this.attributes.delete(name)
   }
 
   /**
+   * Converts a mesh to its serializable form without mutating it.
+   *
+   * When an index buffer is present, `indices` is a new number array made
+   * from it; otherwise it is `undefined`. `attributes` is a new array of
+   * `[name, serializedAttribute]` entries in map order, with each attribute
+   * converted by {@linkcode MeshAttributeData.serialize}.
+   *
    * @param {Mesh} value
+   * @returns {MeshSerial} The mesh's plain serial representation.
    */
   static serialize(value) {
     return {
@@ -78,8 +145,17 @@ export class Mesh {
   }
 
   /**
+   * Restores a mesh from serialized indices and attribute entries.
+   *
+   * A present `indices` array becomes a new `Uint16Array`; an absent or
+   * `undefined` value clears the index buffer. The attribute entries become a
+   * new map, with each value rebuilt by {@linkcode MeshAttributeData.deserialize}.
+   * When `out` is supplied, its index buffer and attribute map are replaced
+   * and that same mesh is returned; otherwise a new mesh is created.
+   *
    * @param {MeshSerial} value
    * @param {Mesh} [out]
+   * @returns {Mesh} The restored mesh.
    */
   static deserialize(value, out = new Mesh()) {
     out.indices = value.indices ? new Uint16Array(value.indices) : undefined
@@ -91,6 +167,13 @@ export class Mesh {
   }
 
   /**
+   * Builds a new centered, non-indexed 2D quad.
+   *
+   * The `position2d` attribute contains four vertices in the order
+   * `(-width / 2, -height / 2)`, `(-width / 2, height / 2)`,
+   * `(width / 2, height / 2)`, `(width / 2, -height / 2)`. The mesh has no
+   * index buffer, normal attribute, or UV attribute.
+   *
    * @param {number} width
    * @param {number} height
    * @returns {Mesh}
@@ -114,8 +197,17 @@ export class Mesh {
   }
 
   /**
+   * Builds a new non-indexed 2D circle vertex list.
+   *
+   * The `position2d` attribute starts with the center, followed by
+   * `resolution + 1` circumference samples for an integer resolution. These
+   * samples use angles from `0` through `2 * Math.PI` in steps of
+   * `2 * Math.PI / resolution`, so the final sample closes the circle for a
+   * positive integer resolution. The mesh has no index buffer or other
+   * attributes; `resolution` is used directly and is not floored.
+   *
    * @param {number} radius
-   * @param {number} resolution
+   * @param {number} [resolution=16]
    * @returns {Mesh}
    */
   static circle2D(radius, resolution = 16) {
@@ -139,9 +231,17 @@ export class Mesh {
   }
 
   /**
+   * Builds a new indexed 2D triangle.
+   *
+   * The `position2d` attribute contains the two base vertices followed by the
+   * upper vertex. The vertices are
+   * `(-base / 2, -height / 2)`, `(base / 2, -height / 2)`, and
+   * `(base * baseRatio / 2, height / 2)`. `baseRatio` defaults to `0`, and
+   * the index buffer is `[0, 1, 2]`; no other attributes are added.
+   *
    * @param {number} base
    * @param {number} height
-   * @param {number} baseRatio
+   * @param {number} [baseRatio=0]
    * @returns {Mesh}
    */
   static triangle2D(base, height, baseRatio = 0) {
@@ -161,6 +261,18 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed 3D triangle in the `z = 0` plane.
+   *
+   * The `position3d` attribute contains the two base vertices followed by the
+   * upper vertex at `(base * baseL / 2, height / 2, 0)`. `baseL` defaults to
+   * `0`, and the index buffer is `[0, 1, 2]`; no other attributes are added.
+   *
+   * @param {number} [base=1]
+   * @param {number} [height=1]
+   * @param {number} [baseL=0]
+   * @returns {Mesh}
+   */
   static triangle3D(base = 1, height = 1, baseL = 0) {
     const mesh = new Mesh()
 
@@ -181,6 +293,23 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed, planar 3D circle fan.
+   *
+   * The mesh has `position3d`, `normal3d`, and `uv` attributes. The first
+   * vertex is the center; subsequent vertices are sampled in the `z = 0`
+   * plane from `arcstart` in increments of `arclength / segments`, while the
+   * sample angle is below `arclength` with a small endpoint tolerance. Each
+   * consecutive pair is joined to the center by the index buffer. `segments`
+   * is used directly and is not floored or clamped; the upper-bound comparison
+   * uses `arclength`, not `arcstart + arclength`.
+   *
+   * @param {number} [radius=0.5]
+   * @param {number} [segments=32]
+   * @param {number} [arcstart=0]
+   * @param {number} [arclength=Math.PI * 2]
+   * @returns {Mesh}
+   */
   static circle3D(radius = 0.5, segments = 32, arcstart = 0, arclength = Math.PI * 2) {
     const mesh = new Mesh()
     const vertices = [0, 0, 0]
@@ -227,6 +356,20 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed 3D plane grid in the `z = 0` plane.
+   *
+   * The mesh contains `position3d`, `normal3d`, and `uv` attributes, with
+   * normals pointing along positive z. `widthSegments` and `heightSegments`
+   * are floored before generation, and each resulting grid cell contributes
+   * two triangles to the index buffer.
+   *
+   * @param {number} [width=1]
+   * @param {number} [height=1]
+   * @param {number} [widthSegments=1]
+   * @param {number} [heightSegments=1]
+   * @returns {Mesh}
+   */
   static plane3D(width = 1, height = 1, widthSegments = 1, heightSegments = 1) {
     const mesh = new Mesh()
     const widthHalf = width / 2
@@ -284,6 +427,24 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed annular 3D surface in the `z = 0` plane.
+   *
+   * The mesh includes `position3d`, `normal3d`, and `uv` attributes, with
+   * normals pointing along positive z. `phiSegments` subdivides the radius
+   * from `innerRadius` to `outerRadius`; each angular row contains samples
+   * from `thetaStart` through `thetaStart + thetaLength`. The supplied
+   * segment counts are used directly and are not floored. Adjacent radial and
+   * angular samples form cells of two indexed triangles.
+   *
+   * @param {number} [innerRadius=0.25]
+   * @param {number} [outerRadius=0.5]
+   * @param {number} [thetaSegments=32]
+   * @param {number} [phiSegments=1]
+   * @param {number} [thetaStart=0]
+   * @param {number} [thetaLength=Math.PI * 2]
+   * @returns {Mesh}
+   */
   static ring3D(innerRadius = 0.25, outerRadius = 0.5, thetaSegments = 32, phiSegments = 1, thetaStart = 0, thetaLength = Math.PI * 2) {
     const mesh = new Mesh()
     const indices = []
@@ -341,6 +502,23 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed surface by revolving a 2D profile around the y-axis.
+   *
+   * Each profile point supplies a radial coordinate from its x value and a y
+   * coordinate. The default profile is `(0, -0.5)`, `(0.5, 0)`, and
+   * `(0, 0.5)`. The mesh includes `position3d`, `normal3d`, and `uv`
+   * attributes, and samples angles from `phiStart` through
+   * `phiStart + phiLength`. `segments` is used directly for the revolution
+   * rows and is not floored; adjacent profile and revolution rows form two
+   * indexed triangles per cell.
+   *
+   * @param {Vector2[]} [points]
+   * @param {number} [segments=12]
+   * @param {number} [phiStart=0]
+   * @param {number} [phiLength=Math.PI * 2]
+   * @returns {Mesh}
+   */
   static lathe3D(points = [new Vector2(0, -0.5), new Vector2(0.5, 0), new Vector2(0, 0.5)], segments = 12, phiStart = 0, phiLength = Math.PI * 2) {
     const mesh = new Mesh()
     const indices = []
@@ -463,6 +641,22 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed six-sided box centered at the origin.
+   *
+   * The mesh has `position3d`, `normal3d`, and `uv` attributes. The width,
+   * height, and depth segment arguments control subdivisions along their
+   * corresponding dimensions on the box faces and are used directly. The
+   * subdivided faces are combined into the index buffer.
+   *
+   * @param {number} [width=1]
+   * @param {number} [height=1]
+   * @param {number} [depth=1]
+   * @param {number} [widthSegments=1]
+   * @param {number} [heightSegments=1]
+   * @param {number} [depthSegments=1]
+   * @returns {Mesh}
+   */
   static cube(width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1) {
     const mesh = new Mesh()
 
@@ -516,15 +710,18 @@ export class Mesh {
       .setAttribute('uv', new MeshAttributeData(new Float32Array(uvs)))
 
     /**
+     * Appends one subdivided cube face to the mesh buffers.
+     *
+     * @private
      * @param {string} u
      * @param {string} v
      * @param {string} w
-     * @param {number}udir
-     * @param {number}vdir
-     * @param {number}width
-     * @param {number}height
-     * @param {number}depth
-     * @param {number}gridX
+     * @param {number} udir
+     * @param {number} vdir
+     * @param {number} width
+     * @param {number} height
+     * @param {number} depth
+     * @param {number} gridX
      * @param {number} gridY
      */
     function buildPlane(u, v, w, udir, vdir, width, height, depth, gridX, gridY) {
@@ -598,6 +795,28 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed UV sphere, optionally limited to angular ranges.
+   *
+   * The mesh contains `position3d`, `normal3d`, and `uv` attributes.
+   * `widthSegments` and `heightSegments` control the subdivisions around the
+   * phi and theta directions. Vertices use phi angles from `phiStart` through
+   * `phiStart + phiLength` and theta angles from `thetaStart` through
+   * `thetaStart + thetaLength`. For index generation, the effective theta end
+   * is `Math.min(thetaStart + thetaLength, Math.PI)`; pole-row triangles are
+   * omitted when the corresponding pole is reached. Segment counts are used
+   * directly and are not floored; the remaining grid cells are connected by
+   * the index buffer.
+   *
+   * @param {number} [radius=0.5]
+   * @param {number} [widthSegments=32]
+   * @param {number} [heightSegments=16]
+   * @param {number} [phiStart=0]
+   * @param {number} [phiLength=Math.PI * 2]
+   * @param {number} [thetaStart=0]
+   * @param {number} [thetaLength=Math.PI]
+   * @returns {Mesh}
+   */
   static uvSphere(radius = 0.5, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI) {
     const mesh = new Mesh()
     const thetaEnd = Math.min(thetaStart + thetaLength, Math.PI)
@@ -664,6 +883,22 @@ export class Mesh {
 
   }
 
+  /**
+   * Builds a new indexed torus.
+   *
+   * The mesh contains `position3d`, `normal3d`, and `uv` attributes. `radius`
+   * is the distance from the origin to the tube centerline, `tube` is the
+   * tube radius, and `arc` is the sweep around the central ring from angle `0`
+   * through `arc`. The radial and tubular segment counts are used directly
+   * and are not floored; each grid cell contributes two indexed triangles.
+   *
+   * @param {number} [radius=0.375]
+   * @param {number} [tube=0.125]
+   * @param {number} [radialSegments=12]
+   * @param {number} [tubularSegments=48]
+   * @param {number} [arc=Math.PI * 2]
+   * @returns {Mesh}
+   */
   static torus(radius = 0.375, tube = 0.125, radialSegments = 12, tubularSegments = 48, arc = Math.PI * 2) {
     const mesh = new Mesh()
     const indices = []
@@ -721,6 +956,28 @@ export class Mesh {
 
   }
 
+  /**
+   * Builds a new indexed cylinder or tapered cylinder with optional end caps.
+   *
+   * The mesh contains `position3d`, `normal3d`, and `uv` attributes. The side
+   * linearly changes from `radiusTop` at `y = height / 2` to `radiusBottom`
+   * at `y = -height / 2`. `radialSegments` and `heightSegments` control the
+   * angular and vertical subdivisions and are used directly. Side and cap
+   * vertices use angles from `thetaStart` through `thetaStart + thetaLength`.
+   * When `openEnded` is exactly `false`, a top cap is added only when
+   * `radiusTop > 0`, and a bottom cap is added only when `radiusBottom > 0`;
+   * side cells and cap sectors are added to the index buffer.
+   *
+   * @param {number} [radiusTop=0.5]
+   * @param {number} [radiusBottom=0.5]
+   * @param {number} [height=1]
+   * @param {number} [radialSegments=32]
+   * @param {number} [heightSegments=1]
+   * @param {boolean} [openEnded=false]
+   * @param {number} [thetaStart=0]
+   * @param {number} [thetaLength=Math.PI * 2]
+   * @returns {Mesh}
+   */
   static cylinder(radiusTop = 0.5, radiusBottom = 0.5, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
     const mesh = new Mesh()
     const indices = []
@@ -837,18 +1094,46 @@ export class Mesh {
     return mesh
   }
 
+  /**
+   * Builds a new indexed cone using {@linkcode Mesh.cylinder} with a zero top
+   * radius and the supplied radius as its bottom radius.
+   *
+   * The cylinder's attributes, segment handling, angular range, and cap
+   * behavior are preserved. With `openEnded` exactly `false`, only the bottom
+   * cap can be generated, and only when `radius > 0`; the zero top radius
+   * cannot produce a top cap.
+   *
+   * @param {number} [radius=0.5]
+   * @param {number} [height=1]
+   * @param {number} [radialSegments=32]
+   * @param {number} [heightSegments=1]
+   * @param {boolean} [openEnded=false]
+   * @param {number} [thetaStart=0]
+   * @param {number} [thetaLength=Math.PI * 2]
+   * @returns {Mesh}
+   */
   static cone(radius = 0.5, height = 1, radialSegments = 32, heightSegments = 1, openEnded = false, thetaStart = 0, thetaLength = Math.PI * 2) {
 
     return Mesh.cylinder(0, radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength)
   }
 
+  /**
+   * Creates and returns a new empty mesh.
+   *
+   * The returned mesh has `indices` set to `undefined` and a new empty
+   * attribute map. Each call returns a distinct mesh.
+   *
+   * @returns {Mesh}
+   */
   static default() {
     return new Mesh()
   }
 }
 
 /**
+ * Plain serialized representation produced by {@linkcode Mesh.serialize}.
+ *
  * @typedef MeshSerial
  * @property {number[] | undefined} indices
- * @property {[string, import('../core').MeshAttributeDataSerial][]} attributes
+ * @property {[string, MeshAttributeDataSerial][]} attributes
  */

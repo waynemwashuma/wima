@@ -1,3 +1,5 @@
+/** @import { DOMWindowPlugin } from '@wimaengine/window-dom' */
+/** @import { TypeId } from '@wimaengine/type' */
 import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { World } from '@wimaengine/ecs'
@@ -9,10 +11,65 @@ import { KeyCode } from './core'
 import { Keyboard } from './resources'
 import { registerKeyboardTypes } from './systems'
 
+/* eslint-disable jsdoc/check-tag-names */
+/**
+ * Adds keyboard input support to an {@linkcode App}.
+ *
+ * `KeyboardPlugin` provides a {@linkcode Keyboard} resource in the app's default
+ * world. Read it to query held {@linkcode KeyCode} values and detect keys that
+ * were just pressed or released.
+ *
+ * The plugin consumes typed {@linkcode KeyDown} and {@linkcode KeyUp} events from
+ * {@linkcode WindowPlugin}. Recognized browser `code` values map to
+ * {@linkcode KeyCode} values; unsupported codes use
+ * {@linkcode KeyCode.Unidentified}. `KeyboardPlugin` does not attach browser
+ * listeners itself. In a browser application, add {@linkcode DOMWindowPlugin} to
+ * bridge native keyboard events into the window event resources.
+ *
+ * `KeyboardPlugin` requires {@linkcode CorePlugin}, {@linkcode ReflectPlugin}, and
+ * {@linkcode WindowPlugin}. Register those dependencies before
+ * {@linkcode App#run}; the app validates dependencies but does not install them
+ * automatically.
+ *
+ * @example
+ * ```js
+ * import { App } from '@wimaengine/app'
+ * import { CorePlugin } from '@wimaengine/core'
+ * import { Keyboard, KeyboardPlugin, KeyCode } from '@wimaengine/keyboard'
+ * import { ReflectPlugin } from '@wimaengine/reflect'
+ * import { DOMWindowPlugin } from '@wimaengine/window-dom'
+ * import { WindowPlugin } from '@wimaengine/window'
+ *
+ * const app = new App()
+ *   .registerPlugin(new ReflectPlugin())
+ *   .registerPlugin(new CorePlugin())
+ *   .registerPlugin(new WindowPlugin())
+ *   .registerPlugin(new KeyboardPlugin())
+ *   .registerPlugin(new DOMWindowPlugin())
+ *
+ * app.run()
+ *
+ * const keyboard = app.getWorld().getResource(Keyboard)
+ * if (keyboard.justPressed(KeyCode.Space)) {
+ *   console.log('Space started')
+ * }
+ *
+ * if (keyboard.pressed(KeyCode.ArrowLeft)) {
+ *   console.log('Move left')
+ * }
+ * ```
+ *
+ * @category plugin
+ */
+/* eslint-enable jsdoc/check-tag-names */
 export class KeyboardPlugin extends Plugin {
 
   /**
-   * @param {App} app
+   * Adds {@linkcode Keyboard} to the app's default world and updates its held
+   * and transition state from {@linkcode KeyDown} and {@linkcode KeyUp} events.
+   *
+   * @param {App} app - {@linkcode App} to configure.
+   * @returns {void} This method updates the app configuration in place.
    */
   register(app) {
     app
@@ -21,6 +78,15 @@ export class KeyboardPlugin extends Plugin {
       .registerSystem({ schedule: AppSchedule.Update, systemGroup: CoreSystems.Start, system: updateKeyBoard })
   }
 
+  /**
+   * Returns the plugin dependencies required for keyboard input.
+   *
+   * The returned IDs identify {@linkcode CorePlugin}, {@linkcode ReflectPlugin},
+   * and {@linkcode WindowPlugin}. `WindowPlugin` provides the typed
+   * {@linkcode KeyDown} and {@linkcode KeyUp} events consumed by this plugin.
+   *
+   * @returns {TypeId[]} Required plugin {@linkcode TypeId} values.
+   */
   requires() {
     return [typeid(CorePlugin), typeid(ReflectPlugin), typeid(WindowPlugin)]
   }

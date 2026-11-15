@@ -4,7 +4,34 @@ import { Affine2, Affine3, Vector2, Vector3, BVector2, TAU, Rotary } from '@wima
 import { GizmoSettings } from './settings'
 
 /**
+ * Collects positions and colors for immediate-mode drawing.
+ *
+ * A {@linkcode Gizmo2D} or {@linkcode Gizmo3D} resource uses this buffer to submit
+ * its drawing data.
+ * The generic type is the owning resource's position type. Use `Vector2` in 2D gizmos and `Vector3` in 3D gizmos.
+ *
+ * Positions are stored in {@linkcode GizmoBuffer#positions}, and matching colors
+ * are stored in {@linkcode GizmoBuffer#colors}. The renderer reads
+ * these arrays in pairs. Strip positions and colors are stored in
+ * {@linkcode GizmoBuffer#stripPositions} and {@linkcode GizmoBuffer#stripColors}; a
+ * strip is ended by the NaN sentinel that the gizmo helpers append.
+ *
+ * A gizmo resource owns its buffer, so application code normally adds drawing
+ * through methods such as {@linkcode Gizmo2D#line} or
+ * {@linkcode Gizmo2D#lineStrip} rather than pushing directly. Call
+ * {@linkcode GizmoBuffer#clear} to discard the current drawing data. It sets the
+ * length of all four arrays to `0`, preserving the array instances and
+ * returning `undefined`.
+ *
  * @template T
+ *
+ * @example
+ * ```js
+ * const buffer = gizmo.buffer
+ * buffer.positions.push(start, end)
+ * buffer.colors.push(Color.WHITE, Color.WHITE)
+ * buffer.clear() // empties all four arrays
+ * ```
  */
 export class GizmoBuffer {
 
@@ -27,6 +54,17 @@ export class GizmoBuffer {
    * @type {Color[]}
    */
   stripColors = []
+
+  /**
+   * Removes all submitted drawing data from the buffer.
+   *
+   * This sets the length of {@linkcode GizmoBuffer#positions},
+   * {@linkcode GizmoBuffer#colors}, {@linkcode GizmoBuffer#stripPositions}, and
+   * {@linkcode GizmoBuffer#stripColors} to `0`. The four array
+   * instances keep their identity and remain usable after the call.
+   *
+   * @returns {void}
+   */
   clear() {
     this.positions.length = 0
     this.colors.length = 0
@@ -35,10 +73,45 @@ export class GizmoBuffer {
   }
 }
 
+/* eslint-disable jsdoc/check-tag-names */
 /**
+ * Provides a labelled world resource for immediate-mode two-dimensional debug
+ * drawing.
+ *
+ * The generic `label` is part of the resource's type ID, so use the same
+ * constructor when retrieving it; different labels produce separate gizmo
+ * resources. The constructor is exposed as {@linkcode Gizmo2D#type} for code
+ * that needs to inspect the label.
+ *
+ * The resource keeps its current drawing transform, collects transformed line
+ * and strip vertices in {@linkcode Gizmo2D#buffer}, and uses
+ * {@linkcode Gizmo2D#settings} for line width, cap, join, and dash behavior. Use
+ * {@linkcode Gizmo2D#reset}, {@linkcode Gizmo2D#setTransform}, and the transform
+ * helpers to position subsequent shapes; use primitive helpers such as
+ * {@linkcode Gizmo2D#line}, {@linkcode Gizmo2D#arc}, and {@linkcode Gizmo2D#grid} to
+ * append geometry. Drawing clears the buffer only after a successful draw;
+ * missing window or canvas resources leave the buffer intact.
+ *
  * @template T
- * Immediate mode drawing of defined 2d shapes.
- * Should be used for visual debugging.
+ *
+ * @example
+ * ```js
+ * import { Color } from '@wimaengine/color'
+ * import { Gizmo2D } from '@wimaengine/gizmo'
+ * import { typeidGeneric } from '@wimaengine/type'
+ *
+ * class PhysicsDebug {}
+ *
+ * function drawPhysicsDebug(world) {
+ *   const gizmo = world.getResourceByTypeId(
+ *     typeidGeneric(Gizmo2D, [PhysicsDebug])
+ *   )
+ *
+ *   gizmo.reset().translate(10, 10).circle(2, Color.RED)
+ * }
+ * ```
+ *
+ * @category resource
  */
 export class Gizmo2D {
 
@@ -348,9 +421,42 @@ export class Gizmo2D {
 }
 
 /**
+ * Provides a labelled world resource for immediate-mode three-dimensional
+ * debug drawing.
+ *
+ * The generic `label` is part of the resource's type ID, so use the same
+ * constructor when retrieving it; different labels produce separate gizmo
+ * resources. The constructor is exposed as {@linkcode Gizmo3D#type} for code
+ * that needs to inspect the label.
+ *
+ * The resource owns a three-dimensional affine transform, collects vector
+ * positions and colors in {@linkcode Gizmo3D#buffer}, and exposes
+ * {@linkcode Gizmo3D#settings} for line settings. Use {@linkcode Gizmo3D#reset} to
+ * restore the transform to identity. Unlike {@linkcode Gizmo2D}, this class
+ * currently has no 3D primitive helpers; a 3D-capable integration can consume
+ * or append the public buffer. The current canvas-2D drawing path cannot render
+ * 3D geometry and clears this buffer every time it runs.
+ *
  * @template T
- * Immediate mode drawing of defined 3d shapes.
- * Should be used for visual debugging.
+ *
+ * @example
+ * ```js
+ * import { Gizmo3D } from '@wimaengine/gizmo'
+ * import { typeidGeneric } from '@wimaengine/type'
+ *
+ * class PhysicsDebug {}
+ *
+ * function preparePhysicsDebug(world) {
+ *   const gizmo = world.getResourceByTypeId(
+ *     typeidGeneric(Gizmo3D, [PhysicsDebug])
+ *   )
+ *
+ *   gizmo.reset()
+ *   // A 3D-capable integration can read or append gizmo.buffer here.
+ * }
+ * ```
+ *
+ * @category resource
  */
 export class Gizmo3D {
 
@@ -385,6 +491,15 @@ export class Gizmo3D {
     this.settings = settings
   }
 
+  /**
+   * Resets the drawing transform to the affine identity.
+   *
+   * The current {@linkcode Gizmo3D#buffer} contents and
+   * {@linkcode Gizmo3D#settings} are preserved. This method mutates the transform
+   * and returns `undefined`.
+   *
+   * @returns {void}
+   */
   reset() {
     Affine3.identity(this.transformation)
   }

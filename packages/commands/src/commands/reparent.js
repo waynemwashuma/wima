@@ -96,23 +96,59 @@ function reparentTransforms(entity, newParent) {
   }
 }
 
+/**
+ * Queues a deferred hierarchy reparenting operation for an entity.
+ *
+ * The command stores the entity and an optional new parent without resolving
+ * either handle or changing the world. {@linkcode ReparentCommand#execute}
+ * resolves them with {@linkcode World#getEntity} when the command is applied.
+ * The requested parent cannot be the entity itself or one of its descendants.
+ *
+ * Passing no parent detaches the entity. Reparenting to its current parent, or
+ * detaching an entity that is already detached, is a no-op. Before changing
+ * the {@linkcode Parent} relationship, each complete 2D or 3D transform set is
+ * decomposed relative to the new parent's matching world transform when that
+ * transform exists. Otherwise, the entity's current world transform is
+ * decomposed unchanged. Incomplete transform sets are left unchanged.
+ *
+ * @example
+ * ```js
+ * const command = new ReparentCommand(child, group)
+ * command.execute(world) // Or add the command to the deferred command queue.
+ *
+ * const detach = new ReparentCommand(child)
+ * detach.execute(world)
+ * ```
+ */
 export class ReparentCommand extends Command {
 
   /**
+   * Entity whose {@linkcode Parent} relationship will be changed.
+   *
    * @readonly
    * @type {EntityHandle}
    */
   entity
 
   /**
+   * New parent for {@linkcode ReparentCommand#entity}, or `undefined` to
+   * detach it.
+   *
    * @readonly
    * @type {EntityHandle | undefined}
    */
   parent
 
   /**
-   * @param {EntityHandle} entity
-   * @param {EntityHandle | undefined} [parent=undefined]
+   * Creates a deferred hierarchy reparenting command.
+   *
+   * This stores the handles only. It does not look up either entity, validate
+   * the hierarchy, or change the world until {@linkcode ReparentCommand#execute}
+   * is called.
+   *
+   * @param {EntityHandle} entity - Entity whose parent will change.
+   * @param {EntityHandle | undefined} [parent=undefined] - New parent, or
+   * `undefined` to detach the entity.
    */
   constructor(entity, parent = undefined) {
     super()
@@ -121,7 +157,25 @@ export class ReparentCommand extends Command {
   }
 
   /**
-   * @param {World} world
+   * Applies the queued hierarchy change to a world.
+   *
+   * This resolves the source entity and optional parent with
+   * {@linkcode World#getEntity}. If the parent is the source entity or one of its
+   * descendants, this throws an `Error` because the requested relationship
+   * would create a cycle. Invalid or stale handles are not converted into a
+   * custom command error; failures from entity lookup or component access are
+   * allowed to propagate.
+   *
+   * If the requested relationship already exists, this returns without
+   * changing transforms or hierarchy components. Otherwise, it decomposes each
+   * complete 2D and 3D transform set before changing the relationship. When a
+   * matching new-parent world transform exists, its inverse is applied to the
+   * entity's world transform first; otherwise the current world transform is
+   * decomposed directly. The old {@linkcode Parent} is then removed when present,
+   * and a new one is inserted when `parent` is defined.
+   *
+   * @param {World} world - World to mutate when the deferred command executes.
+   * @returns {void}
    */
   execute(world) {
     const { entity, parent } = this

@@ -2,8 +2,29 @@ import { Query, World } from '@wimaengine/ecs'
 import { Rotary } from '@wimaengine/math'
 import { Position2D, Orientation2D, Scale2D, Position3D, Orientation3D, Scale3D, RemoteTransform2D, RemoteTransform3D } from '../components'
 
+/* eslint-disable jsdoc/check-tag-names */
 /**
- * @param {World} world
+ * Copies selected local 2D transform channels from referenced entities.
+ *
+ * The source query requires {@linkcode Position2D}, {@linkcode Orientation2D}, and
+ * {@linkcode Scale2D}. The target query requires those same components plus
+ * {@linkcode RemoteTransform2D}. A target is skipped when its referenced entity
+ * is missing, stale, or lacks the complete source transform. Otherwise the
+ * system decomposes the remote offset and applies only the channels enabled by
+ * {@linkcode RemoteTransform2D#copyTranslation},
+ * {@linkcode RemoteTransform2D#copyOrientation}, and
+ * {@linkcode RemoteTransform2D#copyScale}.
+ *
+ * For each enabled channel, the system applies the corresponding decomposed
+ * offset: translation adds the offset position, orientation combines with the
+ * offset orientation, and scale multiplies by the offset scale. Each selected
+ * value is written into the target's local transform component.
+ * The remote-transform plugin registers this function in the repeating Update
+ * schedule.
+ *
+ * @param {World} world - World whose 2D remote transforms are updated.
+ * @returns {void}
+ * @category system
  */
 export function transformRemote2D(world) {
   const transforms = new Query(world, [Position2D, Orientation2D, Scale2D])
@@ -28,7 +49,27 @@ export function transformRemote2D(world) {
 }
 
 /**
- * @param {World} world
+ * Copies selected local 3D transform channels from referenced entities.
+ *
+ * The source query requires {@linkcode Position3D}, {@linkcode Orientation3D}, and
+ * {@linkcode Scale3D}. The target query requires those same components plus
+ * {@linkcode RemoteTransform3D}. A target is skipped when its referenced entity
+ * is missing, stale, or lacks the complete source transform. Otherwise the
+ * system decomposes the remote offset and checks
+ * {@linkcode RemoteTransform3D#copyTranslation},
+ * {@linkcode RemoteTransform3D#copyOrientation}, and
+ * {@linkcode RemoteTransform3D#copyScale} before updating each selected channel.
+ *
+ * For each enabled channel, the system applies the corresponding decomposed
+ * offset: translation adds the offset position, orientation combines with the
+ * offset orientation, and scale multiplies by the offset scale. Each selected
+ * value is written into the target's local transform component. The
+ * remote-transform plugin registers this function in the repeating Update
+ * schedule.
+ *
+ * @param {World} world - World whose 3D remote transforms are updated.
+ * @returns {void}
+ * @category system
  */
 export function transformRemote3D(world) {
   const transforms = new Query(world, [Position3D, Orientation3D, Scale3D])
@@ -52,3 +93,4 @@ export function transformRemote3D(world) {
     }
   })
 }
+/* eslint-enable jsdoc/check-tag-names */

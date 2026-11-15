@@ -1,67 +1,124 @@
+/** @import {VirtualClock} from './resource' */
+
 /**
- * Handles time management for the game.
+ * Tracks elapsed time and the duration of the most recent update.
+ *
+ * Supply timestamps to {@linkcode Clock#update} to record a duration in seconds
+ * and accumulate elapsed seconds. Use {@linkcode Clock#start} to reset the
+ * accumulated values when a new timing interval begins. For a shared
+ * application clock, use {@linkcode VirtualClock}.
+ *
+ * @example
+ * ```js
+ * import { Clock } from '@wimaengine/time'
+ *
+ * const clock = new Clock()
+ *
+ * clock.update(1000)
+ * console.log(clock.getDelta()) // 1 second
+ *
+ * clock.update(1016)
+ * console.log(clock.getDelta()) // 0.016 seconds
+ * console.log(clock.getElapsed()) // 1.016 seconds
+ * console.log(clock.getFrameRate()) // 62.5 frames per second
+ *
+ * clock.start()
+ * console.log(clock.getElapsed()) // 0
+ * ```
  */
 export class Clock {
 
   /**
+   * Total time accumulated by {@linkcode Clock#update}, in seconds.
+   *
    * @private
    * @type {number}
    */
   elapsed = 0
 
   /**
+   * Timestamp supplied to the most recent update, in milliseconds.
+   *
    * @private
    * @type {number}
    */
   lastTick = 0
 
   /**
-   * Difference between the last call in the last frame and current call.
+   * Duration calculated by the most recent update, in seconds.
+   *
    * @private
    * @type {number}
    */
   delta = 0
 
   /**
+   * Resets the elapsed time and current frame delta to zero.
    *
+   * The last update timestamp is preserved. The next call to
+   * {@linkcode Clock#update} therefore measures from the timestamp before the
+   * reset.
+   *
+   * @returns {void}
    */
   start() {
     Clock.start(this)
   }
 
   /**
-   * @returns {number}
+   * Returns the total time accumulated by the clock, in seconds.
+   *
+   * @returns {number} Elapsed time in seconds.
    */
   getElapsed() {
     return Clock.getElapsed(this)
   }
 
   /**
-   * @returns {number}
+   * Returns the duration calculated by the most recent update, in seconds.
+   *
+   * This is `0` before the first update and after {@linkcode Clock#start}.
+   *
+   * @returns {number} The most recent frame delta in seconds.
    */
   getDelta() {
     return Clock.getDelta(this)
   }
 
   /**
-   * @returns {number}
+   * Returns the instantaneous frame rate derived from the current delta.
+   *
+   * The value is calculated as `1 / delta`; it is not averaged or smoothed.
+   * When the delta is `0`, JavaScript returns `Infinity`.
+   *
+   * @returns {number} Frames per second for the most recent delta.
    */
   getFrameRate() {
     return Clock.getFrameRate(this)
   }
 
   /**
-   * @param {number} accumulate
-   * @returns {number}
+   * Advances the clock using an absolute timestamp.
+   *
+   * The timestamp is expected in milliseconds, matching `performance.now()`.
+   * The resulting delta and the accumulated elapsed time are in seconds.
+   * With no argument, the method uses `performance.now()`.
+   *
+   * @param {number} [accumulate] - Timestamp in milliseconds. Defaults to `performance.now()`.
+   * @returns {number} The duration since the previous update, in seconds.
    */
   update(accumulate = performance.now()) {
     return Clock.update(this, accumulate)
   }
 
   /**
-   * Starts the clock.
+   * Resets a clock's elapsed time and current frame delta to zero.
    *
-   * @param {Clock} clock
+   * `lastTick` is intentionally left unchanged, so the next update measures
+   * from the timestamp that was recorded before the reset.
+   *
+   * @param {Clock} clock - {@linkcode Clock} to reset.
+   * @returns {void}
    */
   static start(clock) {
     clock.elapsed = 0
@@ -69,37 +126,49 @@ export class Clock {
   }
 
   /**
-   * Gets the elapsed time of the clock.
+   * Gets the total elapsed time of a clock, in seconds.
    *
-   * @param {Clock} clock
+   * @param {Clock} clock - {@linkcode Clock} to read.
+   * @returns {number} Elapsed time in seconds.
    */
   static getElapsed(clock) {
     return clock.elapsed
   }
 
   /**
-   * Gets the time between two frames/ticks clock.
+   * Gets the duration calculated by the most recent update, in seconds.
    *
-   * @param {Clock} clock
+   * @param {Clock} clock - {@linkcode Clock} to read.
+   * @returns {number} The most recent frame delta in seconds.
    */
   static getDelta(clock) {
     return clock.delta
   }
 
   /**
-   * Gets the frameRate of the clock.
+   * Gets the instantaneous frame rate derived from the current delta.
    *
-   * @param {Clock} clock
+   * The result is `1 / clock.delta`; a zero delta therefore produces
+   * JavaScript's `Infinity` rather than a finite or averaged frame rate.
+   *
+   * @param {Clock} clock - {@linkcode Clock} to read.
+   * @returns {number} Frames per second for the most recent delta.
    */
   static getFrameRate(clock) {
     return 1 / clock.delta
   }
 
   /**
-   * Updates the clock.
+   * Advances a clock using an absolute timestamp in milliseconds.
    *
-   * @param {Clock} clock
-   * @param {number} [accumulate]
+   * The difference between the supplied timestamp and the previous
+   * `lastTick` is divided by `1000` to produce a delta in seconds. That delta
+   * is added to `elapsed`, then the supplied timestamp is stored as
+   * `lastTick`. When omitted, the timestamp defaults to `performance.now()`.
+   *
+   * @param {Clock} clock - {@linkcode Clock} to advance.
+   * @param {number} [accumulate] - Timestamp in milliseconds. Defaults to `performance.now()`.
+   * @returns {number} The duration since the previous update, in seconds.
    */
   static update(clock, accumulate = performance.now()) {
     clock.delta = (accumulate - clock.lastTick) / 1000
@@ -110,7 +179,13 @@ export class Clock {
   }
 
   /**
-   * @param {Clock} value
+   * Converts a clock into the plain state used by the type registry.
+   *
+   * The returned object contains the elapsed time and delta in seconds, plus
+   * the most recent timestamp in milliseconds.
+   *
+   * @param {Clock} value - {@linkcode Clock} to serialize.
+   * @returns {ClockSerial} The {@linkcode ClockSerial} state.
    */
   static serialize(value) {
     return {
@@ -121,8 +196,15 @@ export class Clock {
   }
 
   /**
-   * @param {ClockSerial} value
-   * @param {Clock} [out]
+   * Restores clock state from a serialized value.
+   *
+   * When `out` is supplied, it is updated and returned. Otherwise a new
+   * {@linkcode Clock} is created. Deserialization restores `elapsed`, `lastTick`, and
+   * `delta` exactly; it does not advance the clock or read the current time.
+   *
+   * @param {ClockSerial} value - {@linkcode ClockSerial} state.
+   * @param {Clock} [out] - {@linkcode Clock} to populate.
+   * @returns {Clock} The restored {@linkcode Clock}.
    */
   static deserialize(value, out = new Clock()) {
     out.elapsed = value.elapsed
@@ -134,8 +216,10 @@ export class Clock {
 }
 
 /**
+ * Serialized state for {@linkcode Clock}.
+ *
  * @typedef ClockSerial
- * @property {number} elapsed
- * @property {number} lastTick
- * @property {number} delta
+ * @property {number} elapsed - Accumulated elapsed time in seconds.
+ * @property {number} lastTick - Most recent update timestamp in milliseconds.
+ * @property {number} delta - Most recent frame duration in seconds.
  */

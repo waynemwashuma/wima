@@ -1,0 +1,25 @@
+---
+title: What to learn next
+description: "Finish the Wima getting-started tutorial and choose the next concepts, examples, or build guides to explore."
+ogImage: /branding/logo/wima-logo-dark.png
+---
+
+You now have the basic engine loop: define data with components, store shared state in resources, spawn entities with commands, and update them through a query.
+
+At this point, you have enough to build small, working examples without needing the deeper engine details first.
+
+## What You Can Do Now
+
+- Define entity-specific data with components.
+- Keep shared values in resources.
+- Spawn entities from systems using `EntityCommands`.
+- Update matching entities with queries.
+
+## Recommended Next Steps
+
+The next sections go deeper into systems, schedules, command queues, resource aliases, component hooks, plugin composition, and other concepts. Those topics are easier to understand once the first entity loop is already familiar.
+
+- If you want to understand why the tutorial pattern works, read the [Architecture](../../02-core-concepts/index.md): learn how components, resources, entities, queries, and systems fit together.
+- If you want a broader view of the runtime and schedules, read the [Architecture overview](../../02-core-concepts/index.md): see how the runtime is organized.
+- If you want concrete sample apps, browse the [Examples](https://github.com/wimaengine/wima/tree/dev/examples): explore complete runnable examples and smaller focused demos.
+- If you are preparing to work on the repository itself, read the [Building the project](../../03-building/index.md): set up or verify the project build workflow.
