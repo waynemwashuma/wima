@@ -1,7 +1,7 @@
 {
   "name": "@wimaengine/ecs",
   "description": "Wima engine ecs package.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "SEE LICENSE in LICENSE.txt",
   "author": "Wima engine contributors",
@@ -25,10 +25,10 @@
     "dist"
   ],
   "dependencies": {
-    "@wimaengine/datastructures": "0.3.0",
-    "@wimaengine/logger": "0.3.0",
-    "@wimaengine/type": "0.3.0",
-    "@wimaengine/utils": "0.3.0",
+    "@wimaengine/datastructures": "0.4.0",
+    "@wimaengine/logger": "0.4.0",
+    "@wimaengine/type": "0.4.0",
+    "@wimaengine/utils": "0.4.0",
     "vifaa": "^0.4.0"
   },
   "scripts": {

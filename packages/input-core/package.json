@@ -1,7 +1,7 @@
 {
   "name": "@wimaengine/input-core",
   "description": "Wima engine input core package.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "SEE LICENSE in LICENSE.txt",
   "author": "Wima engine contributors",

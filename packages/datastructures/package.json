@@ -1,7 +1,7 @@
 {
   "name": "@wimaengine/datastructures",
   "description": "Wima engine datastructures package.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "SEE LICENSE in LICENSE.txt",
   "author": "Wima engine contributors",
