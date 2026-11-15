@@ -57,6 +57,6 @@ Asset events report what changed and whether an operation succeeded or failed. T
 ## Notes
 
 - This package is runtime infrastructure for asset-backed engine data, not a standalone asset browser or editor.
-- It is used by `@wimaengine/scene`, `@wimaengine/audio`, and `@wimaengine/render-core`.
+- It is used by audio and rendering packages.
 - `@wimaengine/asset` is the supported package entry, while `@wimaengine/asset/src` is available for source-level imports.
 - The package is designed to plug into the broader engine stack, including app, core, ECS, event, logger, reflect, type, and utils modules.

@@ -4,7 +4,6 @@
 /** @import {Velocity2D} from '@wimaengine/movable' */
 /** @import {Collider2D} from '@wimaengine/narrowphase' */
 /** @import {Position2D} from '@wimaengine/transform' */
-/** @import {DOMWindowPlugin} from '@wimaengine/window-dom' */
 import { App, Plugin } from '@wimaengine/app'
 import { Broadphase2DPlugin } from '@wimaengine/broadphase'
 import { AppSchedule, CorePlugin } from '@wimaengine/core'
@@ -37,11 +36,9 @@ import {
  * import { App } from '@wimaengine/app'
  * import { DefaultPlugin } from '@wimaengine/misc'
  * import { Physics2DDebuggerPlugin } from '@wimaengine/physics'
- * import { DOMWindowPlugin } from '@wimaengine/window-dom'
  *
  * new App()
  *   .registerPlugin(new DefaultPlugin())
- *   .registerPlugin(new DOMWindowPlugin())
  *   .registerPlugin(new Physics2DDebuggerPlugin({
  *     drawBounds: true,
  *     drawContacts: true
@@ -49,9 +46,8 @@ import {
  *   .run()
  * ```
  *
- * Register {@linkcode DefaultPlugin} and {@linkcode DOMWindowPlugin} before this
- * plugin for a standard browser setup. Set `drawShapes` to `false` when the
- * default shape overlay is not wanted.
+ * Register {@linkcode DefaultPlugin} before this plugin for a standard setup.
+ * Set `drawShapes` to `false` when the default shape overlay is not wanted.
  *
  * @category plugin
  */

@@ -1,9 +1,7 @@
-/** @import {DefaultPlugin} from '@wimaengine/misc' */
 /** @import {TypeId} from '@wimaengine/type' */
 /** @import {Camera, OrthographicProjection, RenderCorePlugin, RenderLists2D} from '@wimaengine/render-core' */
 /** @import {GlobalTransform2D, Transform2DPlugin} from '@wimaengine/transform' */
 /** @import {MainWindow, Window, Windows} from '@wimaengine/window' */
-/** @import {DOMWindowPlugin} from '@wimaengine/window-dom' */
 import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { ReflectPlugin } from '@wimaengine/reflect'
@@ -28,8 +26,7 @@ import { clearCanvas2d, registerCanvas2DTypes } from './systems'
  *
  * Before drawing, the renderer clears the main {@linkcode Window} canvas. If no
  * main window, canvas, or 2D context is available, it does not draw.
- * {@linkcode WindowPlugin} provides the window state, and
- * {@linkcode DOMWindowPlugin} connects that state to a browser canvas stored in
+ * {@linkcode WindowPlugin} provides the window state and the canvas is stored in
  * {@linkcode Windows}.
  *
  * The plugin directly requires {@linkcode CorePlugin}, {@linkcode ReflectPlugin},
@@ -40,25 +37,16 @@ import { clearCanvas2d, registerCanvas2DTypes } from './systems'
  *
  * @example
  * ```js
- * import {
- *   App,
- *   Canvas2DRendererPlugin,
- *   DefaultPlugin,
- *   DOMWindowPlugin
- * } from 'wima'
+ * import { App, Canvas2DRendererPlugin } from 'wima'
  *
  * new App()
- *   .registerPlugin(new DefaultPlugin())
- *   .registerPlugin(new DOMWindowPlugin())
  *   .registerPlugin(new Canvas2DRendererPlugin())
  *   .run()
  * ```
  *
- * {@linkcode DefaultPlugin} includes the core, reflection, window, render-core,
- * and transform plugins required by this backend and its nested basic-material
- * plugin. {@linkcode DOMWindowPlugin} supplies the browser canvas integration;
- * without it, the renderer can find the ECS window but has no DOM canvas to
- * clear or draw into.
+ * Register the core, reflection, window, render-core, and transform plugins
+ * required by this backend and its nested basic-material plugin, as well as a
+ * main window with a canvas to render into.
  *
  * @category plugin
  */

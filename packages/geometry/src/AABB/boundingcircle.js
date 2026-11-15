@@ -1,4 +1,3 @@
-/** @import {Broadphase2D} from '@wimaengine/broadphase' */
 /** @import {intersectAABB2DvsCircle, intersectCircle} from './overlap' */
 /** @import {Vector2Like} from '@wimaengine/math' */
 
@@ -9,7 +8,7 @@ import { BoundType } from './boundtype'
  * Represents a circular 2D bounds value for circle-shaped regions.
  *
  * Use {@linkcode BoundingCircle} as a standalone geometry value when an API
- * needs a circle-shaped region, such as {@linkcode Broadphase2D#queryCircle}.
+ * needs a circle-shaped region.
  * Use {@linkcode intersectCircle} or {@linkcode intersectAABB2DvsCircle} to test
  * overlap with another geometry value.
  *
@@ -27,7 +26,6 @@ import { BoundType } from './boundtype'
  * region.translate(2, -1)
  * const copy = BoundingCircle.copy(region)
  * console.log(intersectCircle(region, copy)) // true
- * // A Broadphase2D resource can use `region` with queryCircle(region).
  * ```
  */
 export class BoundingCircle {

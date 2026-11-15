@@ -3,7 +3,6 @@
 /** @import {AssetPlugin} from '../plugins/asset' */
 /** @import {AssetServer} from './assetserver' */
 /** @import {World} from '@wimaengine/ecs' */
-/** @import {AssetSceneMap, Scene} from '@wimaengine/scene' */
 
 import { unpackFrom64Int, DenseList, IndexAllocator } from '@wimaengine/datastructures'
 import { warn } from '@wimaengine/logger'
@@ -861,7 +860,7 @@ export class AssetEntry {
  * It preserves the asset type ID and index-aligned slots so a pool can be
  * serialized and restored with the same layout. Restored asset values use the
  * world's {@linkcode TypeRegistry}; scene restoration records handles in
- * {@linkcode AssetSceneMap} for scene-local references.
+ * the asset scene map for scene-local references.
  *
  * The asset type must be registered with a runtime constructor before
  * restoration. Populated serialized slots also need a `deserialize` method in
@@ -958,7 +957,7 @@ export class AssetsSnapshot {
   /**
    * Restores this snapshot into a new typed {@linkcode Assets} pool.
    *
-   * The world must provide {@linkcode TypeRegistry} and {@linkcode AssetSceneMap}
+   * The world must provide {@linkcode TypeRegistry} and the asset scene map
    * resources; missing resources throw during lookup. The registry entry for
    * `type` must retain a runtime constructor; without one, this method returns
    * `undefined` without creating a pool or changing the scene map.
@@ -969,10 +968,10 @@ export class AssetsSnapshot {
    * to the pool. A missing hook or falsey result leaves that slot without an
    * asset and emits a warning, so later pool indexes can differ from snapshot
    * indexes in that case. Every restored handle, including handles for reserved
-   * slots, is recorded in {@linkcode AssetSceneMap} under `sceneAssetId`, this
+   * slots, is recorded in the asset scene map under `sceneAssetId`, this
    * asset type, and the snapshot index.
    *
-   * {@linkcode Scene#toWorld} supplies this method while restoring a scene
+   * The scene restoration flow supplies this method while restoring a scene
    * resource through the type registry.
    *
    * @param {World} world - World containing the
@@ -1006,7 +1005,7 @@ export class AssetsSnapshot {
    * {@linkcode TypeRegistry}. If the type entry is missing or has no runtime
    * constructor, it returns `false` without clearing the scene map or changing
    * the asset pool. Otherwise the world must already contain the matching typed
-   * {@linkcode Assets} resource and an {@linkcode AssetSceneMap} resource.
+   * {@linkcode Assets} resource and an asset scene map resource.
    *
    * The scene-map entries for `sceneAssetId` and this asset type are cleared,
    * then each snapshot index is restored by reserving an `undefined` slot or
@@ -1016,7 +1015,7 @@ export class AssetsSnapshot {
    * deserialization results are skipped with a warning. It returns `true` once
    * this patch process has run, even when some slots were skipped.
    *
-   * {@linkcode Scene#toWorld} invokes this method when a matching resource
+   * The scene restoration flow invokes this method when a matching resource
    * already exists.
    *
    * @param {AssetsSnapshot<unknown>} snapshot

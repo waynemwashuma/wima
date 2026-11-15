@@ -27,13 +27,11 @@ import { genRegisterBuffer, genRender, genRenderPipeline } from '../systems'
  * import { App } from '@wimaengine/app'
  * import { DefaultPlugin } from '@wimaengine/misc'
  * import { WebglMaterialPlugin, WebglRendererPlugin } from '@wimaengine/render-webgl'
- * import { DOMWindowPlugin } from '@wimaengine/window-dom'
  * import { CustomMaterial } from './custom-material'
  *
  * const app = new App()
  * app
  *   .registerPlugin(new DefaultPlugin())
- *   .registerPlugin(new DOMWindowPlugin())
  *   .registerPlugin(new WebglRendererPlugin())
  *   .registerPlugin(new WebglMaterialPlugin({
  *     material: CustomMaterial, // extends Material and implements asUniformBind()

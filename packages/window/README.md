@@ -69,7 +69,7 @@ File events cover drag and drop with `FileDrag` and `FileDrop`, which capture po
 
 ## Notes
 
-- `@wimaengine/window-dom` supplies the browser-backed implementation layer for this package.
+- A browser integration layer can supply the browser-backed implementation for this package.
 - `WindowRequest` includes low-level variants for resize, reposition, fullscreen, pointer capture/release, and pointer lock, while `WindowCommands` currently wraps the queue-backed helper subset.
 - The package relies on the reflection/type registry to describe `WindowRequest`, `Window`, `MainWindow`, and `Windows` for ECS consumers.
 - `./src` is part of the public contract, so source-level imports should remain consistent with the root export surface.

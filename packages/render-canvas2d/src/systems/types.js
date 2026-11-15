@@ -21,11 +21,9 @@ import { setTypeId, typeid } from '@wimaengine/type'
  * @example
  * ```js
  * import { App } from '@wimaengine/app'
- * import { DefaultPlugin } from '@wimaengine/misc'
  * import { Canvas2DRendererPlugin } from '@wimaengine/render-canvas2d'
  *
  * new App()
- *   .registerPlugin(new DefaultPlugin())
  *   .registerPlugin(new Canvas2DRendererPlugin())
  *   .run()
  * // Startup runs registerCanvas2DTypes before Canvas 2D rendering systems.

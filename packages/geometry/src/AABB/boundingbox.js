@@ -1,4 +1,3 @@
-/** @import {NaiveBroadphase2D, PhysicsHitbox} from '@wimaengine/broadphase' */
 /** @import {Vector2Like} from '@wimaengine/math' */
 
 import { deprecate } from '@wimaengine/logger'
@@ -9,8 +8,7 @@ import { BoundType } from './boundtype'
  * Represents a 2D axis-aligned bounds value for rectangular regions.
  *
  * Use {@linkcode BoundingBox2D} as a standalone geometry value when an API needs
- * a box-shaped region, such as {@linkcode NaiveBroadphase2D#queryBox}. For an
- * entity's stored bounds, use {@linkcode PhysicsHitbox} instead.
+ * a box-shaped region.
  *
  * Use the static helpers to copy, translate, or combine boxes without
  * changing the source values. The deprecated instance wrappers remain for
@@ -19,13 +17,10 @@ import { BoundType } from './boundtype'
  * @example
  * ```js
  * import { BoundingBox2D } from '@wimaengine/geometry'
- * import { NaiveBroadphase2D } from '@wimaengine/broadphase'
  *
  * const local = new BoundingBox2D(-1, -1, 1, 1)
  * const search = BoundingBox2D.translate(local, 10, 0)
- * const broadphase = new NaiveBroadphase2D()
- * const entities = broadphase.queryBox(search)
- * // `entities` contains registered bounds that overlap `search`.
+ * // `search` is a translated box with coordinates from 9 to 11 on x.
  * ```
  */
 export class BoundingBox2D {

@@ -5,7 +5,7 @@
  * Stores the canvas registered for each window entity.
  *
  * `Windows` is a world resource installed by {@linkcode WindowPlugin}. Browser
- * integration such as {@linkcode DOMWindowPlugin} can register the canvas
+ * integration can register the canvas
  * associated with each {@linkcode Window} component. This resource stores those
  * references; it does not create, append, resize, focus, or remove canvas
  * elements itself.

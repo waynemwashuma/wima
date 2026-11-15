@@ -2,7 +2,6 @@
 /** @import {ReflectPlugin} from '@wimaengine/reflect' */
 /** @import {MathPlugin} from '@wimaengine/math' */
 /** @import {WindowPlugin} from '@wimaengine/window' */
-/** @import {DOMWindowPlugin} from '@wimaengine/window-dom' */
 import { App, Plugin } from '@wimaengine/app'
 import { KeyboardPlugin } from '@wimaengine/keyboard'
 import { MousePlugin } from '@wimaengine/mouse'
@@ -19,14 +18,13 @@ import { TouchPlugin } from '@wimaengine/touch'
  * part of the stack.
  *
  * The optional `target` value is retained as input configuration and defaults
- * to `document.body`. Browser event delivery is provided by
- * {@linkcode DOMWindowPlugin} through the window layer.
+ * to `document.body`. Browser event delivery is provided through the window
+ * layer.
  *
  * The stack expects {@linkcode CorePlugin}, {@linkcode ReflectPlugin},
  * {@linkcode MathPlugin}, and {@linkcode WindowPlugin} to be registered before
- * {@linkcode App#run}. Browser applications should also register
- * {@linkcode DOMWindowPlugin}. These dependencies are not installed automatically
- * by {@linkcode InputPlugin}.
+ * {@linkcode App#run}. These dependencies are not installed automatically by
+ * {@linkcode InputPlugin}.
  *
  * @example
  * ```js
@@ -36,7 +34,6 @@ import { TouchPlugin } from '@wimaengine/touch'
  * import { InputPlugin } from '@wimaengine/input'
  * import { MathPlugin } from '@wimaengine/math'
  * import { ReflectPlugin } from '@wimaengine/reflect'
- * import { DOMWindowPlugin } from '@wimaengine/window-dom'
  * import { WindowPlugin } from '@wimaengine/window'
  *
  * const input = new InputPlugin()
@@ -48,14 +45,12 @@ import { TouchPlugin } from '@wimaengine/touch'
  *   .registerPlugin(new MathPlugin())
  *   .registerPlugin(new CommandsPlugin())
  *   .registerPlugin(new WindowPlugin())
- *   .registerPlugin(new DOMWindowPlugin())
  *   .registerPlugin(input)
  *   .run()
  * ```
  *
- * Registering {@linkcode DOMWindowPlugin} supplies the browser canvas event bridge
- * in this example. If the app already registers the individual device plugins,
- * use those registrations instead of also registering `InputPlugin`.
+ * If the app already registers the individual device plugins, use those
+ * registrations instead of also registering `InputPlugin`.
  *
  * @category plugin
  */

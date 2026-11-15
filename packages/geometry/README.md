@@ -28,7 +28,3 @@ The AABB modules cover axis-aligned bounding boxes, circles, and overlap checks.
 ### Systems
 
 The systems modules expose the ECS-facing type surface for geometry work.
-
-## Notes
-
-- `@wimaengine/broadphase`, `@wimaengine/narrowphase`, and rendering packages can use this package for spatial tests.

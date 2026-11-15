@@ -21,7 +21,6 @@ import { genrender } from '../systems'
  * ```js
  * import { App } from '@wimaengine/app'
  * import { AssetPlugin } from '@wimaengine/asset'
- * import { DefaultPlugin } from '@wimaengine/misc'
  * import { Material } from '@wimaengine/render-core'
  * import {
  *   Canvas2DMaterialPlugin,
@@ -34,7 +33,6 @@ import { genrender } from '../systems'
  * }
  *
  * new App()
- *   .registerPlugin(new DefaultPlugin())
  *   .registerPlugin(new AssetPlugin({ asset: OutlineMaterial }))
  *   .registerPlugin(new Canvas2DRendererPlugin())
  *   .registerPlugin(new Canvas2DMaterialPlugin({

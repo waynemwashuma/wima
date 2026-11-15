@@ -26,8 +26,8 @@ import { MainWindow, Windows, Window } from '@wimaengine/window'
  * ```js
  * // Canvas2DRendererPlugin registers clearCanvas2d in the update flow.
  * app.registerPlugin(new Canvas2DRendererPlugin())
- * // Once a WindowPlugin/DOMWindowPlugin main canvas exists, it is cleared
- * // before the Canvas 2D material systems draw their frame.
+ * // Once the main window canvas exists, it is cleared before the Canvas 2D
+ * // material systems draw their frame.
  * ```
  *
  * @param {World} world - World containing the main-window components and {@linkcode Windows} resource.

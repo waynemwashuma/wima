@@ -1,7 +1,6 @@
 /** @import { DefaultPlugin } from '@wimaengine/misc' */
 /** @import { TypeId } from '@wimaengine/type' */
 /** @import { Transform3DPlugin } from '@wimaengine/transform' */
-/** @import { DOMWindowPlugin } from '@wimaengine/window-dom' */
 import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { EntityHandle, Query, World } from '@wimaengine/ecs'
@@ -20,9 +19,9 @@ import { disposeDroppedMeshes, queueMeshes, registerWebglTypes } from './systems
  * Provides the WebGL 2 rendering backend for an {@linkcode App}.
  *
  * Register this plugin to render mesh and material assets through the WebGL 2
- * context associated with the app's main {@linkcode Window}. In a browser
- * application, register {@linkcode DOMWindowPlugin} to connect that window to an
- * {@linkcode HTMLCanvasElement}; this plugin does not create a canvas.
+ * context associated with the app's main {@linkcode Window}. The main window
+ * must provide a canvas with a WebGL 2 context; this plugin does not create a
+ * canvas.
  *
  * The plugin includes a built-in 3D pipeline for {@linkcode BasicMaterial}.
  * Register another {@linkcode WebglMaterialPlugin} for a different material type
@@ -36,12 +35,10 @@ import { disposeDroppedMeshes, queueMeshes, registerWebglTypes } from './systems
  * ```js
  * import { App } from '@wimaengine/app'
  * import { DefaultPlugin } from '@wimaengine/misc'
- * import { DOMWindowPlugin } from '@wimaengine/window-dom'
  * import { WebglRendererPlugin } from '@wimaengine/render-webgl'
  *
  * new App()
  *   .registerPlugin(new DefaultPlugin())
- *   .registerPlugin(new DOMWindowPlugin())
  *   .registerPlugin(new WebglRendererPlugin())
  *   .run()
  * ```

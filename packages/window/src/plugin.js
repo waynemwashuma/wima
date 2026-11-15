@@ -1,5 +1,4 @@
 /** @import {WindowOptions} from './components' */
-/** @import { DOMWindowPlugin } from '@wimaengine/window-dom' */
 /** @import { SystemFunc } from '@wimaengine/ecs' */
 /** @import { TypeId } from '@wimaengine/type' */
 /** @import { WindowRequest } from './commands' */
@@ -42,9 +41,9 @@ import { registerWindowTypes } from './systems'
  *
  * By default, the plugin creates one primary-window entity with a
  * {@linkcode Window} initialized from `primaryWindowOptions` and a
- * {@linkcode MainWindow} marker. The optional {@linkcode DOMWindowPlugin} connects
+ * {@linkcode MainWindow} marker. An optional browser integration layer can connect
  * {@linkcode Window} components to browser {@linkcode HTMLCanvasElement} instances
- * and keeps the associated {@linkcode Windows} resource in sync. Set
+ * and keep the associated {@linkcode Windows} resource in sync. Set
  * `initPrimaryWindow` to `false` when your code will create and manage window
  * entities itself; the resource, events, and persistence-facing support remain
  * available.
@@ -60,7 +59,6 @@ import { registerWindowTypes } from './systems'
  * import { CommandsPlugin } from '@wimaengine/command'
  * import { CorePlugin } from '@wimaengine/core'
  * import { ReflectPlugin } from '@wimaengine/reflect'
- * import { DOMWindowPlugin } from '@wimaengine/window-dom'
  * import { WindowPlugin } from '@wimaengine/window'
  *
  * new App()
@@ -74,7 +72,6 @@ import { registerWindowTypes } from './systems'
  *       height: 720
  *     }
  *   }))
- *   .registerPlugin(new DOMWindowPlugin())
  *   .run()
  * ```
  *
@@ -140,7 +137,7 @@ export class WindowPlugin extends Plugin {
    * entity with {@linkcode Window} and {@linkcode MainWindow}, using
    * `primaryWindowOptions`. When it is disabled, no default primary-window
    * entity is created and your code can create its own window entities.
-   * {@linkcode DOMWindowPlugin} can connect those entities to browser canvases.
+   * A browser integration layer can connect those entities to browser canvases.
    *
    * @param {App} app
    * @returns {void}
