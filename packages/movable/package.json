@@ -1,7 +1,7 @@
 {
   "name": "@wimaengine/movable",
   "description": "Wima engine movable package.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "SEE LICENSE in LICENSE.txt",
   "author": "Wima engine contributors",
@@ -30,13 +30,13 @@
     "types": "tsc -p ./tsc.type.json"
   },
   "dependencies": {
-    "@wimaengine/app": "0.3.0",
-    "@wimaengine/core": "0.3.0",
-    "@wimaengine/ecs": "0.3.0",
-    "@wimaengine/math": "0.3.0",
-    "@wimaengine/reflect": "0.3.0",
-    "@wimaengine/transform": "0.3.0",
-    "@wimaengine/type": "0.3.0"
+    "@wimaengine/app": "0.4.0",
+    "@wimaengine/core": "0.4.0",
+    "@wimaengine/ecs": "0.4.0",
+    "@wimaengine/math": "0.4.0",
+    "@wimaengine/reflect": "0.4.0",
+    "@wimaengine/transform": "0.4.0",
+    "@wimaengine/type": "0.4.0"
   },
   "types": "./dist/index.d.ts"
 }

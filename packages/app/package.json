@@ -1,7 +1,7 @@
 {
   "name": "@wimaengine/app",
   "description": "Wima engine app package.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "SEE LICENSE in LICENSE.txt",
   "author": "Wima engine contributors",
@@ -30,10 +30,10 @@
     "types": "tsc -p ./tsc.type.json"
   },
   "dependencies": {
-    "@wimaengine/ecs": "0.3.0",
-    "@wimaengine/logger": "0.3.0",
-    "@wimaengine/schedule": "0.3.0",
-    "@wimaengine/type": "0.3.0"
+    "@wimaengine/ecs": "0.4.0",
+    "@wimaengine/logger": "0.4.0",
+    "@wimaengine/schedule": "0.4.0",
+    "@wimaengine/type": "0.4.0"
   },
   "types": "./dist/index.d.ts"
 }
