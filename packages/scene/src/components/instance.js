@@ -130,13 +130,14 @@ export class SceneInstance {
    * scene is restored. Numeric, scene-local asset references require the
    * owning scene asset ID when restored.
    *
+   * @param {SceneInstance} instance - Live scene instance being snapshotted.
    * @param {World} world - World used to resolve asset metadata.
    * @returns {SceneInstanceSnapshot} Snapshot of the live asset handles.
    */
-  toSnapshot(world) {
+  static toSnapshot(instance, world) {
     return new SceneInstanceSnapshot(
-      this.handle.toSnapshot(world),
-      this.filter?.toSnapshot(world)
+      Handle.toSnapshot(instance.handle, world),
+      instance.filter && Handle.toSnapshot(instance.filter, world)
     )
   }
 }
@@ -153,10 +154,10 @@ export class SceneInstance {
  * ```js
  * // `instance` is a live SceneInstance and `ownerSceneAssetId` identifies
  * // the scene that owns any numeric, scene-local handle locators.
- * const serial = SceneInstanceSnapshot.serialize(instance.toSnapshot(world))
+ * const snapshot = SceneInstance.toSnapshot(instance, world)
+ * const serial = SceneInstanceSnapshot.serialize(snapshot)
  * const restored = SceneInstanceSnapshot.validateSerial(serial) &&
- *   SceneInstanceSnapshot.deserialize(serial)
- *     .fromSnapshot(world, ownerSceneAssetId)
+ *   SceneInstance.fromSnapshot(SceneInstanceSnapshot.deserialize(serial), world, ownerSceneAssetId)
  * ```
  */
 export class SceneInstanceSnapshot {
@@ -198,28 +199,17 @@ export class SceneInstanceSnapshot {
   }
 
   /**
-   * Restores a live {@linkcode SceneInstance} from this snapshot.
+   * Restores a live {@linkcode SceneInstance} from a snapshot.
    *
-   * Each nested {@linkcode HandleSnapshot} receives the same `world` and
-   * optional `sceneAssetId`. String locators are resolved through
-   * {@linkcode AssetServer}; numeric locators are resolved through
-   * {@linkcode AssetSceneMap} when the scene asset ID is supplied. Missing
-   * numeric mappings produce `undefined`. The method still constructs a
-   * `SceneInstance`, so an unresolved scene handle leaves `handle` undefined,
-   * and an absent or unresolved filter leaves `filter` undefined.
-   *
-   * The world must contain an {@linkcode AssetServer}. A path-backed handle also
-   * requires its asset type to be registered there.
-   *
-   * @param {World} world - World used for asset-handle restoration.
-   * @param {AssetId} [sceneAssetId] - Owning scene ID required for numeric handle locators.
-   * @returns {SceneInstance} A new component containing the restored handle values.
-   * @throws {Error} If the world has no asset server, or a path-backed handle has no registered asset pool.
+   * @param {SceneInstanceSnapshot} snapshot
+   * @param {World} world
+   * @param {AssetId} [sceneAssetId]
+   * @returns {SceneInstance}
    */
-  fromSnapshot(world, sceneAssetId) {
+  static fromSnapshot(snapshot, world, sceneAssetId) {
     return new SceneInstance(
-      /** @type {Handle<Scene>} */(this.handle.fromSnapshot(world, sceneAssetId)),
-      /** @type {Handle<SceneFilter> | undefined} */(this.filter?.fromSnapshot(world, sceneAssetId))
+      /** @type {Handle<Scene>} */(Handle.fromSnapshot(snapshot.handle, world, sceneAssetId)),
+      /** @type {Handle<SceneFilter> | undefined} */(snapshot.filter && Handle.fromSnapshot(snapshot.filter, world, sceneAssetId))
     )
   }
 

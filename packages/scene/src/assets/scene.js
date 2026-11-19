@@ -3,6 +3,7 @@
 /** @import { TypeEntry } from '@wimaengine/reflect' */
 /** @import { Constructor, TypeId } from '@wimaengine/type' */
 import { AssetsSnapshot } from '@wimaengine/asset'
+import { LiveType } from '@wimaengine/core'
 import { EntityHandle, Query, World } from '@wimaengine/ecs'
 import { Parent } from '@wimaengine/hierarchy'
 import { warn } from '@wimaengine/logger'
@@ -121,7 +122,7 @@ export class Scene {
         continue
       }
 
-      const restoredResource = fromSnapshot(resource, world, entry, sceneAssetId)
+      const restoredResource = fromSnapshot(resource, world, typeRegistry, entry, sceneAssetId)
 
       if (!restoredResource) {
         continue
@@ -158,7 +159,7 @@ export class Scene {
           return undefined
         }
 
-        const clonedComponent = fromSnapshot(component, world, entry, sceneAssetId)
+        const clonedComponent = fromSnapshot(component, world, typeRegistry, entry, sceneAssetId)
 
         if (!clonedComponent) {
           return undefined
@@ -323,13 +324,13 @@ function toSnapshot(component, world, entry) {
   const method = entry.getMethod('toSnapshot')
 
   if (method) {
-    return method.method.call(component, world)
+    return method.call([component, world])
   }
 
   const clone = entry.call('clone', [component])
 
   if (clone) {
-    return clone
+    return /** @type {object} */ (clone)
   }
 
   const name = component?.constructor?.name || 'Unknown'
@@ -342,20 +343,28 @@ function toSnapshot(component, world, entry) {
 /**
  * @param {object} component
  * @param {World} world
+ * @param {TypeRegistry} typeRegistry
  * @param {TypeEntry} entry
  * @param {AssetId} [sceneAssetId]
+ * @returns {object | undefined}
  */
-function fromSnapshot(component, world, entry, sceneAssetId) {
-  const method = entry.getMethod('fromSnapshot')
+function fromSnapshot(component, world, typeRegistry, entry, sceneAssetId) {
+  const liveType = entry.getAttribute(LiveType)
+  const liveEntry = liveType ?
+    typeRegistry.getByTypeId(liveType.typeId) :
+    entry
+  const method = liveEntry?.getMethod('fromSnapshot')
 
   if (method) {
-    return method.method.call(component, world, sceneAssetId)
+    return /** @type {object | undefined} */ (method.call([component, world, sceneAssetId]))
   }
 
-  const clone = entry.call('clone', [component])
+  const clone = liveEntry === entry ?
+    entry.call('clone', [component]) :
+    undefined
 
   if (clone) {
-    return clone
+    return /** @type {object} */ (clone)
   }
 
   const name = component?.constructor?.name || 'Unknown'
