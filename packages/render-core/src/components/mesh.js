@@ -103,11 +103,12 @@ export class Meshed {
    * path metadata for this handle. Otherwise it stores the mesh's scene-local
    * asset-pool index for restoration with the owning scene asset ID.
    *
+   * @param {Meshed} meshed - Live mesh component being snapshotted.
    * @param {World} world - World used to resolve asset metadata.
    * @returns {MeshedSnapshot} Snapshot containing the mesh handle reference.
    */
-  toSnapshot(world) {
-    return new MeshedSnapshot(this.handle.toSnapshot(world))
+  static toSnapshot(meshed, world) {
+    return new MeshedSnapshot(Handle.toSnapshot(meshed.handle, world))
   }
 }
 
@@ -146,7 +147,7 @@ export class MeshedSnapshot {
   /**
    * Restores a live {@linkcode Meshed} component from this persistence data.
    *
-   * This delegates to {@linkcode HandleSnapshot.fromSnapshot} and requires the
+   * This delegates to {@linkcode Handle#fromSnapshot} and requires the
    * world to contain an {@linkcode AssetServer} resource. A string locator uses
    * the server to load or reserve the asset; a numeric locator requires
    * `sceneAssetId` and a matching scene asset mapping. If nested restoration
@@ -155,17 +156,17 @@ export class MeshedSnapshot {
    *
    * @example
    * ```js
-   * const serial = MeshedSnapshot.serialize(meshed.toSnapshot(world))
-   * const restored = MeshedSnapshot.deserialize(serial)
-   *   .fromSnapshot(world, sceneAssetId)
+   * const serial = MeshedSnapshot.serialize(Meshed.toSnapshot(meshed, world))
+   * const restored = Meshed.fromSnapshot(MeshedSnapshot.deserialize(serial), world, sceneAssetId)
    * ```
    *
+   * @param {MeshedSnapshot} snapshot - Snapshot being restored.
    * @param {World} world - World used to restore the handle.
    * @param {AssetId} [sceneAssetId] - Owning scene ID for a scene-local handle index.
    * @returns {Meshed} Component wrapping the restored handle; an unmapped numeric index produces a component whose handle is `undefined`.
    */
-  fromSnapshot(world, sceneAssetId) {
-    return new Meshed(/** @type {Handle<Mesh>} */(this.handle.fromSnapshot(world, sceneAssetId)))
+  static fromSnapshot(snapshot, world, sceneAssetId) {
+    return new Meshed(/** @type {Handle<Mesh>} */(Handle.fromSnapshot(snapshot.handle, world, sceneAssetId)))
   }
 
   /**
@@ -191,7 +192,7 @@ export class MeshedSnapshot {
    * The nested {@linkcode HandleSnapshot.deserialize} call copies the serialized
    * type and path or scene-local index into `out.handle`. It does not access a
    * {@linkcode World} or {@linkcode AssetServer}; live-handle restoration happens
-   * only through {@linkcode MeshedSnapshot.fromSnapshot}.
+   * only through {@linkcode Meshed#fromSnapshot}.
    *
    * @param {MeshedSnapshotSerial} value - Serialized handle snapshot.
    * @param {MeshedSnapshot} [out] - Snapshot object to populate.
