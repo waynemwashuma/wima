@@ -126,17 +126,18 @@ export class AudioPlayer {
    * The snapshot stores `sourceNode` and `attach`, plus a
    * {@linkcode HandleSnapshot} for `audio` when a handle is present. It stores
    * asset locator data, not the loaded {@linkcode Audio} object or live Web Audio
-   * node. Restoring it with {@linkcode AudioPlayerSnapshot.fromSnapshot} restores
+   * node. Restoring it with {@linkcode AudioPlayer.fromSnapshot} restores
    * the recorded IDs but does not rebuild the graph slot.
    *
+   * @param {AudioPlayer} player - Live player being snapshotted.
    * @param {World} world - World used to resolve asset metadata.
    * @returns {AudioPlayerSnapshot} Snapshot of the player's persisted fields.
    */
-  toSnapshot(world) {
+  static toSnapshot(player, world) {
     return new AudioPlayerSnapshot(
-      this.sourceNode,
-      this.attach,
-      this.audio?.toSnapshot(world)
+      player.sourceNode,
+      player.attach,
+      player.audio && Handle.toSnapshot(player.audio, world)
     )
   }
 }
@@ -147,7 +148,7 @@ export class AudioPlayer {
  * A snapshot captures the player's graph-slot IDs and its asset handle as
  * serializable data. It is not a live player, asset handle, or Web Audio node;
  * restoring it creates a new component and delegates handle restoration to
- * {@linkcode HandleSnapshot.fromSnapshot}.
+ * {@linkcode Handle#fromSnapshot}.
  *
  * @example
  * ```js
@@ -156,11 +157,11 @@ export class AudioPlayer {
  *
  * const world = new World()
  * const serial = AudioPlayerSnapshot.serialize(
- *   new AudioPlayer().toSnapshot(world)
+ *   AudioPlayer.toSnapshot(new AudioPlayer(), world)
  * )
  *
  * if (AudioPlayerSnapshot.validateSerial(serial)) {
- *   const player = AudioPlayerSnapshot.deserialize(serial).fromSnapshot(world)
+ *   const player = AudioPlayer.fromSnapshot(AudioPlayerSnapshot.deserialize(serial), world)
  *   console.log(player.audio) // undefined: the source player had no handle.
  * }
  * ```
@@ -222,22 +223,23 @@ export class AudioPlayerSnapshot {
    *
    * `attach` and `sourceNode` are copied into the new component, but no graph
    * slot, native source, or graph edge is rebuilt. If `audio` is present,
-   * restoration follows {@linkcode HandleSnapshot.fromSnapshot}: path-backed
+   * restoration follows {@linkcode Handle#fromSnapshot}: path-backed
    * data uses the world's asset server, while a numeric scene-local locator
    * needs `sceneAssetId` and a matching scene mapping. An unmapped numeric
    * locator leaves the restored player's `audio` undefined.
    *
+   * @param {AudioPlayerSnapshot} snapshot - Snapshot being restored.
    * @param {World} world - World used to restore the optional handle.
    * @param {AssetId} [sceneAssetId] - Scene ID for a numeric handle locator.
    * @returns {AudioPlayer} Restored player state.
    */
-  fromSnapshot(world, sceneAssetId) {
+  static fromSnapshot(snapshot, world, sceneAssetId) {
     const player = new AudioPlayer({
-      attach: this.attach,
-      audio: /** @type {Handle<Audio>} */(this.audio?.fromSnapshot(world, sceneAssetId))
+      attach: snapshot.attach,
+      audio: /** @type {Handle<Audio>} */(snapshot.audio && Handle.fromSnapshot(snapshot.audio, world, sceneAssetId))
     })
 
-    player.sourceNode = this.sourceNode
+    player.sourceNode = snapshot.sourceNode
 
     return player
   }

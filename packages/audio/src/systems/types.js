@@ -1,6 +1,7 @@
 /** @import { AppSchedule } from '@wimaengine/core' */
 /** @import { AudioPlugin } from '../plugin' */
 import { Handle, HandleSnapshot } from '@wimaengine/asset'
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { Graph } from '@wimaengine/datastructures'
 import { World } from '@wimaengine/ecs'
 import { EnumInfo, Field, OpaqueInfo, StructInfo, TypeRegistry } from '@wimaengine/reflect'
@@ -80,15 +81,16 @@ export function registerAudioTypes(world) {
   }))
   registry.get(AudioPlayer)?.setMethod(AudioPlayer.copy)
   registry.get(AudioPlayer)?.setMethod(AudioPlayer.clone)
-  registry.get(AudioPlayer)?.setMethod(AudioPlayer.prototype.toSnapshot)
+  registry.get(AudioPlayer)?.setMethod(AudioPlayer.toSnapshot)
+  registry.get(AudioPlayer)?.setAttribute(new SnapshotType(typeid(AudioPlayerSnapshot)))
   registry.register(AudioPlayerSnapshot, new StructInfo({
     sourceNode: new Field(typeid(Number), true),
     attach: new Field(typeid(Number), true),
-    audio: new Field(typeid(HandleSnapshot), true)
+    audio: new Field(typeidGeneric(HandleSnapshot, [Audio]), true)
   }))
   registry.get(AudioPlayerSnapshot)?.setMethod(AudioPlayerSnapshot.serialize)
   registry.get(AudioPlayerSnapshot)?.setMethod(AudioPlayerSnapshot.deserialize)
-  registry.get(AudioPlayerSnapshot)?.setMethod(AudioPlayerSnapshot.prototype.fromSnapshot)
+  registry.get(AudioPlayerSnapshot)?.setAttribute(new LiveType(typeid(AudioPlayer)))
   registry.register(AudioOscillator, new StructInfo({
     sourceNode: new Field(typeid(Number), true),
     type: new Field(oscillatorTypeId),
