@@ -692,20 +692,21 @@ export class Assets {
    * const textures = new Assets(Texture)
    * textures.add(new Texture('player.png'))
    * const reserved = textures.reserve()
-   * const snapshot = textures.toSnapshot(world)
+   * const snapshot = Assets.toSnapshot(textures, world)
    *
    * console.log(snapshot.assets[0]) // { source: 'player.png' }
    * console.log(snapshot.assets[reserved.index]) // undefined
    * ```
    *
+   * @param {Assets<unknown>} assets - Live asset pool being snapshotted.
    * @param {World} world - World containing the {@linkcode TypeRegistry} used for
    * optional asset serialization.
    * @returns {AssetsSnapshot<unknown>}
    */
-  toSnapshot(world) {
+  static toSnapshot(assets, world) {
     const typeRegistry = world.getResource(TypeRegistry)
-    const typeEntry = typeRegistry.get(this.type)
-    const assets = this.assets.values().map((entry) => {
+    const typeEntry = typeRegistry.get(assets.type)
+    const values = assets.assets.values().map((entry) => {
       if (
         typeEntry &&
         entry.asset !== undefined
@@ -716,7 +717,32 @@ export class Assets {
       return entry.asset
     })
 
-    return new AssetsSnapshot(typeid(this.type), assets)
+    return new AssetsSnapshot(typeid(assets.type), values)
+  }
+
+  /**
+   * Restores an asset pool from a snapshot value.
+   *
+   * @param {AssetsSnapshot<unknown>} snapshot
+   * @param {World} world
+   * @param {AssetId} sceneAssetId
+   * @returns {Assets<unknown> | undefined}
+   */
+  static fromSnapshot(snapshot, world, sceneAssetId) {
+
+    /** @type {{ clear: Function, set: Function }} */
+    const sceneMap = world.getResourceByTypeId(assetSceneMapId)
+    const typeEntry = world.getResource(TypeRegistry).getByTypeId(snapshot.type)
+
+    if (!typeEntry?.constructorFn) {
+      return undefined
+    }
+
+    const assets = new Assets(typeEntry.constructorFn)
+
+    patchInternal(snapshot, sceneMap, assets, sceneAssetId, typeEntry)
+
+    return assets
   }
 
   /**
@@ -877,7 +903,7 @@ export class AssetEntry {
  *
  * const strings = new Assets(String)
  * strings.add('player')
- * const snapshot = strings.toSnapshot(world)
+ * const snapshot = Assets.toSnapshot(strings, world)
  * const serial = AssetsSnapshot.serialize(snapshot)
  *
  * if (AssetsSnapshot.validateSerial(serial)) {
@@ -893,7 +919,7 @@ export class AssetsSnapshot {
   /**
    * Type ID of the asset constructor represented by this snapshot.
    *
-   * {@linkcode AssetsSnapshot#fromSnapshot} and {@linkcode AssetsSnapshot.patch} use
+   * {@linkcode Assets#fromSnapshot} and {@linkcode AssetsSnapshot.patch} use
    * this ID to find the constructor and reflection methods in the world's
    * {@linkcode TypeRegistry}. This is the asset type ID, not the generic snapshot
    * ID returned by {@linkcode AssetsSnapshot.typeId}.
@@ -952,50 +978,6 @@ export class AssetsSnapshot {
    */
   static typeId(assetType) {
     return setTypeId(`AssetsSnapshot<${assetType}>`)
-  }
-
-  /**
-   * Restores this snapshot into a new typed {@linkcode Assets} pool.
-   *
-   * The world must provide {@linkcode TypeRegistry} and the asset scene map
-   * resources; missing resources throw during lookup. The registry entry for
-   * `type` must retain a runtime constructor; without one, this method returns
-   * `undefined` without creating a pool or changing the scene map.
-   *
-   * For a registered type, each `undefined` slot is reserved in order so
-   * successfully restored values retain their snapshot indexes. Each other
-   * slot is passed to the entry's `deserialize` hook; a truthy result is added
-   * to the pool. A missing hook or falsey result leaves that slot without an
-   * asset and emits a warning, so later pool indexes can differ from snapshot
-   * indexes in that case. Every restored handle, including handles for reserved
-   * slots, is recorded in the asset scene map under `sceneAssetId`, this
-   * asset type, and the snapshot index.
-   *
-   * The scene restoration flow supplies this method while restoring a scene
-   * resource through the type registry.
-   *
-   * @param {World} world - World containing the
-   * registry and scene map resources.
-   * @param {AssetId} sceneAssetId - Scene asset ID used for scene-local handle
-   * mappings.
-   * @returns {Assets<unknown> | undefined} A restored pool, or `undefined` if
-   * the registry has no runtime constructor for this snapshot's type.
-   */
-  fromSnapshot(world, sceneAssetId) {
-
-    /** @type {{ clear: Function, set: Function }} */
-    const sceneMap = world.getResourceByTypeId(assetSceneMapId)
-    const typeEntry = world.getResource(TypeRegistry).getByTypeId(this.type)
-
-    if (!typeEntry?.constructorFn) {
-      return undefined
-    }
-
-    const assets = new Assets(typeEntry.constructorFn)
-
-    patchInternal(this, sceneMap, assets, sceneAssetId, typeEntry)
-
-    return assets
   }
 
   /**

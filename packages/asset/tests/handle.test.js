@@ -1,6 +1,7 @@
 import { deepStrictEqual, strictEqual } from "assert";
 import { test, describe } from "vitest";
 import { AssetServer, Assets } from "../src/resources";
+import { Handle } from "../src/core";
 import { World } from "@wimaengine/ecs";
 
 describe('Testing `Handle`',()=>{
@@ -196,8 +197,8 @@ describe('Testing `Handle`',()=>{
         server.registerAsset(assets)
 
         const handle = server.load(String, '/assets/text/sample.txt')
-        const snapshot = handle.toSnapshot(world)
-        const restored = snapshot.fromSnapshot(world)
+        const snapshot = Handle.toSnapshot(handle, world)
+        const restored = Handle.fromSnapshot(snapshot, world)
 
         strictEqual(snapshot.asset, '/assets/text/sample.txt')
         deepStrictEqual(restored.id(), handle.id())

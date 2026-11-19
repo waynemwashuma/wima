@@ -4,6 +4,7 @@
 /** @import { AssetPlugin } from '../plugins/asset' */
 /** @import { AssetServerPlugin } from '../plugins/assetServer' */
 
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { World } from '@wimaengine/ecs'
 import { ArrayInfo, Field, StructInfo, TypeRegistry } from '@wimaengine/reflect'
 import { typeid, typeidGeneric } from '@wimaengine/type'
@@ -28,13 +29,12 @@ import { AssetServer, Assets, AssetsSnapshot } from '../resources'
  *
  * It then attaches the methods used by reflection and scene restoration:
  * {@linkcode AssetsSnapshot.serialize}, {@linkcode AssetsSnapshot.deserialize},
- * {@linkcode AssetsSnapshot.patch}, and {@linkcode AssetsSnapshot.fromSnapshot} to
- * the typed asset snapshot entry; {@linkcode HandleSnapshot.serialize},
- * {@linkcode HandleSnapshot.deserialize}, and
- * {@linkcode HandleSnapshot.fromSnapshot} to the handle snapshot entry; and
- * {@linkcode Assets#toSnapshot} to the typed asset pool entry. If a
- * base {@linkcode Handle} entry is already registered, it also receives
- * {@linkcode Handle#toSnapshot}.
+ * and {@linkcode AssetsSnapshot.patch} to the typed asset snapshot entry;
+ * {@linkcode HandleSnapshot.serialize} and {@linkcode HandleSnapshot.deserialize}
+ * to the handle snapshot entry; and the static {@linkcode Assets#toSnapshot} and
+ * {@linkcode Assets#fromSnapshot} methods to the typed asset pool entry. The
+ * static {@linkcode Handle#toSnapshot} and {@linkcode Handle#fromSnapshot}
+ * methods are registered on the matching typed handle entry.
  * The returned system does not create an asset pool or any other world
  * resource.
  *
@@ -69,35 +69,46 @@ import { AssetServer, Assets, AssetsSnapshot } from '../resources'
 export function registerAssetTypes(asset) {
   return function registerAssetTypes(world) {
     const registry = world.getResource(TypeRegistry)
+    const handleTypeId = typeidGeneric(Handle, [asset])
+    const handleSnapshotTypeId = typeidGeneric(HandleSnapshot, [asset])
+    const assetsTypeId = typeidGeneric(Assets, [asset])
+    const assetsSnapshotTypeId = AssetsSnapshot.typeId(typeid(asset))
 
-    registry.registerTypeId(typeidGeneric(Handle, [asset]), new StructInfo({
+    registry.registerTypeId(handleTypeId, new StructInfo({
       type: new Field(typeid(Function)),
       index: new Field(typeid(Number)),
       generation: new Field(typeid(Number))
-    }))
+    }), Handle)
     registry.registerTypeId(
-      typeidGeneric(Assets, [asset]),
+      assetsTypeId,
       new StructInfo({
         type: new Field(typeid(Function))
-      })
+      }),
+      Assets
     )
-    registry.registerTypeId(AssetsSnapshot.typeId(typeid(asset)), new StructInfo({
+    registry.registerTypeId(assetsSnapshotTypeId, new StructInfo({
       type: new Field(typeid(String)),
       assets: new Field(typeid(Array))
-    }))
-    registry.register(HandleSnapshot, new StructInfo({
+    }), AssetsSnapshot)
+    registry.registerTypeId(handleSnapshotTypeId, new StructInfo({
       type: new Field(typeid(Function)),
       asset: new Field(typeid(Object))
-    }))
-    registry.getByTypeId(AssetsSnapshot.typeId(typeid(asset)))?.setMethod(AssetsSnapshot.serialize)
-    registry.getByTypeId(AssetsSnapshot.typeId(typeid(asset)))?.setMethod(AssetsSnapshot.deserialize)
-    registry.getByTypeId(AssetsSnapshot.typeId(typeid(asset)))?.setMethod(AssetsSnapshot.patch)
-    registry.getByTypeId(AssetsSnapshot.typeId(typeid(asset)))?.setMethod(AssetsSnapshot.prototype.fromSnapshot)
-    registry.get(HandleSnapshot)?.setMethod(HandleSnapshot.serialize)
-    registry.get(HandleSnapshot)?.setMethod(HandleSnapshot.deserialize)
-    registry.get(HandleSnapshot)?.setMethod(HandleSnapshot.prototype.fromSnapshot)
-    registry.getByTypeId(typeidGeneric(Assets, [asset]))?.setMethod(Assets.prototype.toSnapshot)
-    registry.get(Handle)?.setMethod(Handle.prototype.toSnapshot)
+    }), HandleSnapshot)
+
+    registry.getByTypeId(assetsTypeId)?.setMethod(Assets.toSnapshot)
+    registry.getByTypeId(assetsTypeId)?.setMethod(Assets.fromSnapshot)
+    registry.getByTypeId(assetsTypeId)?.setAttribute(new SnapshotType(assetsSnapshotTypeId))
+    registry.getByTypeId(assetsSnapshotTypeId)?.setMethod(AssetsSnapshot.serialize)
+    registry.getByTypeId(assetsSnapshotTypeId)?.setMethod(AssetsSnapshot.deserialize)
+    registry.getByTypeId(assetsSnapshotTypeId)?.setMethod(AssetsSnapshot.patch)
+    registry.getByTypeId(assetsSnapshotTypeId)?.setAttribute(new LiveType(assetsTypeId))
+
+    registry.getByTypeId(handleTypeId)?.setMethod(Handle.toSnapshot)
+    registry.getByTypeId(handleTypeId)?.setMethod(Handle.fromSnapshot)
+    registry.getByTypeId(handleTypeId)?.setAttribute(new SnapshotType(handleSnapshotTypeId))
+    registry.getByTypeId(handleSnapshotTypeId)?.setMethod(HandleSnapshot.serialize)
+    registry.getByTypeId(handleSnapshotTypeId)?.setMethod(HandleSnapshot.deserialize)
+    registry.getByTypeId(handleSnapshotTypeId)?.setAttribute(new LiveType(handleTypeId))
   }
 }
 
