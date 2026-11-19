@@ -36,6 +36,10 @@ export class Acceleration3D extends Vector3 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Acceleration3D()
+  }
+
   /**
    * @inheritdoc
    * @param {Acceleration3D} target

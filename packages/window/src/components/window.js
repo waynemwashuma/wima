@@ -108,6 +108,10 @@ export class Window {
     return Window.copy(target)
   }
 
+  static default() {
+    return new Window()
+  }
+
   /**
    * Serializes the window state for persistence.
    *

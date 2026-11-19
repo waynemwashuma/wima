@@ -47,6 +47,10 @@ export class Velocity2D extends Vector2 {
     return Velocity2D.copy(target)
   }
 
+  static default() {
+    return new Velocity2D()
+  }
+
   /**
    * @inheritdoc
    * @param {Velocity2D} value

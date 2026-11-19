@@ -48,6 +48,10 @@ export class Torque2D extends Angle {
     return Torque2D.copy(target)
   }
 
+  static default() {
+    return new Torque2D()
+  }
+
   /**
    * Serializes a {@linkcode Torque2D} to its scalar radian value.
    *

@@ -39,6 +39,10 @@ export class Orientation3D extends Quaternion {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Orientation3D()
+  }
+
   /**
    * @inheritdoc
    * @param {Orientation3D} target

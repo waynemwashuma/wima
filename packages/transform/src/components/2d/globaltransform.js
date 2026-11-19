@@ -52,6 +52,10 @@ export class GlobalTransform2D extends Affine2 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new GlobalTransform2D()
+  }
+
   /**
    * @inheritdoc
    * @param {GlobalTransform2D} target

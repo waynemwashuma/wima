@@ -78,6 +78,10 @@ export class Name {
     return Name.copy(target)
   }
 
+  static default() {
+    return new Name()
+  }
+
   /**
    * Serializes a name to its raw string value.
    *

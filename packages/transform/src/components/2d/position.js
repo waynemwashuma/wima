@@ -42,6 +42,10 @@ export class Position2D extends Vector2 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Position2D()
+  }
+
   /**
    * @inheritdoc
    * @param {Position2D} target - Position to clone.

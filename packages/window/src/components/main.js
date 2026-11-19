@@ -33,6 +33,10 @@
  */
 export class MainWindow {
 
+  static default() {
+    return new MainWindow()
+  }
+
   /**
    * Copies an empty marker into the target component.
    *

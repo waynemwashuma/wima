@@ -91,6 +91,15 @@ export class Playback {
   }
 
   /**
+   * Creates playback with its constructor defaults.
+   *
+   * @returns {Playback} A new default playback value.
+   */
+  static default() {
+    return new Playback()
+  }
+
+  /**
    * Copies all playback fields into a playback value.
    *
    * The five scalar fields are assigned directly. If `target` is omitted, a

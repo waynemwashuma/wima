@@ -106,6 +106,10 @@ export class AnimationTarget {
     return AnimationTarget.copy(target)
   }
 
+  static default() {
+    return new AnimationTarget(new EntityHandle(0, 0), '')
+  }
+
   /**
    * Converts an animation target to its serialized fields.
    *

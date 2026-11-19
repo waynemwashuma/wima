@@ -38,6 +38,10 @@ export class Torque3D extends Vector3 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Torque3D()
+  }
+
   /**
    * @inheritdoc
    *

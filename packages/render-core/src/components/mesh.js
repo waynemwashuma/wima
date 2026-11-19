@@ -121,6 +121,10 @@ export class Meshed {
  */
 export class MeshedSnapshot {
 
+  static default() {
+    return new MeshedSnapshot(new HandleSnapshot(typeid(Mesh), ''))
+  }
+
   /**
    * Snapshot of the live handle held by {@linkcode Meshed}.
    *

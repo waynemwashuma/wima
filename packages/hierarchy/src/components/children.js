@@ -89,6 +89,10 @@ export class Children {
     return Children.copy(target)
   }
 
+  static default() {
+    return new Children()
+  }
+
   /**
    * Serializes the relationship to packed numeric entity identities.
    *

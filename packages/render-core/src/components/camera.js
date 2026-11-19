@@ -70,6 +70,10 @@ export class Camera {
     this.far = far
   }
 
+  static default() {
+    return new Camera()
+  }
+
   /**
    * Copies a camera into a target camera.
    *

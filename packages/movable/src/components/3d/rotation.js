@@ -40,6 +40,10 @@ export class Rotation3D extends Vector3 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Rotation3D()
+  }
+
   /**
    * @inheritdoc
    *

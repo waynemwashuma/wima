@@ -147,6 +147,10 @@ export class RemoteTransform3D {
     return RemoteTransform3D.copy(target)
   }
 
+  static default() {
+    return new RemoteTransform3D(new EntityHandle(0, 0))
+  }
+
   /**
    * Converts a remote transform to its serialized representation.
    *

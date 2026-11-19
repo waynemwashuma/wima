@@ -39,6 +39,10 @@ export class Scale2D extends Vector2 {
     super(x, y)
   }
 
+  static default() {
+    return new Scale2D()
+  }
+
   /**
    * @inheritdoc
    * @param {Scale2D} source

@@ -20,6 +20,10 @@
  */
 export class SoftBody2D {
 
+  static default() {
+    return new SoftBody2D()
+  }
+
   /**
    * Copies an empty marker into a target component.
    *
@@ -95,6 +99,10 @@ export class SoftBody2D {
  * ```
  */
 export class SoftBody3D {
+
+  static default() {
+    return new SoftBody3D()
+  }
 
   /**
    * Copies an empty marker into a target component.

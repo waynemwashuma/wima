@@ -43,6 +43,10 @@ export class Acceleration2D extends Vector2 {
     return Acceleration2D.copy(target)
   }
 
+  static default() {
+    return new Acceleration2D()
+  }
+
   /**
    * @inheritdoc
    * @param {Acceleration2D} value

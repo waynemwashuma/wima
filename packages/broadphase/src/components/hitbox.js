@@ -47,6 +47,10 @@ export class PhysicsHitbox extends BoundingBox2D {
     return PhysicsHitbox.copy(target)
   }
 
+  static default() {
+    return new PhysicsHitbox()
+  }
+
   /**
    * Serializes a hitbox to its plain `max` and `min` vector data.
    *
