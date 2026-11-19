@@ -32,7 +32,10 @@ export function registerStorageTypes(world) {
   const registry = world.getResource(TypeRegistry)
 
   registry.register(Session, new OpaqueInfo())
+  registry.get(Session)?.setMethod(Session.default)
   registry.register(Storage, new OpaqueInfo())
+  registry.get(Storage)?.setMethod(Storage.default)
   registry.register(Cookies, new OpaqueInfo())
+  registry.get(Cookies)?.setMethod(Cookies.default)
 }
 /* eslint-enable jsdoc/check-tag-names */

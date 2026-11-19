@@ -86,6 +86,7 @@ export function registerAssetTypes(asset) {
       }),
       Assets
     )
+    registry.getByTypeId(assetsTypeId)?.setMethod(({ default() { return new Assets(asset) } }).default)
     registry.registerTypeId(assetsSnapshotTypeId, new StructInfo({
       type: new Field(typeid(String)),
       assets: new Field(typeid(Array))

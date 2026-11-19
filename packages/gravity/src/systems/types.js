@@ -41,6 +41,7 @@ export function registerGravity2DTypes(world) {
     x: new Field(typeid(Number)),
     y: new Field(typeid(Number))
   }))
+  registry.get(Gravity2D)?.setMethod(Gravity2D.default)
   registry.get(Gravity2D)?.setMethod(Gravity2D.serialize)
   registry.get(Gravity2D)?.setMethod(Gravity2D.deserialize)
 }
@@ -79,6 +80,7 @@ export function registerGravity3DTypes(world) {
     y: new Field(typeid(Number)),
     z: new Field(typeid(Number))
   }))
+  registry.get(Gravity3D)?.setMethod(Gravity3D.default)
   registry.get(Gravity3D)?.setMethod(Gravity3D.serialize)
   registry.get(Gravity3D)?.setMethod(Gravity3D.deserialize)
 }

@@ -57,6 +57,7 @@ export function registerTransform2DTypes(world) {
   }))
   registry.get(Position2D)?.setMethod(Position2D.copy)
   registry.get(Position2D)?.setMethod(Position2D.clone)
+  registry.get(Position2D)?.setMethod(Position2D.default)
   registry.get(Position2D)?.setMethod(Position2D.serialize)
   registry.get(Position2D)?.setMethod(Position2D.deserialize)
   registry.register(Orientation2D, new StructInfo({
@@ -65,6 +66,7 @@ export function registerTransform2DTypes(world) {
   }))
   registry.get(Orientation2D)?.setMethod(Orientation2D.copy)
   registry.get(Orientation2D)?.setMethod(Orientation2D.clone)
+  registry.get(Orientation2D)?.setMethod(Orientation2D.default)
   registry.get(Orientation2D)?.setMethod(Orientation2D.serialize)
   registry.get(Orientation2D)?.setMethod(Orientation2D.deserialize)
   registry.register(Scale2D, new StructInfo({
@@ -73,6 +75,7 @@ export function registerTransform2DTypes(world) {
   }))
   registry.get(Scale2D)?.setMethod(Scale2D.copy)
   registry.get(Scale2D)?.setMethod(Scale2D.clone)
+  registry.get(Scale2D)?.setMethod(Scale2D.default)
   registry.get(Scale2D)?.setMethod(Scale2D.serialize)
   registry.get(Scale2D)?.setMethod(Scale2D.deserialize)
   registry.register(GlobalTransform2D, new StructInfo({
@@ -85,6 +88,7 @@ export function registerTransform2DTypes(world) {
   }))
   registry.get(GlobalTransform2D)?.setMethod(GlobalTransform2D.copy)
   registry.get(GlobalTransform2D)?.setMethod(GlobalTransform2D.clone)
+  registry.get(GlobalTransform2D)?.setMethod(GlobalTransform2D.default)
   registry.get(GlobalTransform2D)?.setMethod(GlobalTransform2D.serialize)
   registry.get(GlobalTransform2D)?.setMethod(GlobalTransform2D.deserialize)
 }
@@ -117,6 +121,7 @@ export function registerTransform3DTypes(world) {
   }))
   registry.get(Position3D)?.setMethod(Position3D.copy)
   registry.get(Position3D)?.setMethod(Position3D.clone)
+  registry.get(Position3D)?.setMethod(Position3D.default)
   registry.get(Position3D)?.setMethod(Position3D.serialize)
   registry.get(Position3D)?.setMethod(Position3D.deserialize)
   registry.register(Orientation3D, new StructInfo({
@@ -127,6 +132,7 @@ export function registerTransform3DTypes(world) {
   }))
   registry.get(Orientation3D)?.setMethod(Orientation3D.copy)
   registry.get(Orientation3D)?.setMethod(Orientation3D.clone)
+  registry.get(Orientation3D)?.setMethod(Orientation3D.default)
   registry.get(Orientation3D)?.setMethod(Orientation3D.serialize)
   registry.get(Orientation3D)?.setMethod(Orientation3D.deserialize)
   registry.register(Scale3D, new StructInfo({
@@ -136,6 +142,7 @@ export function registerTransform3DTypes(world) {
   }))
   registry.get(Scale3D)?.setMethod(Scale3D.copy)
   registry.get(Scale3D)?.setMethod(Scale3D.clone)
+  registry.get(Scale3D)?.setMethod(Scale3D.default)
   registry.get(Scale3D)?.setMethod(Scale3D.serialize)
   registry.get(Scale3D)?.setMethod(Scale3D.deserialize)
   registry.register(GlobalTransform3D, new StructInfo({
@@ -154,6 +161,7 @@ export function registerTransform3DTypes(world) {
   }))
   registry.get(GlobalTransform3D)?.setMethod(GlobalTransform3D.copy)
   registry.get(GlobalTransform3D)?.setMethod(GlobalTransform3D.clone)
+  registry.get(GlobalTransform3D)?.setMethod(GlobalTransform3D.default)
   registry.get(GlobalTransform3D)?.setMethod(GlobalTransform3D.serialize)
   registry.get(GlobalTransform3D)?.setMethod(GlobalTransform3D.deserialize)
 }
@@ -188,6 +196,7 @@ export function registerRemoteTransform2DTypes(world) {
   }))
   registry.get(RemoteTransform2D)?.setMethod(RemoteTransform2D.copy)
   registry.get(RemoteTransform2D)?.setMethod(RemoteTransform2D.clone)
+  registry.get(RemoteTransform2D)?.setMethod(RemoteTransform2D.default)
   registry.get(RemoteTransform2D)?.setMethod(RemoteTransform2D.serialize)
   registry.get(RemoteTransform2D)?.setMethod(RemoteTransform2D.deserialize)
 }
@@ -222,6 +231,7 @@ export function registerRemoteTransform3DTypes(world) {
   }))
   registry.get(RemoteTransform3D)?.setMethod(RemoteTransform3D.copy)
   registry.get(RemoteTransform3D)?.setMethod(RemoteTransform3D.clone)
+  registry.get(RemoteTransform3D)?.setMethod(RemoteTransform3D.default)
   registry.get(RemoteTransform3D)?.setMethod(RemoteTransform3D.serialize)
   registry.get(RemoteTransform3D)?.setMethod(RemoteTransform3D.deserialize)
 }

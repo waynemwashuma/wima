@@ -73,6 +73,7 @@ export function registerAudioTypes(world) {
   registry.register(Audio, new StructInfo({
     audiobuffer: new Field(audioBufferId)
   }))
+  registry.get(Audio)?.setMethod(Audio.default)
 
   registry.register(AudioPlayer, new StructInfo({
     sourceNode: new Field(typeid(Number), true),
@@ -81,6 +82,7 @@ export function registerAudioTypes(world) {
   }))
   registry.get(AudioPlayer)?.setMethod(AudioPlayer.copy)
   registry.get(AudioPlayer)?.setMethod(AudioPlayer.clone)
+  registry.get(AudioPlayer)?.setMethod(AudioPlayer.default)
   registry.get(AudioPlayer)?.setMethod(AudioPlayer.toSnapshot)
   registry.get(AudioPlayer)?.setAttribute(new SnapshotType(typeid(AudioPlayerSnapshot)))
   registry.register(AudioPlayerSnapshot, new StructInfo({
@@ -90,6 +92,7 @@ export function registerAudioTypes(world) {
   }))
   registry.get(AudioPlayerSnapshot)?.setMethod(AudioPlayerSnapshot.serialize)
   registry.get(AudioPlayerSnapshot)?.setMethod(AudioPlayerSnapshot.deserialize)
+  registry.get(AudioPlayerSnapshot)?.setMethod(AudioPlayerSnapshot.default)
   registry.get(AudioPlayerSnapshot)?.setAttribute(new LiveType(typeid(AudioPlayer)))
   registry.register(AudioOscillator, new StructInfo({
     sourceNode: new Field(typeid(Number), true),
@@ -100,11 +103,13 @@ export function registerAudioTypes(world) {
   }))
   registry.get(AudioOscillator)?.setMethod(AudioOscillator.copy)
   registry.get(AudioOscillator)?.setMethod(AudioOscillator.clone)
+  registry.get(AudioOscillator)?.setMethod(AudioOscillator.default)
   registry.get(AudioOscillator)?.setMethod(AudioOscillator.serialize)
   registry.get(AudioOscillator)?.setMethod(AudioOscillator.deserialize)
   registry.register(AudioGraph, new StructInfo({
     graph: new Field(typeid(Graph))
   }))
+  registry.get(AudioGraph)?.setMethod(AudioGraph.default)
   registry.register(AudioCommands, new StructInfo({}))
 }
 /* eslint-enable jsdoc/check-tag-names */

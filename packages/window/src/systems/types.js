@@ -74,11 +74,13 @@ export function registerWindowTypes(world) {
   }))
   registry.get(Window)?.setMethod(Window.copy)
   registry.get(Window)?.setMethod(Window.clone)
+  registry.get(Window)?.setMethod(Window.default)
   registry.get(Window)?.setMethod(Window.serialize)
   registry.get(Window)?.setMethod(Window.deserialize)
   registry.register(MainWindow, new StructInfo({}))
   registry.get(MainWindow)?.setMethod(MainWindow.copy)
   registry.get(MainWindow)?.setMethod(MainWindow.clone)
+  registry.get(MainWindow)?.setMethod(MainWindow.default)
   registry.get(MainWindow)?.setMethod(MainWindow.serialize)
   registry.get(MainWindow)?.setMethod(MainWindow.deserialize)
   registry.register(Windows, new StructInfo({
