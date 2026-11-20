@@ -32,6 +32,10 @@ import { Vector2, Vector3 } from '@wimaengine/math'
  */
 export class Gravity2D extends Vector2 {
 
+  static default() {
+    return new Gravity2D()
+  }
+
   /**
    * @inheritdoc
    * @param {Gravity2D} value
