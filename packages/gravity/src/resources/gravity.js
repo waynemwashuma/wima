@@ -82,6 +82,10 @@ export class Gravity2D extends Vector2 {
  */
 export class Gravity3D extends Vector3 {
 
+  static default() {
+    return new Gravity3D()
+  }
+
   /**
    * @inheritdoc
    * @param {Gravity3D} value
