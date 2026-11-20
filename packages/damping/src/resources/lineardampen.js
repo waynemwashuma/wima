@@ -145,6 +145,10 @@ export class Linear2DDamping {
  */
 export class Linear3DDamping {
 
+  static default() {
+    return new Linear3DDamping()
+  }
+
   /**
    * Scalar damping value for matching 3D velocities.
    *
