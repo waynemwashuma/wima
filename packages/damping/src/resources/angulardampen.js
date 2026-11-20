@@ -28,6 +28,10 @@
  */
 export class Angular2DDamping {
 
+  static default() {
+    return new Angular2DDamping()
+  }
+
   /**
    * Scalar damping value for matching 2D rotations.
    *
