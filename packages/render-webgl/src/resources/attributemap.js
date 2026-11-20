@@ -23,5 +23,9 @@ import { MeshAttribute } from '@wimaengine/render-core'
  * @augments {Map<string,MeshAttribute>}
  * @category resource
  */
-export class AttributeMap extends Map {}
+export class AttributeMap extends Map {
+  static default() {
+    return new AttributeMap()
+  }
+}
 /* eslint-enable jsdoc/check-tag-names */
