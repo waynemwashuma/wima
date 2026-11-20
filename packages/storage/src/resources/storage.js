@@ -25,6 +25,10 @@
 
 export class Storage {
 
+  static default() {
+    return new Storage()
+  }
+
   /**
    * Serializes `v` and stores it under `k` in the origin's `localStorage`.
    *
