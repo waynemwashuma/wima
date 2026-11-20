@@ -30,6 +30,10 @@ import { Graph } from '@wimaengine/datastructures'
  */
 export class AudioGraph {
 
+  static default() {
+    return new AudioGraph()
+  }
+
   /**
    * Web Audio context used to create and route the graph's native nodes.
    *
