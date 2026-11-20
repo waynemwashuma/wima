@@ -25,6 +25,10 @@
  */
 export class Session {
 
+  static default() {
+    return new Session()
+  }
+
   /**
    * Serializes `v` and stores it under `k` in the current tab's
    * `sessionStorage`.
