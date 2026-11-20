@@ -25,6 +25,10 @@ import { Color } from '@wimaengine/color'
  * ```
  */
 export class ClearColor extends Color {
+  static default() {
+    return new ClearColor()
+  }
+
   constructor() {
     super(0, 0, 0)
   }
