@@ -538,10 +538,11 @@ export class TypeEntry {
    * @returns {this}
    */
   setAttribute(attribute) {
+
     // SAFETY: The generic constraint guarantees a non-null object attribute.
     return this.setAttributeByTypeId(
       typeid(/** @type {Constructor<T>} */ (attribute.constructor)),
-      attribute,
+      attribute
     )
   }
 
