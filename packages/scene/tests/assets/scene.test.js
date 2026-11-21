@@ -1,4 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert'
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { test, describe } from 'vitest'
 import { EntityHandle, Query, World } from '@wimaengine/ecs'
 import { Parent } from '@wimaengine/hierarchy'
@@ -25,11 +26,21 @@ class PureComponent {
   }
 
   /**
+   * @param {PureComponent} target
    * @param {World} _world
    * @returns {ComponentSnapshot}
    */
-  toSnapshot(_world) {
-    return new ComponentSnapshot(this.value)
+  static toSnapshot(target, _world) {
+    return new ComponentSnapshot(target.value)
+  }
+
+  /**
+   * @param {ComponentSnapshot} snapshot
+   * @param {World} _world
+   * @returns {PureComponent}
+   */
+  static fromSnapshot(snapshot, _world) {
+    return new PureComponent(snapshot.value)
   }
 }
 
@@ -51,11 +62,21 @@ class PureResource {
   }
 
   /**
+   * @param {PureResource} target
    * @param {World} _world
    * @returns {ResourceSnapshot}
    */
-  toSnapshot(_world) {
-    return new ResourceSnapshot(this.value)
+  static toSnapshot(target, _world) {
+    return new ResourceSnapshot(target.value)
+  }
+
+  /**
+   * @param {ResourceSnapshot} snapshot
+   * @param {World} _world
+   * @returns {PureResource}
+   */
+  static fromSnapshot(snapshot, _world) {
+    return new PureResource(snapshot.value)
   }
 }
 
@@ -69,13 +90,6 @@ class ComponentSnapshot {
     this.value = value
   }
 
-  /**
-   * @param {World} _world
-   * @returns {PureComponent}
-   */
-  fromSnapshot(_world) {
-    return new PureComponent(this.value)
-  }
 }
 
 class ResourceSnapshot {
@@ -88,13 +102,6 @@ class ResourceSnapshot {
     this.value = value
   }
 
-  /**
-   * @param {World} _world
-   * @returns {PureResource}
-   */
-  fromSnapshot(_world) {
-    return new PureResource(this.value)
-  }
 }
 
 class PatchableResource {
@@ -105,6 +112,15 @@ class PatchableResource {
    */
   constructor(value) {
     this.value = value
+  }
+
+  /**
+   * @param {PatchableResourceSnapshot} _snapshot
+   * @param {World} _world
+   * @returns {PatchableResource}
+   */
+  static fromSnapshot(_snapshot, _world) {
+    throw new Error('`fromSnapshot` should not be called when patching is available')
   }
 }
 
@@ -134,13 +150,6 @@ class PatchableResourceSnapshot {
     return true
   }
 
-  /**
-   * @param {World} _world
-   * @returns {PatchableResource}
-   */
-  fromSnapshot(_world) {
-    throw new Error('`fromSnapshot` should not be called when patching is available')
-  }
 }
 
 class DeferredPatchResource {
@@ -151,6 +160,15 @@ class DeferredPatchResource {
    */
   constructor(value) {
     this.value = value
+  }
+
+  /**
+   * @param {DeferredPatchResourceSnapshot} snapshot
+   * @param {World} _world
+   * @returns {DeferredPatchResource}
+   */
+  static fromSnapshot(snapshot, _world) {
+    return new DeferredPatchResource(snapshot.value)
   }
 }
 
@@ -173,13 +191,6 @@ class DeferredPatchResourceSnapshot {
     return false
   }
 
-  /**
-   * @param {World} _world
-   * @returns {DeferredPatchResource}
-   */
-  fromSnapshot(_world) {
-    return new DeferredPatchResource(this.value)
-  }
 }
 
 /**
@@ -195,17 +206,21 @@ function createRegistry() {
 
   registry.register(PureComponent, StructInfo.default())
   registry.get(PureComponent)?.setMethod(PureComponent.clone)
-  registry.get(PureComponent)?.setMethod(PureComponent.prototype.toSnapshot)
+  registry.get(PureComponent)?.setMethod(PureComponent.toSnapshot)
+  registry.get(PureComponent)?.setMethod(PureComponent.fromSnapshot)
+  registry.get(PureComponent)?.setAttribute(new SnapshotType(typeid(ComponentSnapshot)))
 
   registry.register(ComponentSnapshot, StructInfo.default())
-  registry.get(ComponentSnapshot)?.setMethod(ComponentSnapshot.prototype.fromSnapshot)
+  registry.get(ComponentSnapshot)?.setAttribute(new LiveType(typeid(PureComponent)))
 
   registry.register(PureResource, StructInfo.default())
   registry.get(PureResource)?.setMethod(PureResource.clone)
-  registry.get(PureResource)?.setMethod(PureResource.prototype.toSnapshot)
+  registry.get(PureResource)?.setMethod(PureResource.toSnapshot)
+  registry.get(PureResource)?.setMethod(PureResource.fromSnapshot)
+  registry.get(PureResource)?.setAttribute(new SnapshotType(typeid(ResourceSnapshot)))
 
   registry.register(ResourceSnapshot, StructInfo.default())
-  registry.get(ResourceSnapshot)?.setMethod(ResourceSnapshot.prototype.fromSnapshot)
+  registry.get(ResourceSnapshot)?.setAttribute(new LiveType(typeid(PureResource)))
 
   return registry
 }
@@ -519,8 +534,10 @@ describe.sequential('Testing `Scene`', () => {
       const registry = new TypeRegistry()
       registry.register(PatchableResource, StructInfo.default())
       registry.register(PatchableResourceSnapshot, StructInfo.default())
+      registry.get(PatchableResource)?.setMethod(PatchableResource.fromSnapshot)
+      registry.get(PatchableResource)?.setAttribute(new SnapshotType(typeid(PatchableResourceSnapshot)))
       registry.get(PatchableResourceSnapshot)?.setMethod(PatchableResourceSnapshot.patch)
-      registry.get(PatchableResourceSnapshot)?.setMethod(PatchableResourceSnapshot.prototype.fromSnapshot)
+      registry.get(PatchableResourceSnapshot)?.setAttribute(new LiveType(typeid(PatchableResource)))
 
       const world = new World()
       const worldResource = new PatchableResource('world')
@@ -547,8 +564,10 @@ describe.sequential('Testing `Scene`', () => {
       const registry = new TypeRegistry()
       registry.register(DeferredPatchResource, StructInfo.default())
       registry.register(DeferredPatchResourceSnapshot, StructInfo.default())
+      registry.get(DeferredPatchResource)?.setMethod(DeferredPatchResource.fromSnapshot)
+      registry.get(DeferredPatchResource)?.setAttribute(new SnapshotType(typeid(DeferredPatchResourceSnapshot)))
       registry.get(DeferredPatchResourceSnapshot)?.setMethod(DeferredPatchResourceSnapshot.patch)
-      registry.get(DeferredPatchResourceSnapshot)?.setMethod(DeferredPatchResourceSnapshot.prototype.fromSnapshot)
+      registry.get(DeferredPatchResourceSnapshot)?.setAttribute(new LiveType(typeid(DeferredPatchResource)))
 
       const scene = new Scene()
       scene.resources.set(

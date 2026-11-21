@@ -70,13 +70,14 @@ export class BasicMaterialInstance extends MaterialInstance {
    * The snapshot does not retain the live handle. A path-backed snapshot uses
    * the world's asset server when restored; an index-backed snapshot requires
    * the owning scene asset ID when
-   * {@linkcode BasicMaterialInstanceSnapshot.fromSnapshot} is called.
+   * {@linkcode BasicMaterialInstance.fromSnapshot} is called.
    *
+   * @param {BasicMaterialInstance} instance - Live component being snapshotted.
    * @param {World} world - World used to resolve asset metadata.
    * @returns {BasicMaterialInstanceSnapshot} Snapshot of the material handle.
    */
-  toSnapshot(world) {
-    return new BasicMaterialInstanceSnapshot(this.handle.toSnapshot(world))
+  static toSnapshot(instance, world) {
+    return new BasicMaterialInstanceSnapshot(Handle.toSnapshot(instance.handle, world))
   }
 }
 
@@ -90,10 +91,11 @@ export class BasicMaterialInstance extends MaterialInstance {
  * ```js
  * // `materialInstance` is a BasicMaterialInstance in `world`.
  * const serial = BasicMaterialInstanceSnapshot.serialize(
- *   materialInstance.toSnapshot(world)
+ *   BasicMaterialInstance.toSnapshot(materialInstance, world)
  * )
- * const restored = BasicMaterialInstanceSnapshot.deserialize(serial)
- *   .fromSnapshot(world, sceneAssetId)
+ * const restored = BasicMaterialInstance.fromSnapshot(
+ *   BasicMaterialInstanceSnapshot.deserialize(serial), world, sceneAssetId
+ * )
  * ```
  *
  * A path-backed snapshot does not need `sceneAssetId`; a scene-local numeric
@@ -133,12 +135,13 @@ export class BasicMaterialInstanceSnapshot {
    * restoration returns `undefined`, and this method still constructs a
    * component whose handle is `undefined`.
    *
+   * @param {BasicMaterialInstanceSnapshot} snapshot - Snapshot being restored.
    * @param {World} world - World containing the {@linkcode AssetServer} and, when needed, the scene asset mapping.
    * @param {AssetId} [sceneAssetId] - Owning scene asset ID for a scene-local numeric handle snapshot.
    * @returns {BasicMaterialInstance} Restored material component.
    */
-  fromSnapshot(world, sceneAssetId) {
-    return new BasicMaterialInstance(/** @type {Handle<BasicMaterial>} */(this.handle.fromSnapshot(world, sceneAssetId)))
+  static fromSnapshot(snapshot, world, sceneAssetId) {
+    return new BasicMaterialInstance(/** @type {Handle<BasicMaterial>} */(Handle.fromSnapshot(snapshot.handle, world, sceneAssetId)))
   }
 
   /**

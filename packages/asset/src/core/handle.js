@@ -31,7 +31,7 @@ const assetSceneMapId = setTypeId('AssetSceneMap')
  *
  * const handle = server.load(Texture, '/textures/player.png')
  * const copy = handle.clone()
- * const snapshot = handle.toSnapshot(world)
+ * const snapshot = Handle.toSnapshot(handle, world)
  * console.log(snapshot.asset) // '/textures/player.png'
  *
  * copy.drop()
@@ -163,19 +163,50 @@ export class Handle {
    * restoration. The snapshot always stores the asset type ID. This method does
    * not validate the handle's generation or fetch the asset.
    *
+   * @template U
+   * @param {Handle<U>} handle - Live handle being snapshotted.
    * @param {World} world - World containing the {@linkcode AssetServer} resource.
    * @returns {HandleSnapshot} Path-backed or scene-local reference data.
    * @throws {Error} If the world does not contain an {@linkcode AssetServer} resource.
    */
-  toSnapshot(world) {
+  static toSnapshot(handle, world) {
     const server = world.getResource(AssetServer)
-    const info = server?.getAssetInfo(this)
+    const info = server?.getAssetInfo(handle)
 
     if (info?.path) {
-      return new HandleSnapshot(typeid(this.type), info.path)
+      return new HandleSnapshot(typeid(handle.type), info.path)
     }
 
-    return new HandleSnapshot(typeid(this.type), this.index)
+    return new HandleSnapshot(typeid(handle.type), handle.index)
+  }
+
+  /**
+   * Restores a live handle from a snapshot value.
+   *
+   * @param {HandleSnapshot} snapshot
+   * @param {World} world
+   * @param {AssetId} [sceneAssetId]
+   * @returns {UntypedHandle | undefined}
+   */
+  static fromSnapshot(snapshot, world, sceneAssetId) {
+    const server = world.getResource(AssetServer)
+
+    if (typeof snapshot.asset === 'string') {
+      return server.loadUntyped(snapshot.type, snapshot.asset)
+    }
+
+    if (sceneAssetId !== undefined && world.hasResourceByTypeId(assetSceneMapId)) {
+
+      /** @type {{ get: Function }} */
+      const sceneMap = world.getResourceByTypeId(assetSceneMapId)
+      const mapped = sceneMap.get(sceneAssetId, snapshot.type, snapshot.asset)
+
+      if (mapped) {
+        return mapped
+      }
+    }
+
+    return undefined
   }
 
   /**
@@ -216,9 +247,9 @@ export class Handle {
  * world.setResource(server)
  *
  * const handle = server.load(Texture, '/textures/player.png')
- * const serial = HandleSnapshot.serialize(handle.toSnapshot(world))
+ * const serial = HandleSnapshot.serialize(Handle.toSnapshot(handle, world))
  * if (HandleSnapshot.validateSerial(serial)) {
- *   const restored = HandleSnapshot.deserialize(serial).fromSnapshot(world)
+ *   const restored = Handle.fromSnapshot(HandleSnapshot.deserialize(serial), world)
  *   restored?.drop()
  * }
  * ```
@@ -232,7 +263,7 @@ export class HandleSnapshot {
   /**
    * Type ID of the asset family represented by this snapshot.
    *
-   * {@linkcode HandleSnapshot#fromSnapshot} uses this ID to select the asset
+   * {@linkcode Handle#fromSnapshot} uses this ID to select the asset
    * family when restoring the snapshot through {@linkcode AssetServer}.
    *
    * @type {TypeId}
@@ -264,52 +295,6 @@ export class HandleSnapshot {
   constructor(typeId, asset) {
     this.type = typeId
     this.asset = asset
-  }
-
-  /**
-   * Restores a live handle from this snapshot.
-   *
-   * The world must contain an {@linkcode AssetServer} resource, even when
-   * `asset` is numeric, because the resource is looked up before either
-   * restoration path is selected.
-   *
-   * For a path-backed snapshot, the server resolves the stored type ID and
-   * path. It returns a handle for a live existing path entry or reserves one
-   * and queues its load request. If the path metadata points to a stale entry,
-   * the result is `undefined`; an {@linkcode Assets} pool must be registered for
-   * the type.
-   *
-   * For an index-backed snapshot, this uses `sceneAssetId`, the stored type ID,
-   * and the numeric index to find the scene-owned asset. The restored handle is
-   * a caller-owned reference. If the scene asset ID or mapping entry is
-   * missing, this returns `undefined`; it does not fall back to path loading.
-   *
-   * @param {World} world - World containing the asset server and, for an index-backed snapshot, the scene mapping.
-   * @param {AssetId} [sceneAssetId] - ID of the scene instance that owns an index-backed snapshot.
-   * @returns {UntypedHandle | undefined} A retained handle, or `undefined` when
-   * a path points to a stale entry or a scene index cannot be mapped.
-   * @throws {Error} If the world has no {@linkcode AssetServer} resource or a
-   * path-backed snapshot has no registered {@linkcode Assets} pool.
-   */
-  fromSnapshot(world, sceneAssetId) {
-    const server = world.getResource(AssetServer)
-
-    if (typeof this.asset === 'string') {
-      return server.loadUntyped(this.type, this.asset)
-    }
-
-    if (sceneAssetId !== undefined && world.hasResourceByTypeId(assetSceneMapId)) {
-
-      /** @type {{ get: Function }} */
-      const sceneMap = world.getResourceByTypeId(assetSceneMapId)
-      const mapped = sceneMap.get(sceneAssetId, this.type, this.asset)
-
-      if (mapped) {
-        return mapped
-      }
-    }
-
-    return undefined
   }
 
   /**

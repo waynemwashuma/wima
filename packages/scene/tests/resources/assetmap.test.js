@@ -1,6 +1,6 @@
 import { deepStrictEqual, strictEqual } from 'assert'
 import { test, describe } from 'vitest'
-import { AssetServer, Assets } from '@wimaengine/asset'
+import { AssetServer, Assets, Handle } from '@wimaengine/asset'
 import { World } from '@wimaengine/ecs'
 import { AssetSceneMap } from '../../src/resources'
 import { typeid } from '@wimaengine/type'
@@ -62,11 +62,11 @@ describe.sequential('Testing `AssetSceneMap`', () => {
     const sourceHandle = assets.add('Wima engine')
     const mappedHandle = assets.add('Mapped asset')
     const sceneAssetId = sourceHandle.id()
-    const snapshot = sourceHandle.toSnapshot(world)
+    const snapshot = Handle.toSnapshot(sourceHandle, world)
 
     sceneMap.set(sceneAssetId, typeid(String), sourceHandle.index, mappedHandle)
 
-    const restored = snapshot.fromSnapshot(world, sceneAssetId)
+    const restored = Handle.fromSnapshot(snapshot, world, sceneAssetId)
 
     strictEqual(snapshot.asset, sourceHandle.index)
     deepStrictEqual(restored.id(), mappedHandle.id())

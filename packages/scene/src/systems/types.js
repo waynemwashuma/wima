@@ -3,9 +3,10 @@
 /** @import { ScenePlugin } from '../plugin' */
 
 import { HandleSnapshot } from '@wimaengine/asset'
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { ArrayInfo, EnumInfo, Field, StructInfo, TypeRegistry } from '@wimaengine/reflect'
 import { setTypeId, typeid, typeidGeneric } from '@wimaengine/type'
-import { SceneFilter, SceneFilterMode } from '../assets'
+import { Scene, SceneFilter, SceneFilterMode } from '../assets'
 import { SceneInstance, SceneInstanceSnapshot } from '../components'
 
 /* eslint-disable jsdoc/check-tag-names */
@@ -23,9 +24,9 @@ import { SceneInstance, SceneInstanceSnapshot } from '../components'
  * describes {@linkcode SceneInstance} and {@linkcode SceneInstanceSnapshot} with a
  * `HandleSnapshot` `handle` field and an optional `HandleSnapshot` `filter`
  * field. The live instance entry receives
- * `SceneInstance.prototype.toSnapshot`; the snapshot entry receives
- * `SceneInstanceSnapshot.serialize`, `deserialize`, and
- * `prototype.fromSnapshot` through its {@linkcode TypeRegistry} method registry.
+ * `SceneInstance.toSnapshot`; the snapshot entry receives
+ * `SceneInstanceSnapshot.serialize` and `deserialize`, while
+ * `SceneInstance.fromSnapshot` remains on the live entry.
  *
  * @example
  * ```js
@@ -63,17 +64,18 @@ export function registerSceneTypes(world) {
   }))
 
   registry.register(SceneInstance, new StructInfo({
-    handle: new Field(typeid(HandleSnapshot)),
-    filter: new Field(typeid(HandleSnapshot), true)
+    handle: new Field(typeidGeneric(HandleSnapshot, [Scene])),
+    filter: new Field(typeidGeneric(HandleSnapshot, [SceneFilter]), true)
   }))
-  registry.get(SceneInstance)?.setMethod(SceneInstance.prototype.toSnapshot)
+  registry.get(SceneInstance)?.setMethod(SceneInstance.toSnapshot)
+  registry.get(SceneInstance)?.setAttribute(new SnapshotType(typeid(SceneInstanceSnapshot)))
 
   registry.register(SceneInstanceSnapshot, new StructInfo({
-    handle: new Field(typeid(HandleSnapshot)),
-    filter: new Field(typeid(HandleSnapshot), true)
+    handle: new Field(typeidGeneric(HandleSnapshot, [Scene])),
+    filter: new Field(typeidGeneric(HandleSnapshot, [SceneFilter]), true)
   }))
   registry.get(SceneInstanceSnapshot)?.setMethod(SceneInstanceSnapshot.serialize)
   registry.get(SceneInstanceSnapshot)?.setMethod(SceneInstanceSnapshot.deserialize)
-  registry.get(SceneInstanceSnapshot)?.setMethod(SceneInstanceSnapshot.prototype.fromSnapshot)
+  registry.get(SceneInstanceSnapshot)?.setAttribute(new LiveType(typeid(SceneInstance)))
 }
 /* eslint-enable jsdoc/check-tag-names */

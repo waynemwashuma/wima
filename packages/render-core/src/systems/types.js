@@ -7,6 +7,7 @@
 
 import { Handle, HandleSnapshot } from '@wimaengine/asset'
 import { Color } from '@wimaengine/color'
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { World } from '@wimaengine/ecs'
 import { Vector2 } from '@wimaengine/math'
 import { EnumInfo, Field, MapInfo, OpaqueInfo, StructInfo, TypeRegistry } from '@wimaengine/reflect'
@@ -59,11 +60,11 @@ import { MeshAttributeData, Projection, ShaderStage } from '../core'
  * {@linkcode TypeEntry#setMethod}: {@linkcode MeshAttributeData} gets
  * `serialize` and `deserialize`; {@linkcode Image}, {@linkcode Mesh}, {@linkcode Shader},
  * and {@linkcode BasicMaterial} each get `serialize` and `deserialize`;
- * {@linkcode Meshed} gets `copy`, `clone`, and `prototype.toSnapshot`;
- * {@linkcode MeshedSnapshot} gets `serialize`, `deserialize`, and
- * `prototype.fromSnapshot`; {@linkcode BasicMaterialInstance} gets `copy`, `clone`,
- * and `prototype.toSnapshot`; {@linkcode BasicMaterialInstanceSnapshot} gets
- * `serialize`, `deserialize`, and `prototype.fromSnapshot`; and {@linkcode Camera},
+ * {@linkcode Meshed} gets `copy`, `clone`, `toSnapshot`, and `fromSnapshot`;
+ * {@linkcode MeshedSnapshot} gets `serialize` and `deserialize`;
+ * {@linkcode BasicMaterialInstance} gets `copy`, `clone`, `toSnapshot`, and
+ * `fromSnapshot`; {@linkcode BasicMaterialInstanceSnapshot} gets
+ * `serialize` and `deserialize`; and {@linkcode Camera},
  * {@linkcode RenderLists2D}, and {@linkcode RenderLists3D} each get `copy`, `clone`,
  * `serialize`, and `deserialize`.
  *
@@ -125,25 +126,27 @@ export function registerRenderCoreTypes(world) {
   }))
   registry.get(Meshed)?.setMethod(Meshed.copy)
   registry.get(Meshed)?.setMethod(Meshed.clone)
-  registry.get(Meshed)?.setMethod(Meshed.prototype.toSnapshot)
+  registry.get(Meshed)?.setMethod(Meshed.toSnapshot)
+  registry.get(Meshed)?.setAttribute(new SnapshotType(typeid(MeshedSnapshot)))
   registry.register(MeshedSnapshot, new StructInfo({
-    handle: new Field(typeid(HandleSnapshot))
+    handle: new Field(typeidGeneric(HandleSnapshot, [Mesh]))
   }))
   registry.get(MeshedSnapshot)?.setMethod(MeshedSnapshot.serialize)
   registry.get(MeshedSnapshot)?.setMethod(MeshedSnapshot.deserialize)
-  registry.get(MeshedSnapshot)?.setMethod(MeshedSnapshot.prototype.fromSnapshot)
+  registry.get(MeshedSnapshot)?.setAttribute(new LiveType(typeid(Meshed)))
   registry.register(BasicMaterialInstance, new StructInfo({
     handle: new Field(basicMaterialHandleId)
   }))
   registry.get(BasicMaterialInstance)?.setMethod(BasicMaterialInstance.copy)
   registry.get(BasicMaterialInstance)?.setMethod(BasicMaterialInstance.clone)
-  registry.get(BasicMaterialInstance)?.setMethod(BasicMaterialInstance.prototype.toSnapshot)
+  registry.get(BasicMaterialInstance)?.setMethod(BasicMaterialInstance.toSnapshot)
+  registry.get(BasicMaterialInstance)?.setAttribute(new SnapshotType(typeid(BasicMaterialInstanceSnapshot)))
   registry.register(BasicMaterialInstanceSnapshot, new StructInfo({
-    handle: new Field(typeid(HandleSnapshot))
+    handle: new Field(typeidGeneric(HandleSnapshot, [BasicMaterial]))
   }))
   registry.get(BasicMaterialInstanceSnapshot)?.setMethod(BasicMaterialInstanceSnapshot.serialize)
   registry.get(BasicMaterialInstanceSnapshot)?.setMethod(BasicMaterialInstanceSnapshot.deserialize)
-  registry.get(BasicMaterialInstanceSnapshot)?.setMethod(BasicMaterialInstanceSnapshot.prototype.fromSnapshot)
+  registry.get(BasicMaterialInstanceSnapshot)?.setAttribute(new LiveType(typeid(BasicMaterialInstance)))
   registry.register(Camera, new StructInfo({
     projection: new Field(typeid(Projection)),
     near: new Field(typeid(Number)),
