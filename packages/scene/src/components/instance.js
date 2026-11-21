@@ -165,7 +165,7 @@ export class SceneInstanceSnapshot {
   static default() {
     return new SceneInstanceSnapshot(
       new HandleSnapshot(typeid(Scene), ''),
-      undefined,
+      undefined
     )
   }
 
