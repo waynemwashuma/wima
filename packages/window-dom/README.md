@@ -14,7 +14,7 @@ npm i @wimaengine/window-dom
 
 ## Capability Highlights
 
-- Binds the `Window` component lifecycle to a browser canvas through ECS component hooks.
+- Synchronizes `Window` entities with browser canvases through an update system.
 - Attaches to an existing `<canvas>` when a selector is provided, or creates and appends one on demand.
 - Keeps active canvases tracked in the `Windows` resource so browser state and engine state stay aligned.
 - Converts browser keyboard, pointer, resize, and file interactions into typed ECS event resources.
@@ -25,13 +25,13 @@ npm i @wimaengine/window-dom
 
 ### DOMWindowPlugin
 
-`DOMWindowPlugin` is the application integration point. It registers `Window` component hooks on the `App` with `ComponentHooks(openWindow, closeWindow)`, so the browser-backed window lifecycle is driven by the ECS component system rather than ad hoc DOM setup.
+`DOMWindowPlugin` connects each `Window` entity to a browser canvas. Selector-backed windows use matching canvases; windows without selectors receive newly created canvases appended to the document body. Registered canvases receive input event bridges and are removed when their window component is removed.
 
-### Window Lifecycle Hooks
+### Window Update System
 
-`openWindow` resolves the `Window` component for an entity, looks for a `window.selector` canvas target when one is configured, and falls back to creating a new `<canvas>` and appending it to `document.body`. It sizes the canvas from the window component, stores the element in the `Windows` resource, sets `tabIndex = -1`, and focuses the canvas before wiring event bridges.
+`updateWindow` runs in `Update/CoreSystems.Start`. A window with a selector uses the matching canvas when it is available. If the selector does not resolve yet, the window remains unregistered and is retried on the next update. A window without a selector creates and appends a new `<canvas>`.
 
-`closeWindow` is the teardown path. It removes the canvas from the DOM and deletes the entity entry from `Windows`, keeping the browser surface and the engine registry in sync.
+The system registers each canvas in the `Windows` resource, focuses it, and wires keyboard, pointer, and file event bridges. Canvas dimensions are synchronized by `resizeWindow`.
 
 ### DOM Event Bridges
 
@@ -47,14 +47,15 @@ The core helpers translate browser events into typed engine events by resolving 
 
 ## Exported Surface
 
-- `DOMWindowPlugin`: plugin class that installs browser window component hooks.
-- `openWindow(entity, world)`: component hook that creates or attaches the canvas, registers it, and wires browser listeners.
-- `closeWindow(entity, world)`: component hook that removes the canvas and clears the entity from `Windows`.
-- `./src`: package export for direct source imports; it forwards the `hooks` and `plugin` source modules.
+- `DOMWindowPlugin`: plugin class that connects ECS windows to browser canvases.
+- `closeWindow(entity, world)`: component hook that removes the registered canvas and resource entry.
+- `updateWindow(world)`: update system that creates or resolves canvases and registers them.
+- `resizeWindow(world)`: update system that synchronizes displayed canvas dimensions.
+- `./src`: package export for direct source imports; it forwards the hooks, systems, and plugin source modules.
 
 ## Notes
 
 - This package is browser-only infrastructure and sits underneath `@wimaengine/window`.
 - The event bridges depend on ECS `Events<T>` resources being present for the relevant window event types.
-- If `window.selector` is set but does not resolve to a canvas element, `openWindow` warns and falls back to creating a new canvas.
+- If `window.selector` is set but does not resolve to a canvas element, `updateWindow` warns and retries on the next update instead of creating a replacement canvas.
 - The package root re-exports the same source entry that is exposed through `./src`.
