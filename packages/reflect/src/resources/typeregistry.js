@@ -225,7 +225,9 @@ export class TypeRegistry {
  * missing method is not an error: `getMethod` returns `undefined` and `call`
  * also returns `undefined` without invoking a function. Methods and
  * `constructorFn` are not included by {@linkcode TypeEntry#serialize};
- * serialization only delegates to the stored {@linkcode TypeInfo}.
+ * serialization only delegates to the stored {@linkcode TypeInfo}. Attributes
+ * are process-local metadata as well and are not included in the type-info
+ * serial form.
  *
  * @example
  * ```js
@@ -270,6 +272,14 @@ export class TypeEntry {
    * @type {Map<string, MethodEntry>}
    */
   methods = new Map()
+
+  /**
+   * Metadata objects keyed by their attribute type ID.
+   *
+   * @private
+   * @type {Map<TypeId, object>}
+   */
+  attributes = new Map()
 
   /**
    * Creates an entry around type metadata and an optional runtime constructor.
@@ -496,6 +506,106 @@ export class TypeEntry {
    */
   getMethods() {
     return this.methods
+  }
+
+  /**
+   * Registers an attribute under an explicit type ID.
+   *
+   * Registering another value under the same type ID replaces the previous
+   * attribute. The value is retained by reference and is not cloned.
+   *
+   * @template {object} T
+   * @param {TypeId} typeId
+   * @param {T} attribute
+   * @returns {this}
+   */
+  setAttributeByTypeId(typeId, attribute) {
+    this.attributes.set(typeId, attribute)
+
+    return this
+  }
+
+  /**
+   * Registers an attribute using the runtime constructor's type ID.
+   *
+   * Attribute values are non-null objects with a runtime constructor.
+   * Plain objects are therefore keyed as `Object`; use
+   * {@linkcode TypeEntry#setAttributeByTypeId} when an explicit attribute type
+   * ID is required.
+   *
+   * @template {object} T
+   * @param {T} attribute
+   * @returns {this}
+   */
+  setAttribute(attribute) {
+
+    // SAFETY: The generic constraint guarantees a non-null object attribute.
+    return this.setAttributeByTypeId(
+      typeid(/** @type {Constructor<T>} */ (attribute.constructor)),
+      attribute
+    )
+  }
+
+  /**
+   * Returns an attribute by explicit type ID.
+   *
+   * @template {object} T
+   * @param {TypeId} typeId
+   * @returns {T | undefined}
+   */
+  getAttributeByTypeId(typeId) {
+    return /** @type {T | undefined} */ (this.attributes.get(typeId))
+  }
+
+  /**
+   * Returns an attribute by its runtime constructor.
+   *
+   * @template {object} T
+   * @param {Constructor<T>} type
+   * @returns {T | undefined}
+   */
+  getAttribute(type) {
+    return this.getAttributeByTypeId(typeid(type))
+  }
+
+  /**
+   * Checks whether an attribute is registered under an explicit type ID.
+   *
+   * @param {TypeId} typeId
+   * @returns {boolean}
+   */
+  hasAttributeByTypeId(typeId) {
+    return this.attributes.has(typeId)
+  }
+
+  /**
+   * Checks whether an attribute is registered for a runtime constructor.
+   *
+   * @param {Constructor} type
+   * @returns {boolean}
+   */
+  hasAttribute(type) {
+    return this.hasAttributeByTypeId(typeid(type))
+  }
+
+  /**
+   * Removes an attribute registered under an explicit type ID.
+   *
+   * @param {TypeId} typeId
+   * @returns {boolean} Whether an attribute was removed.
+   */
+  removeAttributeByTypeId(typeId) {
+    return this.attributes.delete(typeId)
+  }
+
+  /**
+   * Removes an attribute registered for a runtime constructor.
+   *
+   * @param {Constructor} type
+   * @returns {boolean} Whether an attribute was removed.
+   */
+  removeAttribute(type) {
+    return this.removeAttributeByTypeId(typeid(type))
   }
 }
 
