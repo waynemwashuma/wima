@@ -1,33 +1,66 @@
 import { EntityHandle, Query, World } from '@wimaengine/ecs'
 import { Events } from '@wimaengine/event'
+import { warn } from '@wimaengine/logger'
 import { typeidGeneric } from '@wimaengine/type'
 import { Window, Windows, WindowResize } from '@wimaengine/window'
+import { setUpKeyboardEvents, setupPointerEvents, setUpFileEvents } from '../core'
 
 /* eslint-disable jsdoc/check-tag-names */
 /**
+ * Synchronizes ECS window entities with their browser canvas elements.
+ *
+ * A window with a selector uses the matching canvas when it is available. A
+ * window without a selector creates and appends a canvas to `document.body`.
+ * A registered canvas is reused while it remains connected to the document; if
+ * it is detached, the window is resolved again.
+ * Selector-backed windows remain unresolved when their selector does not match;
+ * a later update can attach them after the DOM element has been created.
+ *
+ * @param {World} world
+ * @returns {void}
+ * @category system
+ */
+export function updateWindow(world) {
+  const windows = world.getResource(Windows)
+  const query = new Query(world, [EntityHandle, Window])
+
+  query.each(([entity, window]) => {
+    const registered = windows.getWindow(entity)
+    if (registered?.isConnected) return
+
+    let canvas
+
+    if (window.selector) {
+      const element = document.querySelector(window.selector)
+
+      if (!(element instanceof HTMLCanvasElement)) {
+        warn(`The provided selector '${window.selector}' does not yield a canvas element.`)
+        return
+      }
+
+      canvas = element
+    } else {
+      canvas = document.createElement('canvas')
+      document.body.append(canvas)
+    }
+
+    windows.setWindow(entity, canvas)
+    canvas.tabIndex = -1
+    canvas.focus()
+
+    setupPointerEvents(world, canvas)
+    setUpKeyboardEvents(world, canvas)
+    setUpFileEvents(world, canvas)
+  })
+}
+
+/**
  * Synchronizes browser canvas sizes with their {@linkcode Window} components.
  *
- * {@linkcode DOMWindowPlugin} registers this
- * exact function directly in the repeating
- * {@linkcode AppSchedule.Update}
- * schedule's {@linkcode CoreSystems.End}
- * group. The query requires both {@linkcode EntityHandle} and {@linkcode Window}; the
- * system also requires the {@linkcode Windows} resource and the typed
- * {@linkcode Events} resource for {@linkcode WindowResize}. An entity is skipped when
- * its `Windows` entry is not an {@linkcode HTMLCanvasElement}.
- *
- * For each canvas, the system rounds both dimensions from
- * {@linkcode Element#getBoundingClientRect}. It skips the
- * canvas when those dimensions already match the component. Otherwise it
- * updates the canvas backing size, updates the {@linkcode Window} component, and
- * dispatches one {@linkcode WindowResize} event with the new dimensions.
- *
- * @example
- * ```js
- * // DOMWindowPlugin installs resizeWindow in Update/CoreSystems.End.
- * app.registerPlugin(new DOMWindowPlugin())
- * // Resizing a tracked canvas updates Window and writes WindowResize.
- * ```
+ * An entity is skipped when its `Windows` entry is not an
+ * {@linkcode HTMLCanvasElement}. When the rounded displayed dimensions differ,
+ * the system updates the backing canvas, updates the component, and dispatches
+ * one {@linkcode WindowResize} event.
  *
  * @param {World} world
  * @returns {void}

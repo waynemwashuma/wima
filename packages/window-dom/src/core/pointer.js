@@ -27,6 +27,9 @@ import {
  * - `pointerleave` → {@linkcode PointerLeave}.
  * - `wheel` → {@linkcode PointerWheel}.
  *
+ * Wheel defaults are suppressed and the target's browser context menu is
+ * suppressed so a window-backed canvas owns its pointer surface.
+ *
  * The target must provide `addEventListener`; a {@linkcode HTMLElement} such as
  * a canvas can be used. The {@linkcode World} must already contain an
  * {@linkcode Events} resource for each listed event type. Calling this helper
@@ -93,5 +96,10 @@ export function setupPointerEvents(world, target) {
     const dispatch = world.getResourceByTypeId(typeidGeneric(Events, [PointerWheel]))
 
     dispatch.write(new PointerWheel(e))
-  })
+    e.preventDefault()
+  }, { passive: false })
+
+  // Window-backed canvas input owns the pointer surface; do not let the
+  // browser open its context menu over native window interactions.
+  target.addEventListener('contextmenu', (e) => e.preventDefault())
 }
