@@ -28,6 +28,10 @@
  */
 export class Angular2DDamping {
 
+  static default() {
+    return new Angular2DDamping()
+  }
+
   /**
    * Scalar damping value for matching 2D rotations.
    *
@@ -133,6 +137,10 @@ export class Angular2DDamping {
  * @category resource
  */
 export class Angular3DDamping {
+
+  static default() {
+    return new Angular3DDamping()
+  }
 
   /**
    * Scalar damping value for matching 3D rotations.

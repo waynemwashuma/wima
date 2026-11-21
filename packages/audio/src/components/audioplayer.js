@@ -120,6 +120,10 @@ export class AudioPlayer {
     return AudioPlayer.copy(target)
   }
 
+  static default() {
+    return new AudioPlayer()
+  }
+
   /**
    * Creates a persistence snapshot of this player.
    *
@@ -167,6 +171,10 @@ export class AudioPlayer {
  * ```
  */
 export class AudioPlayerSnapshot {
+
+  static default() {
+    return new AudioPlayerSnapshot(undefined, undefined, undefined)
+  }
 
   /**
    * Graph slot ID recorded from the player's {@linkcode AudioGraph}.

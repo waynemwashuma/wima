@@ -78,9 +78,11 @@ export function registerWebglTypes(world) {
     b: new Field(typeid(Number)),
     a: new Field(typeid(Number))
   }))
+  registry.get(ClearColor)?.setMethod(ClearColor.default)
   registry.get(ClearColor)?.setMethod(ClearColor.serialize)
   registry.get(ClearColor)?.setMethod(ClearColor.deserialize)
   registry.register(AttributeMap, new MapInfo(typeid(String), typeid(MeshAttribute)))
+  registry.get(AttributeMap)?.setMethod(AttributeMap.default)
   registry.register(WebglProgramCache, new MapInfo(typeid(String), typeid(WebglRenderPipeline)))
 }
 /* eslint-enable jsdoc/check-tag-names */

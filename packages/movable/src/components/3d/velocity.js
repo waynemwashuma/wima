@@ -36,6 +36,10 @@ export class Velocity3D extends Vector3 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Velocity3D()
+  }
+
   /**
    * @inheritdoc
    * @param {Velocity3D} target

@@ -103,6 +103,10 @@ export class BasicMaterialInstance extends MaterialInstance {
  */
 export class BasicMaterialInstanceSnapshot {
 
+  static default() {
+    return new BasicMaterialInstanceSnapshot(new HandleSnapshot(typeid(BasicMaterial), ''))
+  }
+
   /**
    * Snapshot of the material handle held by
    * {@linkcode BasicMaterialInstance}.

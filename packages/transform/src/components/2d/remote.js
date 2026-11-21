@@ -153,6 +153,10 @@ export class RemoteTransform2D {
     return RemoteTransform2D.copy(target)
   }
 
+  static default() {
+    return new RemoteTransform2D(new EntityHandle(0, 0))
+  }
+
   /**
    * Converts a remote transform to its serialized field representation.
    *

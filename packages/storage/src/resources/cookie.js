@@ -31,6 +31,10 @@
 
 export class Cookies {
 
+  static default() {
+    return new Cookies()
+  }
+
   /**
    * Sets one cookie pair on the current document.
    *

@@ -52,6 +52,10 @@ export class Rotation2D extends Angle {
     return Rotation2D.copy(target)
   }
 
+  static default() {
+    return new Rotation2D()
+  }
+
   /**
    * Serializes a {@linkcode Rotation2D} to its scalar radian representation.
    *

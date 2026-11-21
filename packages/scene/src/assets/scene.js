@@ -32,6 +32,15 @@ import { SceneFilter } from './filter'
 export class Scene {
 
   /**
+   * Creates an empty scene asset.
+   *
+   * @returns {Scene} A new empty scene.
+   */
+  static default() {
+    return new Scene()
+  }
+
+  /**
    * Stores component snapshots by the packed ID of their source entity.
    *
    * This map is the scene's live entity storage. Each value is the component

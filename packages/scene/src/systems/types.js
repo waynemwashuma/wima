@@ -4,7 +4,7 @@
 
 import { HandleSnapshot } from '@wimaengine/asset'
 import { LiveType, SnapshotType } from '@wimaengine/core'
-import { ArrayInfo, EnumInfo, Field, StructInfo, TypeRegistry } from '@wimaengine/reflect'
+import { ArrayInfo, EnumInfo, Field, OpaqueInfo, StructInfo, TypeRegistry } from '@wimaengine/reflect'
 import { setTypeId, typeid, typeidGeneric } from '@wimaengine/type'
 import { Scene, SceneFilter, SceneFilterMode } from '../assets'
 import { SceneInstance, SceneInstanceSnapshot } from '../components'
@@ -19,7 +19,8 @@ import { SceneInstance, SceneInstanceSnapshot } from '../components'
  * and registers that ID with {@linkcode EnumInfo} for `SceneFilterMode`. It also
  * registers the `Array<String>` ID produced by `typeidGeneric(Array, [String])`.
  *
- * The registry then describes {@linkcode SceneFilter} with `typeIds` as that
+ * The registry describes {@linkcode Scene} as an opaque asset with its default
+ * method, then describes {@linkcode SceneFilter} with `typeIds` as that
  * string-array type and `mode` as the {@linkcode SceneFilterMode} type. It
  * describes {@linkcode SceneInstance} and {@linkcode SceneInstanceSnapshot} with a
  * `HandleSnapshot` `handle` field and an optional `HandleSnapshot` `filter`
@@ -58,10 +59,13 @@ export function registerSceneTypes(world) {
 
   registry.registerTypeId(sceneFilterModeId, new EnumInfo(SceneFilterMode))
   registry.registerTypeId(typeIdArrayId, new ArrayInfo(typeid(String)))
+  registry.register(Scene, new OpaqueInfo())
+  registry.get(Scene)?.setMethod(Scene.default)
   registry.register(SceneFilter, new StructInfo({
     typeIds: new Field(typeIdArrayId),
     mode: new Field(sceneFilterModeId)
   }))
+  registry.get(SceneFilter)?.setMethod(SceneFilter.default)
 
   registry.register(SceneInstance, new StructInfo({
     handle: new Field(typeidGeneric(HandleSnapshot, [Scene])),
@@ -76,6 +80,7 @@ export function registerSceneTypes(world) {
   }))
   registry.get(SceneInstanceSnapshot)?.setMethod(SceneInstanceSnapshot.serialize)
   registry.get(SceneInstanceSnapshot)?.setMethod(SceneInstanceSnapshot.deserialize)
+  registry.get(SceneInstanceSnapshot)?.setMethod(SceneInstanceSnapshot.default)
   registry.get(SceneInstanceSnapshot)?.setAttribute(new LiveType(typeid(SceneInstance)))
 }
 /* eslint-enable jsdoc/check-tag-names */

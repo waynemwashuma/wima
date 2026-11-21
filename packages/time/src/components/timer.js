@@ -141,6 +141,10 @@ export class Timer {
     return Timer.copy(target)
   }
 
+  static default() {
+    return new Timer()
+  }
+
   /**
    * @param {Timer} value
    */

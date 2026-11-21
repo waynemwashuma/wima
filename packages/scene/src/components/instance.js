@@ -1,11 +1,11 @@
 /** @import { EntityId } from '@wimaengine/ecs' */
 /** @import { World } from '@wimaengine/ecs' */
 /** @import { AssetId, HandleSnapshotSerial } from '@wimaengine/asset' */
-/** @import { Scene } from "../assets" */
 /** @import { SceneFilter } from '../assets' */
 /** @import { AssetSceneMap } from '../resources' */
 import { Handle, HandleSnapshot } from '@wimaengine/asset'
 import { typeid } from '@wimaengine/type'
+import { Scene } from '../assets'
 
 /* eslint-disable jsdoc/check-tag-names */
 /**
@@ -161,6 +161,13 @@ export class SceneInstance {
  * ```
  */
 export class SceneInstanceSnapshot {
+
+  static default() {
+    return new SceneInstanceSnapshot(
+      new HandleSnapshot(typeid(Scene), ''),
+      undefined
+    )
+  }
 
   /**
    * Snapshot of the scene asset handle held by {@linkcode SceneInstance}.

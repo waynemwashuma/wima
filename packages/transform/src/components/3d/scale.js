@@ -39,6 +39,10 @@ export class Scale3D extends Vector3 {
     super(x, y, z)
   }
 
+  static default() {
+    return new Scale3D()
+  }
+
   /**
    * @inheritdoc
    * @param {Scale3D} source

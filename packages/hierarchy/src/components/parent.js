@@ -115,6 +115,10 @@ export class Parent {
     return Parent.copy(target)
   }
 
+  static default() {
+    return new Parent(new EntityHandle(0, 0))
+  }
+
   /**
    * Serializes a parent relationship to a packed entity identity.
    *

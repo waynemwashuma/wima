@@ -53,6 +53,10 @@ export class GlobalTransform3D extends Affine3 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new GlobalTransform3D()
+  }
+
   /**
    * @inheritdoc
    * @param {GlobalTransform3D} target

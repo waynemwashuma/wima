@@ -189,6 +189,10 @@ export class RenderLists {
  */
 export class RenderLists2D extends RenderLists {
 
+  static default() {
+    return new RenderLists2D()
+  }
+
   /**
    * Returns the copy target without copying any render passes.
    *
@@ -273,6 +277,10 @@ export class RenderLists2D extends RenderLists {
  * @category component
  */
 export class RenderLists3D extends RenderLists {
+
+  static default() {
+    return new RenderLists3D()
+  }
 
   /**
    * Returns the copy target without copying any render passes.

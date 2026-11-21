@@ -42,6 +42,10 @@ export class Orientation2D extends Rotary {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Orientation2D()
+  }
+
   /**
    * @inheritdoc
    * @param {Orientation2D} target - Orientation to clone.

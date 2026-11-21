@@ -134,6 +134,10 @@ export class AnimationPlayer {
     return AnimationPlayer.copy(target)
   }
 
+  static default() {
+    return new AnimationPlayer()
+  }
+
   /**
    * Converts the player to its serializable playback state.
    *

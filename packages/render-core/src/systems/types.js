@@ -45,6 +45,7 @@ import { MeshAttributeData, Projection, ShaderStage } from '../core'
  *
  * - {@linkcode MeshAttributeData}: `data: typeid(Float32Array)`.
  * - {@linkcode Image}: `raw: typeid(Uint8ClampedArray)`, `dimensions: typeid(Vector2)`.
+ * - {@linkcode Material}: no reflected fields.
  * - {@linkcode Mesh}: optional `indices: typeid(Uint16Array)`, `attributes: meshAttributeMapId`.
  * - {@linkcode Shader}: `stage: shaderStageId`, `source: typeid(String)`.
  * - {@linkcode BasicMaterial}: `color: typeid(Color)`.
@@ -58,8 +59,9 @@ import { MeshAttributeData, Projection, ShaderStage } from '../core'
  *
  * The registered entries receive these exact methods through
  * {@linkcode TypeEntry#setMethod}: {@linkcode MeshAttributeData} gets
- * `serialize` and `deserialize`; {@linkcode Image}, {@linkcode Mesh}, {@linkcode Shader},
- * and {@linkcode BasicMaterial} each get `serialize` and `deserialize`;
+ * `serialize` and `deserialize`; {@linkcode Image}, {@linkcode Material},
+ * {@linkcode Mesh}, {@linkcode Shader}, and {@linkcode BasicMaterial} each get
+ * `serialize`, `deserialize`, and `default`;
  * {@linkcode Meshed} gets `copy`, `clone`, `toSnapshot`, and `fromSnapshot`;
  * {@linkcode MeshedSnapshot} gets `serialize` and `deserialize`;
  * {@linkcode BasicMaterialInstance} gets `copy`, `clone`, `toSnapshot`, and
@@ -104,23 +106,31 @@ export function registerRenderCoreTypes(world) {
   }))
   registry.get(Image)?.setMethod(Image.serialize)
   registry.get(Image)?.setMethod(Image.deserialize)
+  registry.get(Image)?.setMethod(Image.default)
+  registry.register(Material, new StructInfo({}))
+  registry.get(Material)?.setMethod(Material.serialize)
+  registry.get(Material)?.setMethod(Material.deserialize)
+  registry.get(Material)?.setMethod(Material.default)
   registry.register(Mesh, new StructInfo({
     indices: new Field(typeid(Uint16Array), true),
     attributes: new Field(meshAttributeMapId)
   }))
   registry.get(Mesh)?.setMethod(Mesh.serialize)
   registry.get(Mesh)?.setMethod(Mesh.deserialize)
+  registry.get(Mesh)?.setMethod(Mesh.default)
   registry.register(Shader, new StructInfo({
     stage: new Field(shaderStageId),
     source: new Field(typeid(String))
   }))
   registry.get(Shader)?.setMethod(Shader.serialize)
   registry.get(Shader)?.setMethod(Shader.deserialize)
+  registry.get(Shader)?.setMethod(Shader.default)
   registry.register(BasicMaterial, new StructInfo({
     color: new Field(typeid(Color))
   }))
   registry.get(BasicMaterial)?.setMethod(BasicMaterial.serialize)
   registry.get(BasicMaterial)?.setMethod(BasicMaterial.deserialize)
+  registry.get(BasicMaterial)?.setMethod(BasicMaterial.default)
   registry.register(Meshed, new StructInfo({
     handle: new Field(typeidGeneric(Handle, [Mesh]))
   }))
@@ -133,6 +143,7 @@ export function registerRenderCoreTypes(world) {
   }))
   registry.get(MeshedSnapshot)?.setMethod(MeshedSnapshot.serialize)
   registry.get(MeshedSnapshot)?.setMethod(MeshedSnapshot.deserialize)
+  registry.get(MeshedSnapshot)?.setMethod(MeshedSnapshot.default)
   registry.get(MeshedSnapshot)?.setAttribute(new LiveType(typeid(Meshed)))
   registry.register(BasicMaterialInstance, new StructInfo({
     handle: new Field(basicMaterialHandleId)
@@ -146,6 +157,7 @@ export function registerRenderCoreTypes(world) {
   }))
   registry.get(BasicMaterialInstanceSnapshot)?.setMethod(BasicMaterialInstanceSnapshot.serialize)
   registry.get(BasicMaterialInstanceSnapshot)?.setMethod(BasicMaterialInstanceSnapshot.deserialize)
+  registry.get(BasicMaterialInstanceSnapshot)?.setMethod(BasicMaterialInstanceSnapshot.default)
   registry.get(BasicMaterialInstanceSnapshot)?.setAttribute(new LiveType(typeid(BasicMaterialInstance)))
   registry.register(Camera, new StructInfo({
     projection: new Field(typeid(Projection)),
@@ -154,18 +166,21 @@ export function registerRenderCoreTypes(world) {
   }))
   registry.get(Camera)?.setMethod(Camera.copy)
   registry.get(Camera)?.setMethod(Camera.clone)
+  registry.get(Camera)?.setMethod(Camera.default)
   registry.get(Camera)?.setMethod(Camera.serialize)
   registry.get(Camera)?.setMethod(Camera.deserialize)
 
   registry.register(RenderLists2D, new OpaqueInfo())
   registry.get(RenderLists2D)?.setMethod(RenderLists2D.copy)
   registry.get(RenderLists2D)?.setMethod(RenderLists2D.clone)
+  registry.get(RenderLists2D)?.setMethod(RenderLists2D.default)
   registry.get(RenderLists2D)?.setMethod(RenderLists2D.serialize)
   registry.get(RenderLists2D)?.setMethod(RenderLists2D.deserialize)
 
   registry.register(RenderLists3D, new OpaqueInfo())
   registry.get(RenderLists3D)?.setMethod(RenderLists3D.copy)
   registry.get(RenderLists3D)?.setMethod(RenderLists3D.clone)
+  registry.get(RenderLists3D)?.setMethod(RenderLists3D.default)
   registry.get(RenderLists3D)?.setMethod(RenderLists3D.serialize)
   registry.get(RenderLists3D)?.setMethod(RenderLists3D.deserialize)
 }

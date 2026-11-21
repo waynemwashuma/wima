@@ -41,7 +41,9 @@ import {
  * {@linkcode BVector2}, {@linkcode BVector3}, {@linkcode BVector4}, {@linkcode Matrix2},
  * {@linkcode Matrix3}, and {@linkcode Matrix4}. Their scalar, boolean, vector, and
  * matrix fields are described with {@linkcode Field} entries in the
- * {@linkcode StructInfo} metadata stored in the registry.
+ * {@linkcode StructInfo} metadata stored in the registry. Each registered type
+ * also receives a direct `default` method that returns a new value from its
+ * constructor defaults.
  *
  * @example
  * ```js
@@ -168,5 +170,22 @@ export function registerMathTypes(world) {
     o: new Field(typeid(Number)),
     p: new Field(typeid(Number))
   }))
+
+  registry.get(Angle)?.setMethod(({ default() { return new Angle() } }).default)
+  registry.get(Rotary)?.setMethod(({ default() { return new Rotary() } }).default)
+  registry.get(Quaternion)?.setMethod(({ default() { return new Quaternion() } }).default)
+  registry.get(Affine2)?.setMethod(({ default() { return new Affine2() } }).default)
+  registry.get(Affine3)?.setMethod(({ default() { return new Affine3() } }).default)
+  registry.get(Basis2)?.setMethod(({ default() { return new Basis2() } }).default)
+  registry.get(Basis3)?.setMethod(({ default() { return new Basis3() } }).default)
+  registry.get(Vector2)?.setMethod(({ default() { return new Vector2() } }).default)
+  registry.get(Vector3)?.setMethod(({ default() { return new Vector3() } }).default)
+  registry.get(Vector4)?.setMethod(({ default() { return new Vector4() } }).default)
+  registry.get(BVector2)?.setMethod(({ default() { return new BVector2() } }).default)
+  registry.get(BVector3)?.setMethod(({ default() { return new BVector3() } }).default)
+  registry.get(BVector4)?.setMethod(({ default() { return new BVector4() } }).default)
+  registry.get(Matrix2)?.setMethod(({ default() { return new Matrix2() } }).default)
+  registry.get(Matrix3)?.setMethod(({ default() { return new Matrix3() } }).default)
+  registry.get(Matrix4)?.setMethod(({ default() { return new Matrix4() } }).default)
 }
 /* eslint-enable jsdoc/check-tag-names */

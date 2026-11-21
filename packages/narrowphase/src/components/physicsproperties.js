@@ -132,6 +132,10 @@ export class PhysicsProperties {
     return PhysicsProperties.copy(target)
   }
 
+  static default() {
+    return new PhysicsProperties()
+  }
+
   /**
    * Converts a component to its plain serialized field object.
    *

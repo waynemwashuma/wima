@@ -137,6 +137,10 @@ export class Collider2D {
     return Collider2D.copy(target)
   }
 
+  static default() {
+    return new Collider2D([])
+  }
+
   /**
    * Converts a collider to its serialized field object.
    *

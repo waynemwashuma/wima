@@ -42,9 +42,10 @@ import { AnimationTrack, Playback, PlaybackRepeat } from '../core'
  *
  * The registry entries for {@linkcode Playback}, {@linkcode AnimationPlayer}, and
  * {@linkcode AnimationTarget} receive their `copy`, `clone`, `serialize`, and
- * `deserialize` methods. The {@linkcode AnimationTrack} and
- * {@linkcode AnimationClip} entries receive only `serialize` and
- * `deserialize`. The function changes reflection metadata only; it does not
+ * `deserialize` methods; {@linkcode Playback} also receives `default`. The
+ * {@linkcode AnimationTrack} and {@linkcode AnimationClip} entries receive
+ * `serialize` and `deserialize`; {@linkcode AnimationClip} also receives
+ * `default`. The function changes reflection metadata only; it does not
  * create the {@linkcode TypeRegistry} or any animation resources. The registry
  * must therefore be installed before Startup runs.
  *
@@ -105,6 +106,7 @@ export function registerAnimationTypes(world) {
   }))
   registry.get(Playback)?.setMethod(Playback.copy)
   registry.get(Playback)?.setMethod(Playback.clone)
+  registry.get(Playback)?.setMethod(Playback.default)
   registry.get(Playback)?.setMethod(Playback.serialize)
   registry.get(Playback)?.setMethod(Playback.deserialize)
   registry.register(AnimationPlayer, new StructInfo({
@@ -113,6 +115,7 @@ export function registerAnimationTypes(world) {
   }))
   registry.get(AnimationPlayer)?.setMethod(AnimationPlayer.copy)
   registry.get(AnimationPlayer)?.setMethod(AnimationPlayer.clone)
+  registry.get(AnimationPlayer)?.setMethod(AnimationPlayer.default)
   registry.get(AnimationPlayer)?.setMethod(AnimationPlayer.serialize)
   registry.get(AnimationPlayer)?.setMethod(AnimationPlayer.deserialize)
   registry.register(AnimationTarget, new StructInfo({
@@ -121,10 +124,12 @@ export function registerAnimationTypes(world) {
   }))
   registry.get(AnimationTarget)?.setMethod(AnimationTarget.copy)
   registry.get(AnimationTarget)?.setMethod(AnimationTarget.clone)
+  registry.get(AnimationTarget)?.setMethod(AnimationTarget.default)
   registry.get(AnimationTarget)?.setMethod(AnimationTarget.serialize)
   registry.get(AnimationTarget)?.setMethod(AnimationTarget.deserialize)
   registry.get(AnimationTrack)?.setMethod(AnimationTrack.serialize)
   registry.get(AnimationTrack)?.setMethod(AnimationTrack.deserialize)
+  registry.get(AnimationClip)?.setMethod(AnimationClip.default)
   registry.get(AnimationClip)?.setMethod(AnimationClip.serialize)
   registry.get(AnimationClip)?.setMethod(AnimationClip.deserialize)
 }

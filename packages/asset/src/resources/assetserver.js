@@ -283,6 +283,10 @@ export class Exporters {
  */
 export class AssetServer {
 
+  static default() {
+    return new AssetServer()
+  }
+
   /**
    * Path, asset ID, and {@linkcode LoadState} metadata for requested assets.
    *

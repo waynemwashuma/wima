@@ -37,6 +37,10 @@ export class Position3D extends Vector3 {
     return super.copy(source, target)
   }
 
+  static default() {
+    return new Position3D()
+  }
+
   /**
    * @inheritdoc
    * @param {Position3D} target

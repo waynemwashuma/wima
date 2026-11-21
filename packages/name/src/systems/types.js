@@ -50,6 +50,7 @@ export function registerNameTypes(world) {
   }))
   registry.get(Name)?.setMethod(Name.copy)
   registry.get(Name)?.setMethod(Name.clone)
+  registry.get(Name)?.setMethod(Name.default)
   registry.get(Name)?.setMethod(Name.serialize)
   registry.get(Name)?.setMethod(Name.deserialize)
 }

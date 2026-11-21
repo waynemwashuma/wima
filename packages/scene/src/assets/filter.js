@@ -77,6 +77,10 @@ export class SceneFilter {
     this.mode = mode
   }
 
+  static default() {
+    return new SceneFilter()
+  }
+
   /**
    * Tests whether a scene component or resource type may be restored.
    *

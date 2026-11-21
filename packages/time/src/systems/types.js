@@ -59,6 +59,7 @@ export function registerTimeTypes(world) {
   }))
   registry.get(Timer)?.setMethod(Timer.copy)
   registry.get(Timer)?.setMethod(Timer.clone)
+  registry.get(Timer)?.setMethod(Timer.default)
   registry.get(Timer)?.setMethod(Timer.serialize)
   registry.get(Timer)?.setMethod(Timer.deserialize)
   registry.register(Clock, new StructInfo({

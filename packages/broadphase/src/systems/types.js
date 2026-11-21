@@ -66,6 +66,7 @@ export function registerBroadphaseTypes2D(world) {
   }))
   registry.get(PhysicsHitbox)?.setMethod(PhysicsHitbox.copy)
   registry.get(PhysicsHitbox)?.setMethod(PhysicsHitbox.clone)
+  registry.get(PhysicsHitbox)?.setMethod(PhysicsHitbox.default)
   registry.get(PhysicsHitbox)?.setMethod(PhysicsHitbox.serialize)
   registry.get(PhysicsHitbox)?.setMethod(PhysicsHitbox.deserialize)
   registry.register(Broadphase2D, new StructInfo({}))

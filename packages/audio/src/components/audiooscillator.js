@@ -138,6 +138,10 @@ export class AudioOscillator {
     return AudioOscillator.copy(target)
   }
 
+  static default() {
+    return new AudioOscillator()
+  }
+
   /**
    * Converts the component into its serialized field object.
    * `sourceNode` is included as-is even though it identifies runtime graph
