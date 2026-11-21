@@ -107,9 +107,9 @@ export class Scene {
     for (const [typeId, resource] of this.resources) {
       const entry = typeRegistry.getByTypeId(typeId)
       const snapshotType = entry?.getAttribute(SnapshotType)
-      const serializationEntry = snapshotType
-        ? typeRegistry.getByTypeId(snapshotType.typeId)
-        : entry
+      const serializationEntry = snapshotType ?
+        typeRegistry.getByTypeId(snapshotType.typeId) :
+        entry
 
       if (filter && !filter.allows(typeId)) {
         continue
@@ -281,9 +281,9 @@ export class Scene {
           }
 
           const snapshotTypeId = liveEntry.getAttribute(SnapshotType)?.typeId
-          const snapshotEntry = snapshotTypeId
-            ? typeRegistry.getByTypeId(snapshotTypeId)
-            : undefined
+          const snapshotEntry = snapshotTypeId ?
+            typeRegistry.getByTypeId(snapshotTypeId) :
+            undefined
 
           return [typeId, (snapshotEntry || liveEntry).call('serialize', [resource]) ?? resource]
         }).filter((value) => value[1] !== undefined)
@@ -319,7 +319,8 @@ export class Scene {
           }
 
           return component
-        }).filter((component) => component !== undefined)
+        })
+          .filter((component) => component !== undefined)
 
         const numericEntityId = Number(entityId)
 
@@ -396,7 +397,7 @@ export class Scene {
    * @returns {Generator<never, Map<EntityId, object[]>, void>} An empty
    * generator whose completion value is {@linkcode Scene#entities}.
    */
-  *[Symbol.iterator]() {
+  * [Symbol.iterator]() {
     return this.entities
   }
 }
@@ -483,7 +484,8 @@ function patchResource(resource, world, entry, sceneAssetId) {
  * @returns {Record<string, unknown>}
  */
 function serializeSnapshots(snapshots, typeRegistry) {
-  /**@type {Record<string, unknown>} */
+
+  /** @type {Record<string, unknown>} */
   const serial = {}
 
   for (const snapshot of snapshots) {
@@ -491,6 +493,7 @@ function serializeSnapshots(snapshots, typeRegistry) {
     const snapshotEntry = typeRegistry.getByTypeId(snapshotTypeId)
     const liveTypeId = snapshotEntry?.getAttribute(LiveType)?.typeId ?? snapshotTypeId
     const value = snapshotEntry?.call('serialize', [snapshot])
+
     if (!value) continue
 
     serial[liveTypeId] = value
