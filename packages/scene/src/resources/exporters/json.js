@@ -1,7 +1,5 @@
 /** @import { TypeRegistry } from '@wimaengine/reflect' */
-/** @import { Constructor, TypeId } from '@wimaengine/type' */
 import { Exporter } from '@wimaengine/asset'
-import { typeid } from '@wimaengine/type'
 import { Scene } from '../../assets'
 
 /**
@@ -32,8 +30,8 @@ export class JSONSceneExporter extends Exporter {
    *
    * Entity snapshots are written under `entities` as object properties keyed
    * by the entity IDs in {@linkcode Scene#entities}. Each entity's component
-   * snapshots become properties keyed by their runtime type IDs. Resource
-   * snapshots are written under `resources`, keyed by the type IDs in
+   * snapshots become properties keyed by their live type IDs. Resource
+   * snapshots are written under `resources`, keyed by the live type IDs in
    * {@linkcode Scene#resources}.
    *
    * For each component or resource snapshot, the matching
@@ -55,20 +53,7 @@ export class JSONSceneExporter extends Exporter {
    * @returns {Promise<string>} JSON text containing the entity and resource snapshots.
    */
   async serialize(asset, typeRegistry) {
-    return JSON.stringify({
-      entities: Object.fromEntries(
-        [...asset.entities].map(([entity, components]) => [
-          entity,
-          serializeSnapshots(components, typeRegistry)
-        ])
-      ),
-      resources: Object.fromEntries(
-        [...asset.resources].map(([typeId, resource]) => [
-          typeId,
-          serializeSnapshot(resource, typeId, typeRegistry)
-        ])
-      )
-    })
+    return JSON.stringify(Scene.serializeWithContext(asset, typeRegistry))
   }
 
   /**
@@ -82,37 +67,4 @@ export class JSONSceneExporter extends Exporter {
   getExtensions() {
     return ['json']
   }
-}
-
-/**
- * @param {unknown[]} snapshots
- * @param {TypeRegistry} typeRegistry
- * @returns {Record<string, unknown>}
- */
-function serializeSnapshots(snapshots, typeRegistry) {
-
-  /** @type {Record<TypeId, unknown>} */
-  const serial = {}
-
-  for (let i = 0; i < snapshots.length; i++) {
-    const snapshot = /** @type {object}*/(snapshots[i])
-    const typeId = typeid(/** @type {Constructor} */ (snapshot.constructor))
-
-    serial[typeId] = serializeSnapshot(snapshot, typeId, typeRegistry)
-  }
-
-  return serial
-}
-
-/**
- * @param {unknown} snapshot
- * @param {TypeId} typeId
- * @param {TypeRegistry} typeRegistry
- * @returns {unknown}
- */
-function serializeSnapshot(snapshot, typeId, typeRegistry) {
-  const entry = typeRegistry.getByTypeId(typeId)
-  const value = entry?.call('serialize', [snapshot]) ?? snapshot
-
-  return value
 }
