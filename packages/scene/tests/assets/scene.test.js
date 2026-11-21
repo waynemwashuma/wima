@@ -281,7 +281,7 @@ describe.sequential('Testing `Scene`', () => {
       strictEqual(scene.entities.size, 0)
       strictEqual(scene.resources.size, 1)
       deepStrictEqual(
-        scene.resources.get(typeid(ResourceSnapshot)),
+        scene.resources.get(typeid(PureResource)),
         new ResourceSnapshot('resource')
       )
     })
@@ -315,14 +315,14 @@ describe.sequential('Testing `Scene`', () => {
         new EntityHandle(entity.index, entity.generation),
         new ComponentSnapshot('component')
       ])
-      scene.resources.set(typeid(ResourceSnapshot), new ResourceSnapshot('resource'))
+      scene.resources.set(typeid(PureResource), new ResourceSnapshot('resource'))
 
       scene.toWorld(
         world,
         new SceneInstance(/** @type {any} */ (null)),
         registry,
         new EntityHandle(99, 1),
-        new SceneFilter([typeid(ComponentSnapshot)], SceneFilterMode.Allow)
+        new SceneFilter([typeid(PureComponent)], SceneFilterMode.Allow)
       )
 
       const [restoredEntity] = new Query(world, [EntityHandle]).single()
@@ -342,14 +342,14 @@ describe.sequential('Testing `Scene`', () => {
         new EntityHandle(entity.index, entity.generation),
         new ComponentSnapshot('component')
       ])
-      scene.resources.set(typeid(ResourceSnapshot), new ResourceSnapshot('resource'))
+      scene.resources.set(typeid(PureResource), new ResourceSnapshot('resource'))
 
       scene.toWorld(
         world,
         new SceneInstance(/** @type {any} */ (null)),
         registry,
         new EntityHandle(99, 1),
-        new SceneFilter([typeid(ResourceSnapshot)], SceneFilterMode.Deny)
+        new SceneFilter([typeid(PureResource)], SceneFilterMode.Deny)
       )
 
       const [restoredEntity] = new Query(world, [EntityHandle]).single()
@@ -459,7 +459,7 @@ describe.sequential('Testing `Scene`', () => {
       strictEqual(scene.entities.size, 0)
       strictEqual(scene.resources.size, 1)
       deepStrictEqual(
-        scene.resources.get(typeid(ResourceSnapshot)),
+        scene.resources.get(typeid(PureResource)),
         new ResourceSnapshot('resource')
       )
     })
@@ -546,7 +546,7 @@ describe.sequential('Testing `Scene`', () => {
 
       const scene = new Scene()
       scene.resources.set(
-        typeid(PatchableResourceSnapshot),
+        typeid(PatchableResource),
         new PatchableResourceSnapshot('scene')
       )
 
@@ -571,7 +571,7 @@ describe.sequential('Testing `Scene`', () => {
 
       const scene = new Scene()
       scene.resources.set(
-        typeid(DeferredPatchResourceSnapshot),
+        typeid(DeferredPatchResource),
         new DeferredPatchResourceSnapshot('resource')
       )
 

@@ -2,8 +2,7 @@
 /** @import { AssetId } from '@wimaengine/asset' */
 /** @import { TypeEntry } from '@wimaengine/reflect' */
 /** @import { Constructor, TypeId } from '@wimaengine/type' */
-import { AssetsSnapshot } from '@wimaengine/asset'
-import { LiveType } from '@wimaengine/core'
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { EntityHandle, Query, World } from '@wimaengine/ecs'
 import { Parent } from '@wimaengine/hierarchy'
 import { warn } from '@wimaengine/logger'
@@ -32,15 +31,6 @@ import { SceneFilter } from './filter'
 export class Scene {
 
   /**
-   * Creates an empty scene asset.
-   *
-   * @returns {Scene} A new empty scene.
-   */
-  static default() {
-    return new Scene()
-  }
-
-  /**
    * Stores component snapshots by the packed ID of their source entity.
    *
    * This map is the scene's live entity storage. Each value is the component
@@ -54,12 +44,11 @@ export class Scene {
   entities = new Map()
 
   /**
-   * Stores resource snapshots by their snapshot type ID.
+   * Stores resource snapshots by their live type ID.
    *
    * This map is the scene's live resource storage. Keys identify the snapshot
-   * types used for registry lookup and filtering during {@linkcode Scene#toWorld};
-   * they are not necessarily the types of the source resources. Snapshot
-   * objects are stored directly without cloning or validation.
+   * types used for registry lookup and filtering during {@linkcode Scene#toWorld}.
+   * Snapshot objects are stored directly without cloning or validation.
    *
    * @type {Map<TypeId, object>}
    */
@@ -116,28 +105,32 @@ export class Scene {
     }
 
     for (const [typeId, resource] of this.resources) {
+      const entry = typeRegistry.getByTypeId(typeId)
+      const snapshotType = entry?.getAttribute(SnapshotType)
+      const serializationEntry = snapshotType ?
+        typeRegistry.getByTypeId(snapshotType.typeId) :
+        entry
+
       if (filter && !filter.allows(typeId)) {
         continue
       }
 
-      const entry = typeRegistry.getByTypeId(typeId)
-
-      if (!entry) {
-        warn(`The type \`${typeId}\` is not registered in the type registry`)
+      if (!serializationEntry) {
+        warn(`The snapshot type of \`${typeId}\` is not registered in the type registry`)
         continue
       }
 
-      if (patchResource(resource, world, entry, sceneAssetId)) {
+      if (patchResource(resource, world, serializationEntry, sceneAssetId)) {
         continue
       }
 
-      const restoredResource = fromSnapshot(resource, world, typeRegistry, entry, sceneAssetId)
+      const restoredResource = fromSnapshot(resource, world, typeRegistry, serializationEntry, sceneAssetId)
 
       if (!restoredResource) {
         continue
       }
 
-      entry
+      serializationEntry
         .getMethod('map')
         ?.method
         ?.call(restoredResource, sceneToWorldMap)
@@ -150,31 +143,31 @@ export class Scene {
       const clonedComponents = components.map((component) => {
         const { constructor } = component
         const componentType = /** @type {Constructor} */ (constructor)
-        const typeId = typeid(componentType)
+        const snapshotTypeId = typeid(componentType)
+        const snapshotEntry = typeRegistry.get(componentType)
+        const liveTypeId = snapshotEntry?.getAttribute(LiveType)?.typeId ?? snapshotTypeId
 
         if (constructor === EntityHandle) {
           return undefined
         }
 
-        if (filter && !filter.allows(typeId)) {
+        if (filter && !filter.allows(liveTypeId)) {
           return undefined
         }
 
-        const entry = typeRegistry.get(componentType)
-
-        if (!entry) {
+        if (!snapshotEntry) {
           warn(`The type \`${componentType.name}\` is not registered in the type registry`)
 
           return undefined
         }
 
-        const clonedComponent = fromSnapshot(component, world, typeRegistry, entry, sceneAssetId)
+        const clonedComponent = fromSnapshot(component, world, typeRegistry, snapshotEntry, sceneAssetId)
 
         if (!clonedComponent) {
           return undefined
         }
 
-        entry
+        snapshotEntry
           .getMethod('map')
           ?.method
           ?.call(clonedComponent, sceneToWorldMap)
@@ -202,9 +195,8 @@ export class Scene {
    * to {@linkcode Scene#resources} when its snapshot succeeds. A registered
    * `toSnapshot` method is preferred; when none is registered, the registered
    * `clone` method is used. Unknown types and values without either method are
-   * skipped. Resource entries are keyed by the type ID of the resulting
-   * snapshot, and an entity remains in the map even if its component array is
-   * empty.
+   * skipped. Resource entries are keyed by the live resource type ID, and an
+   * entity remains in the map even if its component array is empty.
    *
    * The source world is not modified.
    *
@@ -258,13 +250,110 @@ export class Scene {
         continue
       }
 
-      scene.resources.set(
-        getSnapshotTypeId(/** @type {object} */ (snapshot)),
-        /** @type {object} */ (snapshot)
-      )
+      scene.resources.set(typeId, /** @type {object} */(snapshot))
     }
 
     return scene
+  }
+
+  /**
+   * Converts a scene into its registry-aware, JSON-compatible representation.
+   *
+   * @param {Scene} scene - Scene snapshot to serialize.
+   * @param {TypeRegistry} typeRegistry - Registry used for snapshot serialization.
+   * @returns {{ entities: Record<string, Record<string, unknown>>, resources: Record<string, unknown> }}
+   * JSON-compatible scene representation.
+   */
+  static serializeWithContext(scene, typeRegistry) {
+    return {
+      entities: Object.fromEntries(
+        [...scene.entities].map(([entity, components]) => [
+          entity,
+          serializeSnapshots(components, typeRegistry)
+        ])
+      ),
+      resources: Object.fromEntries(
+        [...scene.resources].map(([typeId, resource]) => {
+          const liveEntry = typeRegistry.getByTypeId(typeId)
+
+          if (!liveEntry) {
+            return [typeId, undefined]
+          }
+
+          const snapshotTypeId = liveEntry.getAttribute(SnapshotType)?.typeId
+          const snapshotEntry = snapshotTypeId ?
+            typeRegistry.getByTypeId(snapshotTypeId) :
+            undefined
+
+          return [typeId, (snapshotEntry || liveEntry).call('serialize', [resource]) ?? resource]
+        }).filter((value) => value[1] !== undefined)
+      )
+    }
+  }
+
+  /**
+   * Reconstructs a scene from its registry-aware serialized representation.
+   *
+   * @param {unknown} serial - Serialized scene representation.
+   * @param {TypeRegistry} typeRegistry - Registry used for snapshot deserialization.
+   * @returns {Scene} Reconstructed scene.
+   */
+  static deserializeWithContext(serial, typeRegistry) {
+    const scene = new Scene()
+
+    if (typeof serial !== 'object' || serial === null) {
+      return scene
+    }
+
+    if ('entities' in serial && serial.entities && typeof serial.entities === 'object') {
+      for (const [entityId, componentsSerial] of Object.entries(serial.entities)) {
+        if (!componentsSerial || typeof componentsSerial !== 'object') continue
+
+        const components = Object.entries(componentsSerial).map(([typeId, value]) => {
+          const component = deserializeComponent(/** @type {TypeId} */(typeId), value, typeRegistry)
+
+          if (typeof component !== 'object' || component === null) {
+            warn(`Failed to deserialize scene snapshot with type id \`${typeId}\`.`)
+
+            return undefined
+          }
+
+          return component
+        })
+          .filter((component) => component !== undefined)
+
+        const numericEntityId = Number(entityId)
+
+        if (!Number.isFinite(numericEntityId)) continue
+
+        scene.entities.set(/** @type {EntityId} */(numericEntityId), components)
+      }
+    }
+
+    if ('resources' in serial && serial.resources && typeof serial.resources === 'object') {
+      for (const [typeId, value] of Object.entries(serial.resources)) {
+        const resource = deserializeComponent(/** @type {TypeId} */(typeId), value, typeRegistry)
+
+        if (typeof resource !== 'object' || resource === null) {
+          warn(`Failed to deserialize scene snapshot with type id \`${typeId}\`.`)
+
+          continue
+        }
+
+        scene.resources.set(/** @type {TypeId} */(typeId), resource)
+      }
+    }
+
+    return scene
+  }
+
+  /**
+   * Creates an empty scene asset.
+   *
+   * @returns {Scene} A new empty scene.
+   */
+  static default() {
+    return new Scene()
   }
 
   /**
@@ -311,17 +400,6 @@ export class Scene {
   * [Symbol.iterator]() {
     return this.entities
   }
-}
-
-/**
- * @param {object} snapshot
- */
-function getSnapshotTypeId(snapshot) {
-  if (snapshot instanceof AssetsSnapshot) {
-    return AssetsSnapshot.typeId(snapshot.type)
-  }
-
-  return typeid(/** @type {Constructor} */ (snapshot.constructor))
 }
 
 /**
@@ -398,4 +476,41 @@ function patchResource(resource, world, entry, sceneAssetId) {
   }
 
   return entry.call('patch', [resource, world, sceneAssetId]) === true
+}
+
+/**
+ * @param {object[]} snapshots
+ * @param {TypeRegistry} typeRegistry
+ * @returns {Record<string, unknown>}
+ */
+function serializeSnapshots(snapshots, typeRegistry) {
+
+  /** @type {Record<string, unknown>} */
+  const serial = {}
+
+  for (const snapshot of snapshots) {
+    const snapshotTypeId = typeid(/** @type {Constructor} */(snapshot.constructor))
+    const snapshotEntry = typeRegistry.getByTypeId(snapshotTypeId)
+    const liveTypeId = snapshotEntry?.getAttribute(LiveType)?.typeId ?? snapshotTypeId
+    const value = snapshotEntry?.call('serialize', [snapshot])
+
+    if (!value) continue
+
+    serial[liveTypeId] = value
+  }
+
+  return serial
+}
+
+/**
+ * @param {TypeId} typeId
+ * @param {unknown} value
+ * @param {TypeRegistry} typeRegistry
+ * @returns {unknown}
+ */
+function deserializeComponent(typeId, value, typeRegistry) {
+  const snapshotTypeId = typeRegistry.getByTypeId(typeId)?.getAttribute(SnapshotType)?.typeId ?? typeId
+  const entry = typeRegistry.getByTypeId(snapshotTypeId)
+
+  return entry?.call('deserialize', [value])
 }

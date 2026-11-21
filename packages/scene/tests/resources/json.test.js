@@ -1,4 +1,5 @@
 import { deepStrictEqual, strictEqual } from 'assert'
+import { LiveType, SnapshotType } from '@wimaengine/core'
 import { test, describe } from 'vitest'
 import { Scene } from '../../src/assets'
 import { JSONSceneExporter } from '../../src/resources/exporters'
@@ -44,6 +45,8 @@ class TestSnapshot {
   }
 }
 
+class TestValue {}
+
 describe('Testing scene JSON importer/exporter', () => {
   test('`JSONSceneExporter` serializes scene entities with type metadata', async () => {
     const registry = createRegistry()
@@ -52,7 +55,7 @@ describe('Testing scene JSON importer/exporter', () => {
     const snapshot = new TestSnapshot('hello')
 
     scene.entities.set(42, [snapshot])
-    scene.resources.set(typeid(TestSnapshot), snapshot)
+    scene.resources.set(typeid(TestValue), snapshot)
 
     const text = await exporter.serialize(scene, registry)
     const serial = JSON.parse(text)
@@ -61,13 +64,13 @@ describe('Testing scene JSON importer/exporter', () => {
     deepStrictEqual(serial, {
       entities: {
         42: {
-          [typeid(TestSnapshot)]: {
+          [typeid(TestValue)]: {
             value: 'hello'
           }
         }
       },
       resources: {
-        [typeid(TestSnapshot)]: {
+        [typeid(TestValue)]: {
           value: 'hello'
         }
       }
@@ -82,13 +85,13 @@ describe('Testing scene JSON importer/exporter', () => {
         return {
           entities: {
             42: {
-              [typeid(TestSnapshot)]: {
+              [typeid(TestValue)]: {
                 value: 'hello'
               }
             }
           },
           resources: {
-            [typeid(TestSnapshot)]: {
+            [typeid(TestValue)]: {
               value: 'hello'
             }
           }
@@ -101,8 +104,8 @@ describe('Testing scene JSON importer/exporter', () => {
     strictEqual(scene.entities.get(42)?.[0] instanceof TestSnapshot, true)
     deepStrictEqual(scene.entities.get(42)?.[0], new TestSnapshot('hello'))
     strictEqual(scene.resources.size, 1)
-    strictEqual(scene.resources.get(typeid(TestSnapshot)) instanceof TestSnapshot, true)
-    deepStrictEqual(scene.resources.get(typeid(TestSnapshot)), new TestSnapshot('hello'))
+    strictEqual(scene.resources.get(typeid(TestValue)) instanceof TestSnapshot, true)
+    deepStrictEqual(scene.resources.get(typeid(TestValue)), new TestSnapshot('hello'))
   })
 })
 
@@ -115,6 +118,9 @@ function createRegistry() {
   registry.get(TestSnapshot)?.setMethod(TestSnapshot.clone)
   registry.get(TestSnapshot)?.setMethod(TestSnapshot.serialize)
   registry.get(TestSnapshot)?.setMethod(TestSnapshot.deserialize)
+  registry.register(TestValue, new StructInfo({}))
+  registry.get(TestValue)?.setAttribute(new SnapshotType(typeid(TestSnapshot)))
+  registry.get(TestSnapshot)?.setAttribute(new LiveType(typeid(TestValue)))
 
   return registry
 }

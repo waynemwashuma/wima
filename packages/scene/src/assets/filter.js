@@ -6,7 +6,8 @@
  * `Allow` admits only the type IDs listed by a filter, while `Deny` admits
  * every type ID except those listed. The mode is applied by
  * {@linkcode SceneFilter#allows} when scene component and resource snapshots are
- * restored.
+ * restored. Filter entries use live component and resource type IDs rather
+ * than snapshot type IDs.
  *
  * @readonly
  * @enum {number}
@@ -20,7 +21,7 @@ export const SceneFilterMode = /** @type {const} */({
 })
 
 /**
- * Filters scene component and resource type IDs during {@linkcode Scene#toWorld}.
+ * Filters live scene component and resource type IDs during {@linkcode Scene#toWorld}.
  *
  * {@linkcode SceneFilterMode.Allow} admits only listed IDs, while
  * {@linkcode SceneFilterMode.Deny} admits every ID except those listed. An empty
