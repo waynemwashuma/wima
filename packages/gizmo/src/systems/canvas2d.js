@@ -3,8 +3,8 @@
 import { EntityHandle, Query } from '@wimaengine/ecs'
 import { warn } from '@wimaengine/logger'
 import { Camera, OrthographicProjection, RenderLists2D } from '@wimaengine/render-core'
-import { typeidGeneric } from '@wimaengine/type'
 import { GlobalTransform2D } from '@wimaengine/transform'
+import { typeidGeneric } from '@wimaengine/type'
 import { Windows, Window } from '@wimaengine/window'
 import {
   Gizmo2D,
@@ -91,7 +91,7 @@ export function genenerateDrawGizmo2Dsystem(label) {
     const offsetX = width / 2
     const offsetY = height / 2
     const cameraTransform = GlobalTransform2D.invert(camera[0])
-    const projection = camera[2].projection
+    const { projection } = camera[2]
 
     if (!(projection instanceof OrthographicProjection)) return
 
@@ -108,6 +108,7 @@ export function genenerateDrawGizmo2Dsystem(label) {
     const projectionHeight = projection.top - projection.bottom
     const projectionOffsetX = -(projection.right + projection.left) / projectionWidth
     const projectionOffsetY = -(projection.top + projection.bottom) / projectionHeight
+
     context.translate(offsetX, offsetY)
     context.scale(offsetX, -offsetY)
     context.transform(
@@ -116,7 +117,7 @@ export function genenerateDrawGizmo2Dsystem(label) {
       0,
       2 / projectionHeight,
       projectionOffsetX,
-      projectionOffsetY,
+      projectionOffsetY
     )
     context.transform(
       cameraTransform.a,
@@ -124,7 +125,7 @@ export function genenerateDrawGizmo2Dsystem(label) {
       cameraTransform.c,
       cameraTransform.d,
       cameraTransform.x,
-      cameraTransform.y,
+      cameraTransform.y
     )
     context.lineWidth = lineWidth
     context.lineCap = mapCap(lineCap)
