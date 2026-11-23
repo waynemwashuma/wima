@@ -1,7 +1,7 @@
 /** @import { Matrix4 } from '@wimaengine/math' */
 /** @import { ProjectionSerial } from '../core' */
 /** @import { RenderLists2D, RenderLists3D } from './renderlists' */
-import { Vector2 } from '@wimaengine/math'
+import { Vector2, Vector3 } from '@wimaengine/math'
 import { OrthographicProjection, Projection, PerspectiveProjection } from '../core'
 
 /* eslint-disable jsdoc/check-tag-names */
@@ -88,6 +88,26 @@ export class Camera {
     const ndcY = ((position.y - projection.bottom) / (projection.top - projection.bottom)) * 2 - 1
 
     return new Vector2(ndcX, ndcY)
+  }
+
+  /**
+   * Projects a 3D position from camera view space into screen-space NDC.
+   *
+   * The returned vector stores screen-space X and Y in `x` and `y`, with
+   * normalized device-coordinate depth in `z`.
+   *
+   * @param {Vector3} position
+   * @returns {Vector3}
+   */
+  viewToScreen3D(position) {
+    const matrix = this.projectionMatrix()
+    const clipX = matrix.a * position.x + matrix.e * position.y + matrix.i * position.z + matrix.m
+    const clipY = matrix.b * position.x + matrix.f * position.y + matrix.j * position.z + matrix.n
+    const clipZ = matrix.c * position.x + matrix.g * position.y + matrix.k * position.z + matrix.o
+    const clipW = matrix.d * position.x + matrix.h * position.y + matrix.l * position.z + matrix.p
+    const inverseW = 1 / clipW
+
+    return new Vector3(clipX * inverseW, clipY * inverseW, clipZ * inverseW)
   }
 
   static default() {
