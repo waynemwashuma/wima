@@ -109,6 +109,19 @@ export class WindowCommands {
   }
 
   /**
+   * Queues a {@linkcode WindowRequest.PointerRelease} for a pointer id.
+   *
+   * @param {number} id - Pointer id to release.
+   * @returns {this}
+   */
+  requestPointerRelease(id) {
+    assert(this.entity, 'No window entity selected for pointer release')
+    this.buffer.add(new WindowCommand(this.entity, WindowRequest.PointerRelease, { id }))
+
+    return this
+  }
+
+  /**
    * Queues a {@linkcode WindowRequest.FullScreen} with an `undefined` payload.
    *
    * Throws `No window entity selected for fullscreen` when called before
