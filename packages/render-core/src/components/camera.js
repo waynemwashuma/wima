@@ -1,6 +1,7 @@
 /** @import { Matrix4 } from '@wimaengine/math' */
 /** @import { ProjectionSerial } from '../core' */
 /** @import { RenderLists2D, RenderLists3D } from './renderlists' */
+import { Affine2, Affine3, Vector2, Vector3 } from '@wimaengine/math'
 import { OrthographicProjection, Projection, PerspectiveProjection } from '../core'
 
 /* eslint-disable jsdoc/check-tag-names */
@@ -68,6 +69,171 @@ export class Camera {
     this.projection = projection
     this.near = near
     this.far = far
+  }
+
+  /**
+   * Projects a 2D position from camera view space into screen-space NDC.
+   *
+   * Returns `undefined` when this camera uses perspective projection.
+   *
+   * @param {Vector2} position
+   * @returns {Vector2 | undefined}
+   */
+  viewToScreen2D(position) {
+    const { projection } = this
+
+    if (!(projection instanceof OrthographicProjection)) return undefined
+
+    const ndcX = ((position.x - projection.left) / (projection.right - projection.left)) * 2 - 1
+    const ndcY = ((position.y - projection.bottom) / (projection.top - projection.bottom)) * 2 - 1
+
+    return new Vector2(ndcX, ndcY)
+  }
+
+  /**
+   * Projects a 3D position from camera view space into screen-space NDC.
+   *
+   * The returned vector stores screen-space X and Y in `x` and `y`, with
+   * normalized device-coordinate depth in `z`.
+   *
+   * @param {Vector3} position
+   * @returns {Vector3}
+   */
+  viewToScreen3D(position) {
+    const matrix = this.projectionMatrix()
+    const clipX = matrix.a * position.x + matrix.e * position.y + matrix.i * position.z + matrix.m
+    const clipY = matrix.b * position.x + matrix.f * position.y + matrix.j * position.z + matrix.n
+    const clipZ = matrix.c * position.x + matrix.g * position.y + matrix.k * position.z + matrix.o
+    const clipW = matrix.d * position.x + matrix.h * position.y + matrix.l * position.z + matrix.p
+    const inverseW = 1 / clipW
+
+    return new Vector3(clipX * inverseW, clipY * inverseW, clipZ * inverseW)
+  }
+
+  /**
+   * Converts screen-space NDC into a 2D position in camera view space.
+   *
+   * Returns `undefined` when this camera uses perspective projection.
+   *
+   * @param {Vector2} point
+   * @returns {Vector2 | undefined}
+   */
+  screenToView2D(point) {
+    const { projection } = this
+
+    if (!(projection instanceof OrthographicProjection)) return undefined
+
+    return new Vector2(
+      projection.left + ((point.x + 1) / 2) * (projection.right - projection.left),
+      projection.bottom + ((point.y + 1) / 2) * (projection.top - projection.bottom)
+    )
+  }
+
+  /**
+   * Converts screen-space NDC into a ray in camera view space.
+   *
+   * Orthographic rays start on the near clipping plane. Perspective rays start
+   * at the camera origin.
+   *
+   * @param {Vector2} point
+   * @returns {{origin: Vector3, direction: Vector3} | undefined}
+   */
+  screenToView3D(point) {
+    const { projection } = this
+
+    if (projection instanceof OrthographicProjection) {
+      return {
+        origin: new Vector3(
+          projection.left + ((point.x + 1) / 2) * (projection.right - projection.left),
+          projection.bottom + ((point.y + 1) / 2) * (projection.top - projection.bottom),
+          -this.near
+        ),
+        direction: new Vector3(0, 0, -1)
+      }
+    }
+
+    if (projection instanceof PerspectiveProjection) {
+      const scale = Math.tan(projection.fov / 2)
+
+      return {
+        origin: new Vector3(),
+        direction: new Vector3(point.x * projection.aspect * scale, point.y * scale, -1).normalize()
+      }
+    }
+
+    return undefined
+  }
+
+  /**
+   * Projects a world-space 2D position into screen-space NDC.
+   *
+   * Returns `undefined` when this camera uses perspective projection because a
+   * perspective camera does not define a single 2D world plane.
+   *
+   * @param {Vector2} position
+   * @param {Affine2} cameraTransform
+   * @returns {Vector2 | undefined}
+   */
+  worldToScreen2D(position, cameraTransform) {
+    const view = Affine2.invert(cameraTransform, new Affine2()).transform(position.clone())
+
+    return this.viewToScreen2D(view)
+  }
+
+  /**
+   * Projects a world-space 3D position into screen-space NDC.
+   *
+   * The returned vector stores screen-space X and Y in `x` and `y`, with
+   * normalized device-coordinate depth in `z`. The camera transform is inverted
+   * with {@linkcode Affine3} before applying the active projection.
+   *
+   * @param {Vector3} position
+   * @param {Affine3} cameraTransform
+   * @returns {Vector3}
+   */
+  worldToScreen3D(position, cameraTransform) {
+    const view = Affine3.invert(cameraTransform, new Affine3()).transform(position.clone())
+
+    return this.viewToScreen3D(view)
+  }
+
+  /**
+   * Converts screen-space NDC into a world-space 2D position.
+   *
+   * Returns `undefined` when this camera uses perspective projection.
+   *
+   * @param {Vector2} point
+   * @param {Affine2} cameraTransform
+   * @returns {Vector2 | undefined}
+   */
+  screenToWorld2D(point, cameraTransform) {
+    const viewPosition = this.screenToView2D(point)
+
+    if (!viewPosition) return undefined
+
+    return cameraTransform.transform(viewPosition)
+  }
+
+  /**
+   * Converts screen-space NDC into a world-space ray.
+   *
+   * Orthographic rays start on the near clipping plane. Perspective rays start
+   * at the camera position. The returned ray is transformed by the supplied
+   * camera affine.
+   *
+   * @param {Vector2} point
+   * @param {Affine3} cameraTransform
+   * @returns {{origin: Vector3, direction: Vector3} | undefined}
+   */
+  screenToWorld3D(point, cameraTransform) {
+    const ray = this.screenToView3D(point)
+
+    if (!ray) return undefined
+
+    cameraTransform.transform(ray.origin)
+    cameraTransform.transformWithoutTranslation(ray.direction).normalize()
+
+    return ray
   }
 
   static default() {
