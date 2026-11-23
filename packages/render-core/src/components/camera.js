@@ -1,7 +1,7 @@
 /** @import { Matrix4 } from '@wimaengine/math' */
 /** @import { ProjectionSerial } from '../core' */
 /** @import { RenderLists2D, RenderLists3D } from './renderlists' */
-import { Vector2, Vector3 } from '@wimaengine/math'
+import { Affine2, Vector2, Vector3 } from '@wimaengine/math'
 import { OrthographicProjection, Projection, PerspectiveProjection } from '../core'
 
 /* eslint-disable jsdoc/check-tag-names */
@@ -162,6 +162,22 @@ export class Camera {
     }
 
     return undefined
+  }
+
+  /**
+   * Projects a world-space 2D position into screen-space NDC.
+   *
+   * Returns `undefined` when this camera uses perspective projection because a
+   * perspective camera does not define a single 2D world plane.
+   *
+   * @param {Vector2} position
+   * @param {Affine2} cameraTransform
+   * @returns {Vector2 | undefined}
+   */
+  worldToScreen2D(position, cameraTransform) {
+    const view = Affine2.invert(cameraTransform, new Affine2()).transform(position.clone())
+
+    return this.viewToScreen2D(view)
   }
 
   static default() {
