@@ -110,6 +110,25 @@ export class Camera {
     return new Vector3(clipX * inverseW, clipY * inverseW, clipZ * inverseW)
   }
 
+  /**
+   * Converts screen-space NDC into a 2D position in camera view space.
+   *
+   * Returns `undefined` when this camera uses perspective projection.
+   *
+   * @param {Vector2} point
+   * @returns {Vector2 | undefined}
+   */
+  screenToView2D(point) {
+    const { projection } = this
+
+    if (!(projection instanceof OrthographicProjection)) return undefined
+
+    return new Vector2(
+      projection.left + ((point.x + 1) / 2) * (projection.right - projection.left),
+      projection.bottom + ((point.y + 1) / 2) * (projection.top - projection.bottom)
+    )
+  }
+
   static default() {
     return new Camera()
   }
