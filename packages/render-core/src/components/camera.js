@@ -129,6 +129,41 @@ export class Camera {
     )
   }
 
+  /**
+   * Converts screen-space NDC into a ray in camera view space.
+   *
+   * Orthographic rays start on the near clipping plane. Perspective rays start
+   * at the camera origin.
+   *
+   * @param {Vector2} point
+   * @returns {{origin: Vector3, direction: Vector3} | undefined}
+   */
+  screenToView3D(point) {
+    const { projection } = this
+
+    if (projection instanceof OrthographicProjection) {
+      return {
+        origin: new Vector3(
+          projection.left + ((point.x + 1) / 2) * (projection.right - projection.left),
+          projection.bottom + ((point.y + 1) / 2) * (projection.top - projection.bottom),
+          -this.near
+        ),
+        direction: new Vector3(0, 0, -1)
+      }
+    }
+
+    if (projection instanceof PerspectiveProjection) {
+      const scale = Math.tan(projection.fov / 2)
+
+      return {
+        origin: new Vector3(),
+        direction: new Vector3(point.x * projection.aspect * scale, point.y * scale, -1).normalize()
+      }
+    }
+
+    return undefined
+  }
+
   static default() {
     return new Camera()
   }
