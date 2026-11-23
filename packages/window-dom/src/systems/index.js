@@ -26,6 +26,7 @@ export function updateWindow(world) {
 
   query.each(([entity, window]) => {
     const registered = windows.getWindow(entity)
+
     if (registered?.isConnected) return
 
     let canvas
@@ -35,6 +36,7 @@ export function updateWindow(world) {
 
       if (!(element instanceof HTMLCanvasElement)) {
         warn(`The provided selector '${window.selector}' does not yield a canvas element.`)
+
         return
       }
 
