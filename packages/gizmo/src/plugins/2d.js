@@ -111,8 +111,16 @@ export class Gizmo2DPlugin extends Plugin {
 
     app
       .setResourceByTypeId(typeidGeneric(Gizmo2D, [label]), new Gizmo2D(label, settings))
-      .registerSystem({ schedule: AppSchedule.Startup, system: registerGizmo2DTypes(label) })
-      .registerSystem({ schedule: AppSchedule.Update, system: genenerateDrawGizmo2Dsystem(label) })
+      .registerSystem({
+        schedule: AppSchedule.Startup,
+        label: `registerGizmo2DTypes<${typeid(label)}>`,
+        system: registerGizmo2DTypes(label)
+      })
+      .registerSystem({
+        schedule: AppSchedule.Update,
+        label: `drawGizmo2D<${typeid(label)}>`,
+        system: genenerateDrawGizmo2Dsystem(label)
+      })
   }
 
   /**

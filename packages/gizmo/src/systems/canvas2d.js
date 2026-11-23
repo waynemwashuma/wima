@@ -2,7 +2,9 @@
 /** @import { SystemFunc } from '@wimaengine/ecs' */
 import { EntityHandle, Query } from '@wimaengine/ecs'
 import { warn } from '@wimaengine/logger'
+import { Camera, OrthographicProjection, RenderLists2D } from '@wimaengine/render-core'
 import { typeidGeneric } from '@wimaengine/type'
+import { GlobalTransform2D } from '@wimaengine/transform'
 import { Windows, Window } from '@wimaengine/window'
 import {
   Gizmo2D,
@@ -22,15 +24,18 @@ import {
  * constructor used when the gizmo resource was installed.
  *
  * Each invocation looks up that resource, the {@linkcode Windows} canvas resource,
- * and the first entity matching `[EntityHandle, Window]`. With the default
+ * the first entity matching `[EntityHandle, Window]`, and the first entity matching
+ * `[GlobalTransform2D, RenderLists2D, Camera]`. With the default
  * {@linkcode WindowPlugin} setup, this is the primary window entity. The query
  * does not require the `MainWindow` marker, so applications that manage their
  * own windows can provide any matching `Window` entity. `Windows` must contain
  * a canvas for the entity, as provided by {@linkcode DOMWindowPlugin}; the canvas
- * must also expose a 2D rendering context.
+ * must also expose a 2D rendering context. The camera must use an
+ * {@linkcode OrthographicProjection}; gizmo positions are interpreted as world
+ * coordinates and transformed into canvas space using that camera.
  *
- * The system returns without drawing when there is no matching window, no
- * canvas mapped to that window, or no 2D context. These early returns leave
+ * The system returns without drawing when there is no matching window, camera,
+ * orthographic projection, canvas mapped to that window, or 2D context. These early returns leave
  * the gizmo buffer unchanged. A labelled {@linkcode Gizmo2D} resource and the
  * {@linkcode Windows} resource are required by the world; the factory does not
  * install either one.
@@ -69,8 +74,9 @@ export function genenerateDrawGizmo2Dsystem(label) {
     const gizmo = world.getResourceByTypeId(gizmotypeid)
     const canvases = world.getResource(Windows)
     const window = new Query(world, [EntityHandle, Window]).single()
+    const camera = new Query(world, [GlobalTransform2D, RenderLists2D, Camera]).single()
 
-    if (!window) return
+    if (!window || !camera) return
 
     const canvas = canvases.getWindow(window[0])
 
@@ -79,6 +85,15 @@ export function genenerateDrawGizmo2Dsystem(label) {
     const context = canvas.getContext('2d')
 
     if (!context) return
+
+    const width = window[1].getWidth()
+    const height = window[1].getHeight()
+    const offsetX = width / 2
+    const offsetY = height / 2
+    const cameraTransform = GlobalTransform2D.invert(camera[0])
+    const projection = camera[2].projection
+
+    if (!(projection instanceof OrthographicProjection)) return
 
     const {
       lineWidth,
@@ -89,6 +104,28 @@ export function genenerateDrawGizmo2Dsystem(label) {
     } = gizmo.settings
 
     context.save()
+    const projectionWidth = projection.right - projection.left
+    const projectionHeight = projection.top - projection.bottom
+    const projectionOffsetX = -(projection.right + projection.left) / projectionWidth
+    const projectionOffsetY = -(projection.top + projection.bottom) / projectionHeight
+    context.translate(offsetX, offsetY)
+    context.scale(offsetX, -offsetY)
+    context.transform(
+      2 / projectionWidth,
+      0,
+      0,
+      2 / projectionHeight,
+      projectionOffsetX,
+      projectionOffsetY,
+    )
+    context.transform(
+      cameraTransform.a,
+      cameraTransform.b,
+      cameraTransform.c,
+      cameraTransform.d,
+      cameraTransform.x,
+      cameraTransform.y,
+    )
     context.lineWidth = lineWidth
     context.lineCap = mapCap(lineCap)
     context.lineJoin = mapJoin(lineJoin)
@@ -105,8 +142,8 @@ export function genenerateDrawGizmo2Dsystem(label) {
 
       const colorGradient = context.createLinearGradient(startPos.x, startPos.y, endPos.x, endPos.y)
 
-      colorGradient.addColorStop(0, `rgba(${startColor.r * 255},${startColor.g * 255},${startColor.b * 255},${startColor.a * 255})`)
-      colorGradient.addColorStop(1, `rgba(${endColor.r * 255},${endColor.g * 255},${endColor.b * 255},${endColor.a * 255})`)
+      colorGradient.addColorStop(0, `rgba(${startColor.r * 255},${startColor.g * 255},${startColor.b * 255},${startColor.a})`)
+      colorGradient.addColorStop(1, `rgba(${endColor.r * 255},${endColor.g * 255},${endColor.b * 255},${endColor.a})`)
 
       context.moveTo(startPos.x, startPos.y)
       context.lineTo(endPos.x, endPos.y)
