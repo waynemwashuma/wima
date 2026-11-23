@@ -93,17 +93,30 @@ export class WindowCommands {
   }
 
   /**
-   * Queues a {@linkcode WindowRequest.PointerCapture} with an `undefined`
-   * payload.
+   * Queues a {@linkcode WindowRequest.PointerCapture} for a pointer id.
    *
    * Throws `No window entity selected for pointer capture` when called before
    * {@linkcode WindowCommands#window}.
    *
+   * @param {number} id - Pointer id to capture.
    * @returns {this}
    */
-  requestPointerCapture() {
+  requestPointerCapture(id) {
     assert(this.entity, 'No window entity selected for pointer capture')
-    this.buffer.add(new WindowCommand(this.entity, WindowRequest.PointerCapture, undefined))
+    this.buffer.add(new WindowCommand(this.entity, WindowRequest.PointerCapture, { id }))
+
+    return this
+  }
+
+  /**
+   * Queues a {@linkcode WindowRequest.PointerRelease} for a pointer id.
+   *
+   * @param {number} id - Pointer id to release.
+   * @returns {this}
+   */
+  requestPointerRelease(id) {
+    assert(this.entity, 'No window entity selected for pointer release')
+    this.buffer.add(new WindowCommand(this.entity, WindowRequest.PointerRelease, { id }))
 
     return this
   }
