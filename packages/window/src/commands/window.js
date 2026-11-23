@@ -182,9 +182,8 @@ function execute(command, canvas, window) {
  * - {@linkcode WindowRequest.Reposition} uses an object with `x` and `y` fields
  *   assigned to the canvas's right and left styles.
  *
- * {@linkcode WindowCommands#requestPointerCapture}
- * currently queues `undefined` data; use {@linkcode WindowCommand} directly with
- * the required `{id}` payload when issuing a pointer-capture command.
+ * {@linkcode WindowCommands#requestPointerCapture} queues the required `{id}`
+ * payload when issuing a pointer-capture command.
  *
  * @example
  * ```js
