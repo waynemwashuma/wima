@@ -1,6 +1,7 @@
 /** @import { Matrix4 } from '@wimaengine/math' */
 /** @import { ProjectionSerial } from '../core' */
 /** @import { RenderLists2D, RenderLists3D } from './renderlists' */
+import { Vector2 } from '@wimaengine/math'
 import { OrthographicProjection, Projection, PerspectiveProjection } from '../core'
 
 /* eslint-disable jsdoc/check-tag-names */
@@ -68,6 +69,25 @@ export class Camera {
     this.projection = projection
     this.near = near
     this.far = far
+  }
+
+  /**
+   * Projects a 2D position from camera view space into screen-space NDC.
+   *
+   * Returns `undefined` when this camera uses perspective projection.
+   *
+   * @param {Vector2} position
+   * @returns {Vector2 | undefined}
+   */
+  viewToScreen2D(position) {
+    const { projection } = this
+
+    if (!(projection instanceof OrthographicProjection)) return undefined
+
+    const ndcX = ((position.x - projection.left) / (projection.right - projection.left)) * 2 - 1
+    const ndcY = ((position.y - projection.bottom) / (projection.top - projection.bottom)) * 2 - 1
+
+    return new Vector2(ndcX, ndcY)
   }
 
   static default() {
