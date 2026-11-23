@@ -4,10 +4,10 @@ import { App, Plugin } from '@wimaengine/app'
 import { AppSchedule, CoreSystems, CorePlugin } from '@wimaengine/core'
 import { World } from '@wimaengine/ecs'
 import { Events } from '@wimaengine/event'
-import { MathPlugin, Vector2 } from '@wimaengine/math'
+import { MathPlugin, Vector2, Vector3 } from '@wimaengine/math'
 import { ReflectPlugin } from '@wimaengine/reflect'
 import { typeidGeneric, typeid } from '@wimaengine/type'
-import { PointerDown, PointerMove, PointerUp, WindowPlugin } from '@wimaengine/window'
+import { PointerDown, PointerMove, PointerUp, PointerWheel, WindowPlugin } from '@wimaengine/window'
 import { MouseButton } from './core'
 import { Mouse, MouseButtons } from './resources'
 import { registerMouseTypes } from './systems'
@@ -21,11 +21,9 @@ import { registerMouseTypes } from './systems'
  * movement, and {@linkcode MouseButtons} for held, just-pressed, and
  * just-released {@linkcode MouseButton} values.
  *
- * Only pointer events whose `pointerType` is `'mouse'` affect these resources.
- * The latest matching {@linkcode PointerMove} event supplies the pointer
- * position and movement delta; matching {@linkcode PointerDown} and
- * {@linkcode PointerUp} events update the button transitions. Other pointer
- * types are ignored.
+ * These resources respond only to mouse input. {@linkcode Mouse} exposes the
+ * pointer position, movement, and wheel scrolling, while {@linkcode MouseButtons}
+ * exposes button transitions. Input from other pointer types is ignored.
  *
  * {@linkcode WindowPlugin} provides the typed pointer events consumed by this
  * plugin. In browser applications, add {@linkcode DOMWindowPlugin} to bridge
@@ -113,6 +111,7 @@ export class MousePlugin extends Plugin {
 function updateMouse(world) {
   const mouse = world.getResource(Mouse)
   const moves = /** @type {Events<PointerMove>} */(world.getResourceByTypeId(typeidGeneric(Events, [PointerMove])))
+  const wheels = /** @type {Events<PointerWheel>} */(world.getResourceByTypeId(typeidGeneric(Events, [PointerWheel])))
 
   /** @type {PointerMove | undefined} */
   let move
@@ -124,12 +123,17 @@ function updateMouse(world) {
   })
 
   mouse.delta.copy(Vector2.Zero)
+  mouse.wheelDelta.copy(Vector3.Zero)
   mouse.lastPosition.copy(mouse.position)
 
-  if (!move) return
+  if (move) {
+    mouse.delta.copy(move.delta)
+    mouse.position.copy(move.position)
+  }
 
-  mouse.delta.copy(move.delta)
-  mouse.position.copy(move.position)
+  wheels.each((event) => {
+    if (event.data.pointerType === 'mouse') mouse.wheelDelta.add(event.data.delta)
+  })
 }
 
 /**

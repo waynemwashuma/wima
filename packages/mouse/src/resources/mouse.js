@@ -1,16 +1,15 @@
-import { Vector2 } from '@wimaengine/math'
+import { Vector2, Vector3 } from '@wimaengine/math'
 
 /* eslint-disable jsdoc/check-tag-names */
 /**
- * Provides the current mouse-pointer motion state as a world resource.
+ * Provides the current mouse-pointer motion and wheel state as a world resource.
  *
- * The resource is updated from the latest matching {@linkcode PointerMove} event
- * whose `pointerType` is `'mouse'`. The pointer position is local to the event
- * target, and the movement reflects the values reported by that event.
+ * The pointer position is local to the input target. Movement and wheel values
+ * describe the mouse input received during the current update.
  *
- * If no matching event is available, the pointer position stays unchanged and
- * the movement for that update is zero. This resource represents pointer
- * motion only; use {@linkcode MouseButtons} for mouse-button state.
+ * If there is no mouse input during an update, the pointer position stays
+ * unchanged and the movement and wheel values are zero. Use
+ * {@linkcode MouseButtons} for mouse-button state.
  *
  * @example
  * ```js
@@ -29,35 +28,42 @@ import { Vector2 } from '@wimaengine/math'
 export class Mouse {
 
   /**
-   * Pointer position from before the most recent mouse-state update.
+   * Pointer position from the previous update.
    *
-   * The resource stores the current {@linkcode Mouse#position} here before
-   * applying the latest matching {@linkcode PointerMove} event. When no matching
-   * event is available, this remains the same as the current position.
+   * This can be used with {@linkcode Mouse#position} to compare the pointer's
+   * position across updates.
    *
    * @type {Vector2}
    */
   lastPosition = new Vector2()
 
   /**
-   * Current pointer position in the pointer-event target's local coordinates.
+   * Current pointer position in the input target's local coordinates.
    *
-   * This follows the latest matching {@linkcode PointerMove} event's `offsetX` and
-   * `offsetY` values. It remains unchanged when no matching event is received.
+   * It remains unchanged when the pointer does not move.
    *
    * @type {Vector2}
    */
   position = new Vector2()
 
   /**
-   * Movement reported by the latest matching pointer-move event.
+   * Mouse movement during the current update.
    *
-   * This follows the event's `movementX` and `movementY` values. It is
-   * `Vector2.Zero` when no matching event is received.
+   * It is `Vector2.Zero` when the mouse does not move.
    *
    * @type {Vector2}
    */
   delta = new Vector2()
+
+  /**
+   * Mouse-wheel movement during the current update.
+   *
+   * The value is `Vector3.Zero` when the wheel does not move and includes
+   * horizontal, vertical, and depth-axis scroll movement.
+   *
+   * @type {Vector3}
+   */
+  wheelDelta = new Vector3()
 
   /**
    * Reports whether the current update contains non-zero pointer movement.
