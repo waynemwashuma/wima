@@ -1,7 +1,7 @@
 /** @import { Matrix4 } from '@wimaengine/math' */
 /** @import { ProjectionSerial } from '../core' */
 /** @import { RenderLists2D, RenderLists3D } from './renderlists' */
-import { Affine2, Vector2, Vector3 } from '@wimaengine/math'
+import { Affine2, Affine3, Vector2, Vector3 } from '@wimaengine/math'
 import { OrthographicProjection, Projection, PerspectiveProjection } from '../core'
 
 /* eslint-disable jsdoc/check-tag-names */
@@ -178,6 +178,23 @@ export class Camera {
     const view = Affine2.invert(cameraTransform, new Affine2()).transform(position.clone())
 
     return this.viewToScreen2D(view)
+  }
+
+  /**
+   * Projects a world-space 3D position into screen-space NDC.
+   *
+   * The returned vector stores screen-space X and Y in `x` and `y`, with
+   * normalized device-coordinate depth in `z`. The camera transform is inverted
+   * with {@linkcode Affine3} before applying the active projection.
+   *
+   * @param {Vector3} position
+   * @param {Affine3} cameraTransform
+   * @returns {Vector3}
+   */
+  worldToScreen3D(position, cameraTransform) {
+    const view = Affine3.invert(cameraTransform, new Affine3()).transform(position.clone())
+
+    return this.viewToScreen3D(view)
   }
 
   static default() {
