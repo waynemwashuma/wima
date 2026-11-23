@@ -197,6 +197,23 @@ export class Camera {
     return this.viewToScreen3D(view)
   }
 
+  /**
+   * Converts screen-space NDC into a world-space 2D position.
+   *
+   * Returns `undefined` when this camera uses perspective projection.
+   *
+   * @param {Vector2} point
+   * @param {Affine2} cameraTransform
+   * @returns {Vector2 | undefined}
+   */
+  screenToWorld2D(point, cameraTransform) {
+    const viewPosition = this.screenToView2D(point)
+
+    if (!viewPosition) return undefined
+
+    return cameraTransform.transform(viewPosition)
+  }
+
   static default() {
     return new Camera()
   }
