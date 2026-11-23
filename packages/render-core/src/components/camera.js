@@ -214,6 +214,28 @@ export class Camera {
     return cameraTransform.transform(viewPosition)
   }
 
+  /**
+   * Converts screen-space NDC into a world-space ray.
+   *
+   * Orthographic rays start on the near clipping plane. Perspective rays start
+   * at the camera position. The returned ray is transformed by the supplied
+   * camera affine.
+   *
+   * @param {Vector2} point
+   * @param {Affine3} cameraTransform
+   * @returns {{origin: Vector3, direction: Vector3} | undefined}
+   */
+  screenToWorld3D(point, cameraTransform) {
+    const ray = this.screenToView3D(point)
+
+    if (!ray) return undefined
+
+    cameraTransform.transform(ray.origin)
+    cameraTransform.transformWithoutTranslation(ray.direction).normalize()
+
+    return ray
+  }
+
   static default() {
     return new Camera()
   }
