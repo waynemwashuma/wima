@@ -414,11 +414,30 @@ export class Gizmo2D {
     length = 1,
     color = Color.RED.clone()
   ) {
-    this.line(
-      Vector2.Zero.clone(),
-      direction.multiplyScalar(length),
-      color
+    const directionLength = direction.magnitude()
+    if (directionLength === 0 || length === 0) return this
+
+    const normalizedDirection = Vector2.normalize(direction)
+    const tip = Vector2.multiplyScalar(normalizedDirection, length)
+    const headLength = Math.abs(length) * 0.25
+    const headWidth = headLength * 0.6
+    const headBase = Vector2.multiplyScalar(
+      normalizedDirection,
+      length - Math.sign(length) * headLength,
     )
+    const headOffset = new Vector2(
+      -normalizedDirection.y * headWidth,
+      normalizedDirection.x * headWidth,
+    )
+
+    this.polyline([
+      Vector2.Zero.clone(),
+      headBase,
+      Vector2.add(headBase, headOffset),
+      tip,
+      Vector2.subtract(headBase, headOffset),
+      headBase,
+    ], color)
 
     return this
   }
