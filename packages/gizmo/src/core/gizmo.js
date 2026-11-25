@@ -372,6 +372,32 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a filled convex polygon.
+   *
+   * @param {Vector2[]} vertices
+   * @param {Color} color
+   * @returns {this}
+   */
+  fillPolygon(vertices, color = Color.WHITE) {
+    if (vertices.length < 3) return this
+
+    const positions = [vertices[0], vertices[1], vertices[2]]
+    for (let i = 1; i < vertices.length - 2; i++) {
+      positions.push(vertices[i + 1], vertices[0], vertices[i + 1], vertices[i + 2])
+    }
+
+    for (let i = 0; i < positions.length; i++) {
+      this.buffer.fillPositions.push(this.transformation.transform(positions[i]))
+      this.buffer.fillColors.push(color)
+    }
+
+    this.buffer.fillPositions.push(new Vector2(NaN, NaN))
+    this.buffer.fillColors.push(new Color(NaN, NaN, NaN, NaN))
+
+    return this
+  }
+
+  /**
    * Draws a capsule centered on the origin and aligned to the local X axis.
    *
    * @param {number} radius
