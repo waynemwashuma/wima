@@ -352,6 +352,37 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a capsule centered on the origin and aligned to the local X axis.
+   *
+   * @param {number} radius
+   * @param {number} halfLength
+   * @param {Color} color
+   * @param {number} resolution
+   * @returns {this}
+   */
+  capsule(radius = 1, halfLength = 1, color = Color.WHITE, resolution = 16) {
+    const positions = [
+      new Vector2(-halfLength, -radius),
+      new Vector2(halfLength, -radius),
+    ]
+
+    for (let i = 1; i <= resolution; i++) {
+      const angle = -Math.PI / 2 + Math.PI * i / resolution
+      positions.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(halfLength, 0)))
+    }
+
+    positions.push(new Vector2(-halfLength, radius))
+    for (let i = 1; i <= resolution; i++) {
+      const angle = Math.PI / 2 + Math.PI * i / resolution
+      positions.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(-halfLength, 0)))
+    }
+
+    this.polyline(positions, color)
+
+    return this
+  }
+
+  /**
    * @param {Vector2} direction
    * @param {number} length
    * @param {Color} color
