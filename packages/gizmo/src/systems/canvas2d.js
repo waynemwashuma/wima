@@ -47,6 +47,9 @@ import {
  * {@linkcode GizmoBuffer#polylinePositions} and {@linkcode GizmoBuffer#polylineColors} are
  * consumed as adjacent pairs; the NaN sentinel written by
  * {@linkcode Gizmo2D#polyline} and {@linkcode Gizmo2D#polylineGradient} prevents a segment from connecting separate polylines.
+ * Entries in {@linkcode GizmoBuffer#fillPositions} are consumed as
+ * sentinel-delimited triangle strips. The first corresponding color in
+ * {@linkcode GizmoBuffer#fillColors} is used for the entire strip.
  * After a successful draw, the buffer is cleared and the canvas state is
  * restored. The returned {@linkcode SystemFunc} accepts a world and returns
  * `undefined`.
@@ -132,6 +135,34 @@ export function genenerateDrawGizmo2Dsystem(label) {
     context.lineJoin = mapJoin(lineJoin)
     context.setLineDash(mapStyle(lineStyle, lineWidth))
     context.lineDashOffset = lineDashOffset
+
+    // Render filled triangle strips.
+    let fillStart = 0
+    for (let i = 0; i <= gizmo.buffer.fillPositions.length; i += 1) {
+      const position = gizmo.buffer.fillPositions[i]
+      const isEnd = i === gizmo.buffer.fillPositions.length || isNaN(position.x)
+      if (!isEnd) continue
+
+      const color = gizmo.buffer.fillColors[fillStart]
+      if (color) {
+        context.fillStyle = `rgba(${color.r * 255},${color.g * 255},${color.b * 255},${color.a})`
+
+        for (let j = fillStart; j + 2 < i; j += 1) {
+          const first = gizmo.buffer.fillPositions[j]
+          const second = gizmo.buffer.fillPositions[j + 1]
+          const third = gizmo.buffer.fillPositions[j + 2]
+
+          context.beginPath()
+          context.moveTo(first.x, first.y)
+          context.lineTo(second.x, second.y)
+          context.lineTo(third.x, third.y)
+          context.closePath()
+          context.fill()
+        }
+      }
+
+      fillStart = i + 1
+    }
 
     // Render Lines
     for (let i = 0; i < gizmo.buffer.positions.length; i += 2) {

@@ -19,7 +19,8 @@ import { Gizmo2D, Gizmo3D, GizmoBuffer, GizmoLineCap, GizmoLineJoin, GizmoLineSt
  * `GizmoLineJoin`, and `GizmoLineStyle` (created with `setTypeId`) with
  * {@linkcode EnumInfo}. It registers `GizmoBuffer<Vector2>` with fields
  * `positions: Array<Vector2>`, `colors: Array<Color>`,
- * `polylinePositions: Array<Vector2>`, and `polylineColors: Array<Color>`. It
+ * `polylinePositions: Array<Vector2>`, `polylineColors: Array<Color>`,
+ * `fillPositions: Array<Vector2>`, and `fillColors: Array<Color>`. It
  * registers {@linkcode GizmoSettings} with numeric `lineWidth` and
  * `lineDashOffset` fields plus enum-typed `lineCap`, `lineJoin`, and
  * `lineStyle` fields. Finally, it registers the generic ID produced by
@@ -67,7 +68,9 @@ export function registerGizmo2DTypes(label) {
       positions: new Field(vector2ArrayId),
       colors: new Field(colorArrayId),
       polylinePositions: new Field(vector2ArrayId),
-      polylineColors: new Field(colorArrayId)
+      polylineColors: new Field(colorArrayId),
+      fillPositions: new Field(vector2ArrayId),
+      fillColors: new Field(colorArrayId)
     }))
     registry.register(GizmoSettings, new StructInfo({
       lineWidth: new Field(typeid(Number)),
@@ -97,7 +100,8 @@ export function registerGizmo2DTypes(label) {
  * `GizmoLineJoin`, and `GizmoLineStyle` (created with `setTypeId`) with
  * {@linkcode EnumInfo}. It registers `GizmoBuffer<Vector3>` with fields
  * `positions: Array<Vector3>`, `colors: Array<Color>`,
- * `polylinePositions: Array<Vector3>`, and `polylineColors: Array<Color>`. It
+ * `polylinePositions: Array<Vector3>`, `polylineColors: Array<Color>`,
+ * `fillPositions: Array<Vector3>`, and `fillColors: Array<Color>`. It
  * registers {@linkcode GizmoSettings} with numeric `lineWidth` and
  * `lineDashOffset` fields plus enum-typed `lineCap`, `lineJoin`, and
  * `lineStyle` fields. Finally, it registers the generic ID produced by
@@ -145,7 +149,9 @@ export function registerGizmo3DTypes(label) {
       positions: new Field(vector3ArrayId),
       colors: new Field(colorArrayId),
       polylinePositions: new Field(vector3ArrayId),
-      polylineColors: new Field(colorArrayId)
+      polylineColors: new Field(colorArrayId),
+      fillPositions: new Field(vector3ArrayId),
+      fillColors: new Field(colorArrayId)
     }))
     registry.register(GizmoSettings, new StructInfo({
       lineWidth: new Field(typeid(Number)),

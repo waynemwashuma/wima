@@ -15,12 +15,15 @@ import { GizmoSettings } from './settings'
  * these arrays in pairs. Strip positions and colors are stored in
  * {@linkcode GizmoBuffer#polylinePositions} and {@linkcode GizmoBuffer#polylineColors}; a
  * polyline is ended by the NaN sentinel that the gizmo helpers append.
+ * Filled triangle-fan positions and colors are stored in
+ * {@linkcode GizmoBuffer#fillPositions} and {@linkcode GizmoBuffer#fillColors}; a
+ * fan is ended by the same NaN sentinel convention.
  *
  * A gizmo resource owns its buffer, so application code normally adds drawing
  * through methods such as {@linkcode Gizmo2D#line} or
  * {@linkcode Gizmo2D#polyline} rather than pushing directly. Call
  * {@linkcode GizmoBuffer#clear} to discard the current drawing data. It sets the
- * length of all four arrays to `0`, preserving the array instances and
+ * length of all six arrays to `0`, preserving the array instances and
  * returning `undefined`.
  *
  * @template T
@@ -30,7 +33,7 @@ import { GizmoSettings } from './settings'
  * const buffer = gizmo.buffer
  * buffer.positions.push(start, end)
  * buffer.colors.push(Color.WHITE, Color.WHITE)
- * buffer.clear() // empties all four arrays
+ * buffer.clear() // empties all six arrays
  * ```
  */
 export class GizmoBuffer {
@@ -56,11 +59,26 @@ export class GizmoBuffer {
   polylineColors = []
 
   /**
+   * Vertex positions for filled triangle fans.
+   *
+   * @type {T[]}
+   */
+  fillPositions = []
+
+  /**
+   * Colors corresponding to {@linkcode GizmoBuffer#fillPositions}.
+   *
+   * @type {Color[]}
+   */
+  fillColors = []
+
+  /**
    * Removes all submitted drawing data from the buffer.
    *
    * This sets the length of {@linkcode GizmoBuffer#positions},
- * {@linkcode GizmoBuffer#colors}, {@linkcode GizmoBuffer#polylinePositions}, and
- * {@linkcode GizmoBuffer#polylineColors} to `0`. The four array
+   * {@linkcode GizmoBuffer#colors}, {@linkcode GizmoBuffer#polylinePositions},
+   * {@linkcode GizmoBuffer#polylineColors}, {@linkcode GizmoBuffer#fillPositions}, and
+   * {@linkcode GizmoBuffer#fillColors} to `0`. The six array
    * instances keep their identity and remain usable after the call.
    *
    * @returns {void}
@@ -70,6 +88,8 @@ export class GizmoBuffer {
     this.colors.length = 0
     this.polylinePositions.length = 0
     this.polylineColors.length = 0
+    this.fillPositions.length = 0
+    this.fillColors.length = 0
   }
 }
 
