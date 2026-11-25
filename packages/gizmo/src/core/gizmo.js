@@ -450,6 +450,23 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a filled triangle.
+   *
+   * @param {number} base
+   * @param {number} height
+   * @param {number} [baseRatio=0]
+   * @param {Color} color
+   * @returns {this}
+   */
+  fillTriangle(base = 1, height = 1, baseRatio = 0, color = Color.WHITE) {
+    return this.fillPolygon([
+      new Vector2(-base / 2, -height / 2),
+      new Vector2(base / 2, -height / 2),
+      new Vector2(base / 2 * baseRatio, height / 2),
+    ], color)
+  }
+
+  /**
    * @param {Vector2} direction
    * @param {number} length
    * @param {Color} color
