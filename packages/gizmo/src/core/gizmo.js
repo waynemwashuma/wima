@@ -383,6 +383,27 @@ export class Gizmo2D {
   }
 
   /**
+   * @param {number} base
+   * @param {number} height
+   * @param {number} [baseRatio=0]
+   * @param {Color} color
+   * @returns {this}
+   */
+  triangle(base = 1, height = 1, baseRatio = 0, color = Color.WHITE) {
+    this.polyline(
+      [
+        new Vector2(-base / 2, -height / 2),
+        new Vector2(base / 2, -height / 2),
+        new Vector2(base / 2 * baseRatio, height / 2),
+        new Vector2(-base / 2, -height / 2),
+      ],
+      color,
+    )
+
+    return this
+  }
+
+  /**
    * @param {Vector2} direction
    * @param {number} length
    * @param {Color} color
