@@ -452,6 +452,35 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a filled capsule centered on the origin and aligned to the local X axis.
+   *
+   * @param {number} radius
+   * @param {number} halfLength
+   * @param {Color} color
+   * @param {number} resolution
+   * @returns {this}
+   */
+  fillCapsule(radius = 1, halfLength = 1, color = Color.WHITE, resolution = 16) {
+    const boundary = [
+      new Vector2(-halfLength, -radius),
+      new Vector2(halfLength, -radius),
+    ]
+
+    for (let i = 1; i <= resolution; i++) {
+      const angle = -Math.PI / 2 + Math.PI * i / resolution
+      boundary.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(halfLength, 0)))
+    }
+
+    boundary.push(new Vector2(-halfLength, radius))
+    for (let i = 1; i < resolution; i++) {
+      const angle = Math.PI / 2 + Math.PI * i / resolution
+      boundary.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(-halfLength, 0)))
+    }
+
+    return this.fillPolygon([Vector2.Zero.clone(), ...boundary, boundary[0]], color)
+  }
+
+  /**
    * @param {number} base
    * @param {number} height
    * @param {number} [baseRatio=0]
