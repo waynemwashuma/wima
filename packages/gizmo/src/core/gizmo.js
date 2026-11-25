@@ -628,6 +628,20 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a filled circle.
+   *
+   * @param {number} radius
+   * @param {Color} color
+   * @param {number} resolution
+   * @returns {this}
+   */
+  fillCircle(radius, color, resolution = 32) {
+    this.fillEllipse(radius, radius, color, resolution)
+
+    return this
+  }
+
+  /**
    * @param {number} halfWidth
    * @param {number} halfHeight
    * @param {Color} color
