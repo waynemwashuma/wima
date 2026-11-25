@@ -677,6 +677,27 @@ export class Gizmo2D {
 
     return this
   }
+
+  /**
+   * Draws a filled ellipse.
+   *
+   * @param {number} radiusX
+   * @param {number} radiusY
+   * @param {Color} color
+   * @param {number} resolution
+   * @returns {this}
+   */
+  fillEllipse(radiusX, radiusY, color, resolution = 32) {
+    const spacing = TAU / resolution
+    const radii = new Vector2(radiusX, radiusY)
+    const boundary = []
+
+    for (let i = 0; i < resolution; i++) {
+      boundary.push(Vector2.fromAngle(spacing * i).multiply(radii))
+    }
+
+    return this.fillPolygon([Vector2.Zero.clone(), ...boundary, boundary[0]], color)
+  }
 }
 
 /**
