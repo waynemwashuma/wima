@@ -394,7 +394,7 @@ export class Gizmo2D {
    * @param {Color} color
    * @returns {this}
    */
-  aabb(halfWidth, halfHeight, color) {
+  rect(halfWidth, halfHeight, color) {
     this.polyline(
       [
         new Vector2(-halfWidth, -halfHeight),
