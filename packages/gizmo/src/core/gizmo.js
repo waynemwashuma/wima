@@ -597,6 +597,23 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a filled rectangle centered on the origin.
+   *
+   * @param {number} halfWidth
+   * @param {number} halfHeight
+   * @param {Color} color
+   * @returns {this}
+   */
+  fillRect(halfWidth, halfHeight, color) {
+    return this.fillPolygon([
+      new Vector2(-halfWidth, -halfHeight),
+      new Vector2(-halfWidth, halfHeight),
+      new Vector2(halfWidth, halfHeight),
+      new Vector2(halfWidth, -halfHeight),
+    ], color)
+  }
+
+  /**
    * @param {number} radiusX
    * @param {number} radiusY
    * @param {Color} color
