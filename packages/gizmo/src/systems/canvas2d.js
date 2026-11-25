@@ -44,9 +44,9 @@ import {
  * line width, cap, join, dash pattern, and dash offset. Entries in
  * {@linkcode GizmoBuffer#positions} and {@linkcode GizmoBuffer#colors} are consumed in
  * pairs as independent gradient lines. Entries in
- * {@linkcode GizmoBuffer#stripPositions} and {@linkcode GizmoBuffer#stripColors} are
+ * {@linkcode GizmoBuffer#polylinePositions} and {@linkcode GizmoBuffer#polylineColors} are
  * consumed as adjacent pairs; the NaN sentinel written by
- * {@linkcode Gizmo2D#lineStrip} and {@linkcode Gizmo2D#lineStripGradient} prevents a segment from connecting separate strips.
+ * {@linkcode Gizmo2D#polyline} and {@linkcode Gizmo2D#polylineGradient} prevents a segment from connecting separate polylines.
  * After a successful draw, the buffer is cleared and the canvas state is
  * restored. The returned {@linkcode SystemFunc} accepts a world and returns
  * `undefined`.
@@ -153,13 +153,13 @@ export function genenerateDrawGizmo2Dsystem(label) {
       context.closePath()
     }
 
-    // Render strips.
-    for (let i = 1; i < gizmo.buffer.stripPositions.length; i += 1) {
+    // Render polylines.
+    for (let i = 1; i < gizmo.buffer.polylinePositions.length; i += 1) {
       context.beginPath()
-      const startPos = gizmo.buffer.stripPositions[i - 1]
-      const endPos = gizmo.buffer.stripPositions[i]
-      const startColor = gizmo.buffer.stripColors[i - 1]
-      const endColor = gizmo.buffer.stripColors[i]
+      const startPos = gizmo.buffer.polylinePositions[i - 1]
+      const endPos = gizmo.buffer.polylinePositions[i]
+      const startColor = gizmo.buffer.polylineColors[i - 1]
+      const endColor = gizmo.buffer.polylineColors[i]
 
       if (isNaN(endPos.x) || isNaN(startPos.x)) continue
 

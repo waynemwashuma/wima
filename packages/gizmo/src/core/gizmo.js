@@ -13,12 +13,12 @@ import { GizmoSettings } from './settings'
  * Positions are stored in {@linkcode GizmoBuffer#positions}, and matching colors
  * are stored in {@linkcode GizmoBuffer#colors}. The renderer reads
  * these arrays in pairs. Strip positions and colors are stored in
- * {@linkcode GizmoBuffer#stripPositions} and {@linkcode GizmoBuffer#stripColors}; a
- * strip is ended by the NaN sentinel that the gizmo helpers append.
+ * {@linkcode GizmoBuffer#polylinePositions} and {@linkcode GizmoBuffer#polylineColors}; a
+ * polyline is ended by the NaN sentinel that the gizmo helpers append.
  *
  * A gizmo resource owns its buffer, so application code normally adds drawing
  * through methods such as {@linkcode Gizmo2D#line} or
- * {@linkcode Gizmo2D#lineStrip} rather than pushing directly. Call
+ * {@linkcode Gizmo2D#polyline} rather than pushing directly. Call
  * {@linkcode GizmoBuffer#clear} to discard the current drawing data. It sets the
  * length of all four arrays to `0`, preserving the array instances and
  * returning `undefined`.
@@ -48,19 +48,19 @@ export class GizmoBuffer {
   /**
    * @type {T[]}
    */
-  stripPositions = []
+  polylinePositions = []
 
   /**
    * @type {Color[]}
    */
-  stripColors = []
+  polylineColors = []
 
   /**
    * Removes all submitted drawing data from the buffer.
    *
    * This sets the length of {@linkcode GizmoBuffer#positions},
-   * {@linkcode GizmoBuffer#colors}, {@linkcode GizmoBuffer#stripPositions}, and
-   * {@linkcode GizmoBuffer#stripColors} to `0`. The four array
+ * {@linkcode GizmoBuffer#colors}, {@linkcode GizmoBuffer#polylinePositions}, and
+ * {@linkcode GizmoBuffer#polylineColors} to `0`. The four array
    * instances keep their identity and remain usable after the call.
    *
    * @returns {void}
@@ -68,8 +68,8 @@ export class GizmoBuffer {
   clear() {
     this.positions.length = 0
     this.colors.length = 0
-    this.stripPositions.length = 0
-    this.stripColors.length = 0
+    this.polylinePositions.length = 0
+    this.polylineColors.length = 0
   }
 }
 
@@ -84,7 +84,7 @@ export class GizmoBuffer {
  * that needs to inspect the label.
  *
  * The resource keeps its current drawing transform, collects transformed line
- * and strip vertices in {@linkcode Gizmo2D#buffer}, and uses
+ * and polyline vertices in {@linkcode Gizmo2D#buffer}, and uses
  * {@linkcode Gizmo2D#settings} for line width, cap, join, and dash behavior. Use
  * {@linkcode Gizmo2D#reset}, {@linkcode Gizmo2D#setTransform}, and the transform
  * helpers to position subsequent shapes; use primitive helpers such as
@@ -241,34 +241,34 @@ export class Gizmo2D {
   }
 
   /**
-   * @param {Vector2[]} strips
+   * @param {Vector2[]} points
    * @param {Color} color
    * @returns {this}
    */
-  lineStrip(strips, color) {
-    for (let i = 0; i < strips.length; i++) {
-      this.buffer.stripPositions.push(this.transformation.transform(strips[i]))
-      this.buffer.stripColors.push(color)
+  polyline(points, color) {
+    for (let i = 0; i < points.length; i++) {
+      this.buffer.polylinePositions.push(this.transformation.transform(points[i]))
+      this.buffer.polylineColors.push(color)
     }
 
-    this.buffer.stripPositions.push(new Vector2(NaN, NaN))
-    this.buffer.stripColors.push(new Color(NaN, NaN, NaN, NaN))
+    this.buffer.polylinePositions.push(new Vector2(NaN, NaN))
+    this.buffer.polylineColors.push(new Color(NaN, NaN, NaN, NaN))
 
     return this
   }
 
   /**
-   * @param {[Vector2,Color][]} strips
+   * @param {[Vector2,Color][]} points
    * @returns {this}
    */
-  lineStripGradient(strips) {
-    for (let i = 0; i < strips.length; i++) {
-      this.buffer.stripPositions.push(this.transformation.transform(strips[i][0]))
-      this.buffer.stripColors.push(strips[i][1])
+  polylineGradient(points) {
+    for (let i = 0; i < points.length; i++) {
+      this.buffer.polylinePositions.push(this.transformation.transform(points[i][0]))
+      this.buffer.polylineColors.push(points[i][1])
     }
 
-    this.buffer.stripPositions.push(new Vector2(NaN, NaN))
-    this.buffer.stripColors.push(new Color(NaN, NaN, NaN, NaN))
+    this.buffer.polylinePositions.push(new Vector2(NaN, NaN))
+    this.buffer.polylineColors.push(new Color(NaN, NaN, NaN, NaN))
 
     return this
   }
@@ -293,7 +293,7 @@ export class Gizmo2D {
       positions.push(position)
     }
 
-    this.lineStrip(positions, color)
+    this.polyline(positions, color)
 
     return this
   }
@@ -395,7 +395,7 @@ export class Gizmo2D {
    * @returns {this}
    */
   aabb(halfWidth, halfHeight, color) {
-    this.lineStrip(
+    this.polyline(
       [
         new Vector2(-halfWidth, -halfHeight),
         new Vector2(-halfWidth, halfHeight),
