@@ -208,6 +208,18 @@ export class Gizmo2D {
   }
 
   /**
+   * @param {Vector2} translation
+   * @param {Rotary} orientation
+   * @param {Vector2} scale
+   * @returns {this}
+   */
+  compose(translation, orientation, scale) {
+    Affine2.compose(translation, orientation, scale, this.transformation)
+
+    return this
+  }
+
+  /**
    * @param {Vector2} start
    * @param {Vector2} end
    * @param {Color} color
