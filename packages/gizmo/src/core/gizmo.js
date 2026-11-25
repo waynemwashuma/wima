@@ -357,6 +357,29 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a filled sector from the origin.
+   *
+   * @param {number} arcStart
+   * @param {number} arcEnd
+   * @param {number} radiusX
+   * @param {number} radiusY
+   * @param {Color} color
+   * @param {number} resolution
+   * @returns {this}
+   */
+  fillSector(arcStart, arcEnd, radiusX = 1, radiusY = 1, color = Color.WHITE.clone(), resolution = 32) {
+    const spacing = (arcEnd - arcStart) / resolution
+    const radii = new Vector2(radiusX, radiusY)
+    const boundary = []
+
+    for (let i = 0; i <= resolution; i++) {
+      boundary.push(Vector2.fromAngle(arcStart + spacing * i).multiply(radii))
+    }
+
+    return this.fillPolygon([Vector2.Zero.clone(), ...boundary], color)
+  }
+
+  /**
    * Draws a closed polygon outline.
    *
    * @param {Vector2[]} vertices
