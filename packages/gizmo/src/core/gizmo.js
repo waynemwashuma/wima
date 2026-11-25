@@ -311,6 +311,32 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a sector outline from the origin.
+   *
+   * @param {number} arcStart
+   * @param {number} arcEnd
+   * @param {number} radiusX
+   * @param {number} radiusY
+   * @param {Color} color
+   * @param {number} resolution
+   * @returns {this}
+   */
+  sector(arcStart, arcEnd, radiusX = 1, radiusY = 1, color = Color.WHITE.clone(), resolution = 32) {
+    const spacing = (arcEnd - arcStart) / resolution
+    const radii = new Vector2(radiusX, radiusY)
+    const positions = [Vector2.Zero.clone()]
+
+    for (let i = 0; i <= resolution; i++) {
+      positions.push(Vector2.fromAngle(arcStart + spacing * i).multiply(radii))
+    }
+
+    positions.push(Vector2.Zero.clone())
+    this.polyline(positions, color)
+
+    return this
+  }
+
+  /**
    * @param {Vector2} direction
    * @param {number} length
    * @param {Color} color
