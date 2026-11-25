@@ -337,6 +337,21 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws a closed polygon outline.
+   *
+   * @param {Vector2[]} vertices
+   * @param {Color} color
+   * @returns {this}
+   */
+  polygon(vertices, color = Color.WHITE) {
+    if (!vertices[0]) return this
+
+    this.polyline([...vertices, vertices[0]], color)
+
+    return this
+  }
+
+  /**
    * @param {Vector2} direction
    * @param {number} length
    * @param {Color} color
