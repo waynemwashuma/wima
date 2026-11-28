@@ -1,7 +1,7 @@
 /** @import { Constructor } from '@wimaengine/type' */
 import { Color } from '@wimaengine/color'
 import { Affine2, Affine3, Vector2, Vector3, BVector2, TAU, Rotary } from '@wimaengine/math'
-import { GizmoSettings } from './settings'
+import { GizmoSettings, GizmoTextAlign } from './settings'
 
 /**
  * Collects positions and colors for immediate-mode drawing.
@@ -15,15 +15,23 @@ import { GizmoSettings } from './settings'
  * these arrays in pairs. Strip positions and colors are stored in
  * {@linkcode GizmoBuffer#polylinePositions} and {@linkcode GizmoBuffer#polylineColors}; a
  * polyline is ended by the NaN sentinel that the gizmo helpers append.
- * Filled triangle-fan positions and colors are stored in
+ * Filled triangle-strip positions and colors are stored in
  * {@linkcode GizmoBuffer#fillPositions} and {@linkcode GizmoBuffer#fillColors}; a
- * fan is ended by the same NaN sentinel convention.
+ * strip is ended by the same NaN sentinel convention.
+ * Text, text transforms, and text colors are stored in
+ * {@linkcode GizmoBuffer#texts}, {@linkcode GizmoBuffer#textAffines}, and
+ * {@linkcode GizmoBuffer#textColors}, and {@linkcode GizmoBuffer#textAlignments};
+ * text sizes are stored in {@linkcode GizmoBuffer#textSizes};
+ * filled text uses the corresponding {@linkcode GizmoBuffer#fillTexts},
+ * {@linkcode GizmoBuffer#fillTextAffines}, {@linkcode GizmoBuffer#fillTextColors},
+ * {@linkcode GizmoBuffer#fillTextAlignments}, and {@linkcode GizmoBuffer#fillTextSizes}
+ * arrays.
  *
  * A gizmo resource owns its buffer, so application code normally adds drawing
  * through methods such as {@linkcode Gizmo2D#line} or
  * {@linkcode Gizmo2D#polyline} rather than pushing directly. Call
  * {@linkcode GizmoBuffer#clear} to discard the current drawing data. It sets the
- * length of all six arrays to `0`, preserving the array instances and
+ * length of all twelve arrays to `0`, preserving the array instances and
  * returning `undefined`.
  *
  * @template T
@@ -59,7 +67,7 @@ export class GizmoBuffer {
   polylineColors = []
 
   /**
-   * Vertex positions for filled triangle fans.
+   * Vertex positions for filled triangle strips.
    *
    * @type {T[]}
    */
@@ -73,12 +81,87 @@ export class GizmoBuffer {
   fillColors = []
 
   /**
+   * Text strings rendered with the canvas stroke-text operation.
+   *
+   * @type {string[]}
+   */
+  texts = []
+
+  /**
+   * Affine transforms corresponding to {@linkcode GizmoBuffer#texts}.
+   *
+   * @type {Affine2[]}
+   */
+  textAffines = []
+
+  /**
+   * Colors corresponding to {@linkcode GizmoBuffer#texts}.
+   *
+   * @type {Color[]}
+   */
+  textColors = []
+
+  /**
+   * Horizontal alignments corresponding to {@linkcode GizmoBuffer#texts}.
+   *
+   * @type {GizmoTextAlign[]}
+   */
+  textAlignments = []
+
+  /**
+   * Font sizes corresponding to {@linkcode GizmoBuffer#texts}.
+   *
+   * @type {number[]}
+   */
+  textSizes = []
+
+  /**
+   * Text strings rendered with the canvas fill-text operation.
+   *
+   * @type {string[]}
+   */
+  fillTexts = []
+
+  /**
+   * Affine transforms corresponding to {@linkcode GizmoBuffer#fillTexts}.
+   *
+   * @type {Affine2[]}
+   */
+  fillTextAffines = []
+
+  /**
+   * Colors corresponding to {@linkcode GizmoBuffer#fillTexts}.
+   *
+   * @type {Color[]}
+   */
+  fillTextColors = []
+
+  /**
+   * Horizontal alignments corresponding to {@linkcode GizmoBuffer#fillTexts}.
+   *
+   * @type {GizmoTextAlign[]}
+   */
+  fillTextAlignments = []
+
+  /**
+   * Font sizes corresponding to {@linkcode GizmoBuffer#fillTexts}.
+   *
+   * @type {number[]}
+   */
+  fillTextSizes = []
+
+  /**
    * Removes all submitted drawing data from the buffer.
    *
    * This sets the length of {@linkcode GizmoBuffer#positions},
    * {@linkcode GizmoBuffer#colors}, {@linkcode GizmoBuffer#polylinePositions},
-   * {@linkcode GizmoBuffer#polylineColors}, {@linkcode GizmoBuffer#fillPositions}, and
-   * {@linkcode GizmoBuffer#fillColors} to `0`. The six array
+   * {@linkcode GizmoBuffer#polylineColors}, {@linkcode GizmoBuffer#fillPositions},
+   * {@linkcode GizmoBuffer#fillColors}, {@linkcode GizmoBuffer#texts},
+   * {@linkcode GizmoBuffer#textAffines}, {@linkcode GizmoBuffer#textColors},
+   * {@linkcode GizmoBuffer#textAlignments}, {@linkcode GizmoBuffer#fillTexts},
+   * {@linkcode GizmoBuffer#fillTextAffines}, {@linkcode GizmoBuffer#fillTextColors}, and
+   * {@linkcode GizmoBuffer#fillTextAlignments}, {@linkcode GizmoBuffer#textSizes}, and
+   * {@linkcode GizmoBuffer#fillTextSizes} to `0`. The sixteen array
    * instances keep their identity and remain usable after the call.
    *
    * @returns {void}
@@ -90,6 +173,16 @@ export class GizmoBuffer {
     this.polylineColors.length = 0
     this.fillPositions.length = 0
     this.fillColors.length = 0
+    this.texts.length = 0
+    this.textAffines.length = 0
+    this.textColors.length = 0
+    this.textAlignments.length = 0
+    this.textSizes.length = 0
+    this.fillTexts.length = 0
+    this.fillTextAffines.length = 0
+    this.fillTextColors.length = 0
+    this.fillTextAlignments.length = 0
+    this.fillTextSizes.length = 0
   }
 }
 
