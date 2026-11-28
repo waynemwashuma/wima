@@ -421,7 +421,7 @@ export class Gizmo2D {
   }
 
   /**
-   * Draws a capsule centered on the origin and aligned to the local X axis.
+   * Draws a capsule centered on the origin and aligned to the local Y axis.
    *
    * @param {number} radius
    * @param {number} halfLength
@@ -431,19 +431,19 @@ export class Gizmo2D {
    */
   capsule(radius = 1, halfLength = 1, color = Color.WHITE, resolution = 16) {
     const positions = [
-      new Vector2(-halfLength, -radius),
-      new Vector2(halfLength, -radius),
+      new Vector2(radius, -halfLength),
+      new Vector2(radius, halfLength),
     ]
 
     for (let i = 1; i <= resolution; i++) {
-      const angle = -Math.PI / 2 + Math.PI * i / resolution
-      positions.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(halfLength, 0)))
+      const angle = Math.PI * i / resolution
+      positions.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(0, halfLength)))
     }
 
-    positions.push(new Vector2(-halfLength, radius))
+    positions.push(new Vector2(-radius, -halfLength))
     for (let i = 1; i <= resolution; i++) {
-      const angle = Math.PI / 2 + Math.PI * i / resolution
-      positions.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(-halfLength, 0)))
+      const angle = Math.PI + Math.PI * i / resolution
+      positions.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(0, -halfLength)))
     }
 
     this.polyline(positions, color)
@@ -452,7 +452,7 @@ export class Gizmo2D {
   }
 
   /**
-   * Draws a filled capsule centered on the origin and aligned to the local X axis.
+   * Draws a filled capsule centered on the origin and aligned to the local Y axis.
    *
    * @param {number} radius
    * @param {number} halfLength
@@ -462,19 +462,19 @@ export class Gizmo2D {
    */
   fillCapsule(radius = 1, halfLength = 1, color = Color.WHITE, resolution = 16) {
     const boundary = [
-      new Vector2(-halfLength, -radius),
-      new Vector2(halfLength, -radius),
+      new Vector2(radius, -halfLength),
+      new Vector2(radius, halfLength),
     ]
 
     for (let i = 1; i <= resolution; i++) {
-      const angle = -Math.PI / 2 + Math.PI * i / resolution
-      boundary.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(halfLength, 0)))
+      const angle = Math.PI * i / resolution
+      boundary.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(0, halfLength)))
     }
 
-    boundary.push(new Vector2(-halfLength, radius))
+    boundary.push(new Vector2(-radius, -halfLength))
     for (let i = 1; i < resolution; i++) {
-      const angle = Math.PI / 2 + Math.PI * i / resolution
-      boundary.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(-halfLength, 0)))
+      const angle = Math.PI + Math.PI * i / resolution
+      boundary.push(Vector2.fromAngle(angle).multiplyScalar(radius).add(new Vector2(0, -halfLength)))
     }
 
     return this.fillPolygon([Vector2.Zero.clone(), ...boundary, boundary[0]], color)
