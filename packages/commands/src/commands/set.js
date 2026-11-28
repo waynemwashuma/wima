@@ -1,7 +1,55 @@
-/** @import { TypeId } from '@wimaengine/type' */
-/** @import { World } from '@wimaengine/ecs' */
+/** @import { Constructor, TypeId } from '@wimaengine/type' */
+/** @import { EntityHandle, World } from '@wimaengine/ecs' */
 import { Command } from '@wimaengine/command'
 import { warnOnce } from '@wimaengine/logger'
+
+/**
+ * Sets one component value, or one value inside an existing component.
+ *
+ * An empty path replaces the component. Non-empty paths update the existing
+ * component in place before re-inserting it so the world's component hooks
+ * still observe the change.
+ */
+export class SetComponentCommand extends Command {
+  /** @type {EntityHandle} */
+  entity
+
+  /** @type {Constructor} */
+  componentType
+
+  /** @type {NonNullable<unknown>} */
+  value
+
+  /** @type {(number|string)[]} */
+  path
+
+  /**
+   * @param {EntityHandle} entity
+   * @param {Constructor} componentType
+   * @param {NonNullable<unknown>} value
+   * @param {(number|string)[]} [path=[]]
+   */
+  constructor(entity, componentType, value, path = []) {
+    super()
+    this.entity = entity
+    this.componentType = componentType
+    this.value = value
+    this.path = path
+  }
+
+  /** @param {World} world */
+  execute(world) {
+    if (this.path.length === 0) {
+      world.insert(this.entity, [this.value])
+      return
+    }
+
+    const component = world.get(this.entity, this.componentType)
+    if (component === null || component === undefined) return
+
+    setValueAtPath(component, this.path, this.value)
+  }
+}
 
 /**
  * Sets one resource value, or one value inside an existing resource.
