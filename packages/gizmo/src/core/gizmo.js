@@ -385,6 +385,25 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws filled text at the current transform's origin.
+   *
+   * @param {string} value
+   * @param {Color} color
+   * @param {GizmoTextAlign} align
+   * @param {number} size
+   * @returns {this}
+   */
+  fillText(value, color = Color.WHITE, align = GizmoTextAlign.Left, size = 16) {
+    this.buffer.fillTexts.push(value)
+    this.buffer.fillTextAffines.push(Affine2.copy(this.transformation, new Affine2()))
+    this.buffer.fillTextColors.push(color)
+    this.buffer.fillTextAlignments.push(align)
+    this.buffer.fillTextSizes.push(size)
+
+    return this
+  }
+
+  /**
    * @param {Vector2[]} points
    * @param {Color} color
    * @returns {this}
