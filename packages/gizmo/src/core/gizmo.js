@@ -333,6 +333,25 @@ export class Gizmo2D {
   }
 
   /**
+   * Draws stroked text at the current transform's origin.
+   *
+   * @param {string} value
+   * @param {Color} color
+   * @param {GizmoTextAlign} align
+   * @param {number} size
+   * @returns {this}
+   */
+  text(value, color = Color.WHITE, align = GizmoTextAlign.Left, size = 16) {
+    this.buffer.texts.push(value)
+    this.buffer.textAffines.push(Affine2.copy(this.transformation, new Affine2()))
+    this.buffer.textColors.push(color)
+    this.buffer.textAlignments.push(align)
+    this.buffer.textSizes.push(size)
+
+    return this
+  }
+
+  /**
    * @param {Vector2} start
    * @param {Vector2} end
    * @param {Color} color
